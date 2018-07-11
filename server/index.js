@@ -1,9 +1,10 @@
+import cors from "cors";
+import dotenv from "dotenv";
 import express from "express";
 import session from "express-session";
-import cors from "cors";
-import errorhandler from "errorhandler";
-import db from "./models";
+import db from "./models/index";
 
+dotenv.config();
 const isProduction = process.env.NODE_ENV === "production";
 const port = process.env.PORT || 3000;
 
@@ -18,8 +19,6 @@ app.use(require("morgan")("dev"));
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 
-app.use(require("method-override")());
-
 app.use(
   session({
     secret: "authorshaven",
@@ -28,10 +27,6 @@ app.use(
     saveUninitialized: false
   })
 );
-
-if (!isProduction) {
-  app.use(errorhandler());
-}
 
 if (isProduction) {
   //
@@ -44,28 +39,39 @@ app.get("/", (req, res, next) => {
             <a href='https://github.com/andela/inception-ah-backend'>Our Github page</a></P>
             <h4>Thanks  &#x1F600;</h4>`);
 });
-/// catch 404 and forward to error handler
+
+// catch 404 and forward to error handler
 app.use((error, req, res, next) => {
   if (error) {
     const err = new Error("Not Found");
     err.status = 404;
-    return next(err);
+    next(err);
   }
   next();
 });
 
-// development error handler, will print stacktrace
-
+// error handler
 app.use((err, req, res, next) => {
+  // development error handler
+  // will print stacktrace
   if (!isProduction) {
     console.log(err.stack);
   }
+
   res.status(err.status || 500);
+
   res.json({
     errors: {
       message: err.message,
       error: err
     }
+  });
+});
+
+app.all("/api", (req, res) => {
+  res.status("200").json({
+    status: "Success",
+    message: "Connection ok"
   });
 });
 
@@ -79,6 +85,7 @@ db.sequelize
     console.error("Unable to connect to the database:", err);
   });
 
-app.listen(port, () => console.log(`Listening on port ${port}...`));
-
+const server = app.listen(port, () => {
+  console.log(`Listening on port ${server.address().port}`);
+});
 export default app;
