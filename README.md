@@ -1,3 +1,5 @@
+[![Coverage Status](https://coveralls.io/repos/github/andela/inception-ah-backend/badge.svg?branch=master)](https://coveralls.io/github/andela/inception-ah-backend?branch=master)
+
 Authors Haven - A Social platform for the creative at heart.
 =======
 
