@@ -1,4 +1,5 @@
 [![Coverage Status](https://coveralls.io/repos/github/andela/inception-ah-backend/badge.svg?branch=master)](https://coveralls.io/github/andela/inception-ah-backend?branch=master)
+[![Build Status](https://travis-ci.org/andela/inception-ah-backend.svg?branch=master)](https://travis-ci.org/andela/inception-ah-backend)
 
 Authors Haven - A Social platform for the creative at heart.
 =======
