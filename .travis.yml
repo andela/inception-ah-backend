@@ -6,6 +6,7 @@ services:
 
 install:
   - npm install
+  - echo "$SLACK_ENV  >>>>>>>>>>>>>>>>>>>>>>" 
 
 script:
   # - npm run test
