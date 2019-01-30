@@ -12,10 +12,6 @@ script:
 
 notifications:
   slack: andela:E6PvFgt7ygC8QJHxXQJ7mEML
-
-env:
-  - POSTGRES_CONNECTION_STRING=postgresql//travis@localhost:5432/travis_ci_test
-  - DB_NAME=travis_ci_test
   
 before_script:
   - psql -c 'create database travis_ci_test;' -U postgres
