@@ -6,13 +6,12 @@ services:
 
 install:
   - npm install
-  - echo ${SLACK_ENV}  >>>>>>>>>>>>>>>>>>>>>>
 
 script:
   # - npm run test
 
 notifications:
-  slack: "$SLACK_ENV"
+  slack=${SLACK_ENV}
   
 before_script:
   - psql -c 'create database travis_ci_test;' -U postgres
