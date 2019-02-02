@@ -28,6 +28,7 @@ build/Release
 # Dependency directory
 node_modules
 
+
 # Optional npm cache directory
 .npm
 
@@ -36,5 +37,6 @@ node_modules
 
 # Coverage Output
 .nyc_output
-.coveralls.yml
  
+# Coveralls yml file
+.coveralls.yml
