@@ -21,7 +21,7 @@ after_script:
  # -run after all script is executed successfully
 
  after_success:
-  # - run all jobs is successfull
+  npm run coverage
 
 after_failure: 
   # - run if any job fails
