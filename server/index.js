@@ -1,15 +1,12 @@
-const fs = require("fs"),
-  http = require("http"),
-  path = require("path"),
-  methods = require("methods"),
-  express = require("express"),
-  bodyParser = require("body-parser"),
-  session = require("express-session"),
-  cors = require("cors"),
-  passport = require("passport"),
-  errorhandler = require("errorhandler");
+import express from "express";
+import bodyParser from "body-parser";
+import session from "express-session";
+import cors from "cors";
+import errorhandler from "errorhandler";
+import db from "./models";
 
 const isProduction = process.env.NODE_ENV === "production";
+const port = process.env.PORT || 3000;
 
 // Create global app object
 const app = express();
@@ -24,8 +21,6 @@ app.use(bodyParser.json());
 
 app.use(require("method-override")());
 
-app.use(express.static(`${__dirname}/public`));
-
 app.use(
   session({
     secret: "authorshaven",
@@ -39,51 +34,41 @@ if (!isProduction) {
   app.use(errorhandler());
 }
 
-if (isProduction) {
-  //
-} else {
-  //
-}
-
 /// catch 404 and forward to error handler
-app.use((req, res, next) => {
-  const err = new Error("Not Found");
-  err.status = 404;
-  next(err);
+app.use((error, req, res, next) => {
+  if (error) {
+    const err = new Error("Not Found");
+    err.status = 404;
+    return next(err);
+  }
+  next();
 });
 
-/// error handlers
+// development error handler, will print stacktrace
 
-// development error handler
-// will print stacktrace
-if (!isProduction) {
-  app.use((err, req, res, next) => {
-    console.log(err.stack);
-
-    res.status(err.status || 500);
-
-    res.json({
-      errors: {
-        message: err.message,
-        error: err
-      }
-    });
-  });
-}
-
-// production error handler
-// no stacktraces leaked to user
 app.use((err, req, res, next) => {
+  if (!isProduction) {
+    console.log(err.stack);
+  }
   res.status(err.status || 500);
   res.json({
     errors: {
       message: err.message,
-      error: {}
+      error: err
     }
   });
 });
 
 // finally, let's start our server...
-const server = app.listen(process.env.PORT || 3000, () => {
-  console.log(`Listening on port ${server.address().port}`);
-});
+db.sequelize
+  .authenticate()
+  .then(() => {
+    console.log("Connection to DB has been established successfully.");
+  })
+  .catch(err => {
+    console.error("Unable to connect to the database:", err);
+  });
+
+app.listen(port, () => console.log(`Listening on port ${port}...`));
+
+export default app;
