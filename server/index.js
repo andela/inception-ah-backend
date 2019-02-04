@@ -1,5 +1,4 @@
 import express from "express";
-import bodyParser from "body-parser";
 import session from "express-session";
 import cors from "cors";
 import errorhandler from "errorhandler";
@@ -16,8 +15,8 @@ app.use(cors());
 // Normal express config defaults
 app.use(require("morgan")("dev"));
 
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(bodyParser.json());
+app.use(express.urlencoded({ extended: false }));
+app.use(express.json());
 
 app.use(require("method-override")());
 
@@ -34,6 +33,17 @@ if (!isProduction) {
   app.use(errorhandler());
 }
 
+if (isProduction) {
+  //
+} else {
+  //
+}
+app.get("/", (req, res, next) => {
+  res.send(`<h1>Welcome To Authors Heaven</h1>
+            <p>For any more info please visit 
+            <a href='https://github.com/andela/inception-ah-backend'>Our Github page</a></P>
+            <h4>Thanks  &#x1F600;</h4>`);
+});
 /// catch 404 and forward to error handler
 app.use((error, req, res, next) => {
   if (error) {
