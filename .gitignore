@@ -27,7 +27,6 @@ build/Release
 
 # Dependency directory
 node_modules
-dist
 
 # dist folder
 dist
@@ -46,3 +45,5 @@ dist
 
 # Environment variables
 .env
+
+*.sqlite

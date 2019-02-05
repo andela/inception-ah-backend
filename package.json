@@ -15,7 +15,7 @@
     "clean": "rm -rf dist",
     "coverage": "nyc report --reporter=text-lcov|coveralls",
     "lint": "eslint '**/*js'",
-    "lint:fix": "prettier-eslint **/*{js,json} --write && prettier-eslint server/tests/**/*.js --write",
+    "lint:fix": "prettier-eslint **/*{js,json} --write",
     "heroku-postbuild": "npm run build"
   },
   "husky": {
@@ -40,8 +40,6 @@
   "license": "MIT",
   "dependencies": {
     "cors": "^2.8.4",
-    "eslint-config-airbnb-base": "^13.1.0",
-    "eslint-plugin-import": "^2.16.0",
     "express": "^4.16.3",
     "express-jwt": "^5.3.1",
     "express-session": "^1.15.6",
@@ -55,11 +53,14 @@
     "pg-hstore": "^2.3.2",
     "request": "^2.87.0",
     "sequelize": "^4.42.0",
+    "sequelize-cli": "^5.4.0",
     "session": "^0.1.0",
     "slug": "^0.9.3",
     "underscore": "^1.9.1"
   },
   "devDependencies": {
+    "eslint-config-airbnb-base": "^13.1.0",
+    "eslint-plugin-import": "^2.16.0",
     "@babel/cli": "^7.2.3",
     "@babel/core": "^7.2.2",
     "@babel/node": "^7.2.2",
@@ -67,6 +68,7 @@
     "@babel/plugin-transform-runtime": "^7.2.0",
     "@babel/preset-env": "^7.3.1",
     "chai": "^4.2.0",
+    "chai-as-promised": "^7.1.1",
     "chai-http": "^4.2.1",
     "coveralls": "^3.0.2",
     "cross-env": "^5.2.0",

@@ -9,7 +9,8 @@ const config = {
   },
   test: {
     dialect: process.env.TEST_DIALECT,
-    storage: process.env.TEST_STORAGE
+    storage: process.env.TEST_STORAGE,
+    logging: process.env.VERBOSE
   },
   production: {
     url: process.env.PROD_DATABASE_URL,
