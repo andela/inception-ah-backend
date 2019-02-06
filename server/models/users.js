@@ -1,6 +1,6 @@
 const getUserModel = (sequelize, Sequelize) => {
   const flags = {
-    freezeTableName: true
+    freezeTableName: true,
   };
   const userSchema = {
     id: {
@@ -13,54 +13,54 @@ const getUserModel = (sequelize, Sequelize) => {
     },
     firstName: {
       type: Sequelize.STRING,
-      allowNull: false
+      allowNull: false,
     },
     middleName: {
-      type: Sequelize.STRING
+      type: Sequelize.STRING,
     },
     lastName: {
       type: Sequelize.STRING,
-      allowNull: false
+      allowNull: false,
     },
     email: {
       type: Sequelize.STRING,
       allowNull: false,
-      unique: true
+      unique: true,
     },
     password: {
       type: Sequelize.STRING,
-      allowNull: false
+      allowNull: false,
     },
     gender: {
       type: Sequelize.STRING
     },
     biography: {
-      type: Sequelize.TEXT
+      type: Sequelize.TEXT,
     },
     mobileNumber: {
-      type: Sequelize.CHAR
+      type: Sequelize.CHAR,
     },
     imageURL: {
-      type: Sequelize.TEXT
+      type: Sequelize.TEXT,
     },
     isVerified: {
       type: Sequelize.BOOLEAN,
-      defaultValue: false
+      defaultValue: false,
     },
     isNotifiable: {
       type: Sequelize.BOOLEAN,
       defaultValue: false,
-      allowNull: false
+      allowNull: false,
     },
     isAdmin: {
       type: Sequelize.BOOLEAN,
-      defaultValue: false
+      defaultValue: false,
     },
     lastLogin: {
       type: Sequelize.DATE,
       defaultValue: Date.now,
-      allowNull: false
-    }
+      allowNull: false,
+    },
   };
 
   const User = sequelize.define("Users", userSchema, flags);
