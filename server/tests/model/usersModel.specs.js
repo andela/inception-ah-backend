@@ -1,8 +1,10 @@
 import mocha from "mocha";
 import chai from "chai";
+import chaiAsPromise from "chai-as-promised";
 import database from "../../models/index";
 import user from "../fixtures/model/userData";
 
+chai.use(chaiAsPromise);
 const sequelize = database.sequelize;
 const assert = chai.assert;
 const Users = database["Users"];
