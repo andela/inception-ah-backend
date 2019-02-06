@@ -1,2 +1,11 @@
 # Dependency directory
 node_modules
+
+# dist folder
+dist
+
+# nyc output
+.nyc_output
+
+# Coverage
+coverage
