@@ -40,5 +40,11 @@ dist
 
 # Coverage Output
 .nyc_output
-.coveralls.yml
  
+# Coveralls yml file
+.coveralls.yml
+
+# Environment variables
+.env
+
+*.sqlite
