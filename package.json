@@ -13,7 +13,7 @@
     "pretest": "npm run build",
     "test": "cross-env NODE_ENV=test nyc mocha dist/tests/**/index.spec.js --timeout 80000 --exit",
     "clean": "rm -rf dist",
-    "coverage": "nyc report --reporter=text-lcov|coveralls",
+    "coverage": "nyc report --reporter=text-lcov | coveralls",
     "lint": "eslint '**/*js'",
     "lint:fix": "prettier-eslint **/*{js,json} --write && prettier-eslint server/tests/**/*.js --write",
     "heroku-postbuild": "npm run build"
