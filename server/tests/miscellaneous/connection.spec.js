@@ -9,11 +9,9 @@ describe("GET <API />", () => {
   it("should return successful connection", done => {
     chai
       .request(app)
-      .post("/api")
+      .get("/")
       .end((err, res) => {
         expect(res.statusCode).to.equal(200);
-        expect(res.body.status).to.equal("Success");
-        expect(res.body.message).to.equal("Connection ok");
         done();
       });
   });
@@ -24,16 +22,6 @@ describe("GET <API />", () => {
       .post("/api/blahblahblah")
       .end((err, res) => {
         expect(res.statusCode).to.equal(404);
-        done();
-      });
-  });
-
-  it("should return 200 as status code", done => {
-    chai
-      .request(app)
-      .get("/")
-      .end((err, res) => {
-        expect(res.statusCode).to.equal(200);
         done();
       });
   });
