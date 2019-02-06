@@ -7,7 +7,6 @@ const basename = path.basename(__filename);
 const env = process.env.NODE_ENV || "development";
 const config = configuration[env];
 const db = {};
-
 const configPath = env === "test" ? config : config.url;
 const sequelize = new Sequelize(configPath);
 
@@ -27,6 +26,8 @@ Object.keys(db).forEach(modelName => {
     db[modelName].associate(db);
   }
 });
+
+sequelize.sync();
 
 db.sequelize = sequelize;
 db.Sequelize = Sequelize;
