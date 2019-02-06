@@ -1,70 +1,76 @@
 {
-    "root": true,
-    "extends": "airbnb-base",
-    "env": {
-        "node": true,
-        "es6": true,
-        "mocha": true
-    },
-    "parserOptions": {
-        "ecmaVersion": 2018,
-        "ecmaFeatures": {
-            "modules": true
-        }
-    },
-    "rules": {
-        "arrow-parens": 0,
-        "one-var": 0,
-        "new-cap": 0,
-        "no-tabs": 0,
-        "eol-last": 0,
-        "no-console": 0,
-        "prefer-const": 0,
-        "no-plusplus": 0,
-        "func-names": 0,
-        "no-sequences": 0,
-        "no-use-before-define": 0,
-        "indent": 0,
-        "no-unused-expressions": 0,
-        "no-unused-vars": 0,
-        "no-underscore-dangle": 0,
-        "newline-per-chained-call": 0,
-        "arrow-body-style": 0,
-        "no-restricted-syntax": 0,
-        "class-methods-use-this": 0,
-        "space-in-parens": 0,
-        "spaced-comment": 0,
-        "dot-notation": 0,
-        "import/no-extraneous-dependencies": 0,
-        "no-constant-condition": 0,
-        "function-paren-newline": 0,
-        "prefer-destructuring": 0,
-        "no-trailing-spaces": 0,
-        "comma-dangle": 0,
-        "max-len": [1, 100, 2],
-        "no-useless-escape": 0,
-        "one-var-declaration-per-line": 0,
-        "consistent-return": 0,
-        "no-param-reassign": 0,
-        "linebreak-style": 0,
-        "object-curly-newline": 0,
-        "quotes": 0,
-        "import/no-unresolved": [2, { "commonjs": true }],
-        "no-shadow": ["error", { "allow": ["req", "res", "err"] }],
-        "valid-jsdoc": ["error", {
-          "requireReturn": false,
-          "requireReturnType": true,
-          "requireParamDescription": false,
-          "requireReturnDescription": true
-        }],
-        "require-jsdoc": ["error", {
-            "require": {
-                "FunctionDeclaration": true,
-                "MethodDefinition": true,
-                "ClassDeclaration": true
-            }
-        }]       
+  "root": true,
+  "extends": "airbnb-base",
+  "env": {
+    "node": true,
+    "es6": true,
+    "mocha": true
+  },
+  "parserOptions": {
+    "ecmaVersion": 2018,
+    "ecmaFeatures": {
+      "modules": true
     }
+  },
+  "rules": {
+    "arrow-parens": 0,
+    "one-var": 0,
+    "new-cap": 0,
+    "no-tabs": 0,
+    "eol-last": 0,
+    "no-console": 0,
+    "prefer-const": 0,
+    "no-plusplus": 0,
+    "func-names": 0,
+    "no-sequences": 0,
+    "no-use-before-define": 0,
+    "indent": 0,
+    "no-unused-expressions": 0,
+    "no-unused-vars": 0,
+    "no-underscore-dangle": 0,
+    "newline-per-chained-call": 0,
+    "arrow-body-style": 0,
+    "no-restricted-syntax": 0,
+    "class-methods-use-this": 0,
+    "space-in-parens": 0,
+    "spaced-comment": 0,
+    "dot-notation": 0,
+    "import/no-extraneous-dependencies": 0,
+    "import/prefer-default-export":0,
+    "no-constant-condition": 0,
+    "function-paren-newline": 0,
+    "prefer-destructuring": 0,
+    "no-trailing-spaces": 0,
+    "comma-dangle": 0,
+    "max-len": [1, 100, 2],
+    "no-useless-escape": 0,
+    "one-var-declaration-per-line": 0,
+    "consistent-return": 0,
+    "no-param-reassign": 0,
+    "linebreak-style": 0,
+    "curly": ["error", "multi-line"],
+    "object-curly-newline": 0,
+    "quotes": 0,
+    "import/no-unresolved": [2, { "commonjs": true }],
+    "no-shadow": ["error", { "allow": ["req", "res", "err"] }],
+    "valid-jsdoc": [
+      "error",
+      {
+        "requireReturn": false,
+        "requireReturnType": true,
+        "requireParamDescription": false,
+        "requireReturnDescription": true
+      }
+    ],
+    "require-jsdoc": [
+      "error",
+      {
+        "require": {
+          "FunctionDeclaration": true,
+          "MethodDefinition": true,
+          "ClassDeclaration": true
+        }
+      }
+    ]
+  }
 }
-
-
