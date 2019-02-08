@@ -1,3 +1,4 @@
+import uuid4 from "uuid4";
 //seeds is shared among models, treat as immutable
 export default {
   users: {
@@ -13,14 +14,12 @@ export default {
     isAdmin: true
   },
 
-  articles: {
+  article: {
     title: "The book of Eli",
-    authorId: 1,
-    categoryId: 5,
-    body: "This is article body",
-    favourited: true,
-    numberOfReads: 2,
-    createdAt: Date.now,
-    updatedAt: Date.now
+    authorId: uuid4(),
+    categoryId: uuid4(),
+    content: "This is article body",
+    readTime: "3:50",
+    description: "This the article description"
   }
 };

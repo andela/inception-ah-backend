@@ -60,7 +60,10 @@ const getUserModel = (sequelize, Sequelize) => {
   };
 
   const User = sequelize.define("Users", userSchema, flags);
-  User.associate = db => {};
+  User.associate = db => {
+    // Add association between user and article
+    User.hasMany(db["Articles"]);
+  };
   return User;
 };
 
