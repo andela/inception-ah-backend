@@ -47,7 +47,7 @@
         "consistent-return": 0,
         "no-param-reassign": 0,
         "linebreak-style": 0,
-        "curly": ["error", "multi-line"],
+        "object-curly-newline": 0,
         "quotes": 0,
         "import/no-unresolved": [2, { "commonjs": true }],
         "no-shadow": ["error", { "allow": ["req", "res", "err"] }],
