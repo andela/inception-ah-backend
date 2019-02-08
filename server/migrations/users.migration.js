@@ -26,9 +26,12 @@ export default {
           allowNull: false,
           unique: true
         },
-        gender: {
+        password: {
           type: Sequelize.STRING,
           allowNull: false
+        },
+        gender: {
+          type: Sequelize.STRING
         },
         biography: {
           type: Sequelize.TEXT
