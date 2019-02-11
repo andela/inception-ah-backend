@@ -31,19 +31,18 @@ export const logInUserDependencies = async (email, password) => {
   });
 };
 
-export const favoriteDependencies = async () => {
-  const { id, token } = await logInUserDependencies(
-    "obasajujoshua31@gmail.com",
-    "make.meProud2"
-  );
-  const articleTemplate = Object.assign(articleSeed, { authorId: id });
-  const article = await Articles.create(articleTemplate);
-  const slug = article.get("slug");
-  const articleId = article.get("id");
-
+export const updateProfileDependencies = async (email, password, userScope) => {
+  await Users.create(userScope);
+  const response = await chai
+    .request(app)
+    .post("/api/v1/auth/signin")
+    .send({ email, password });
+  const {
+    userId,
+    data: { token }
+  } = response.body;
   return Promise.resolve({
-    slug,
-    articleId,
+    userId,
     token
   });
 };

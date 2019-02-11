@@ -1,13 +1,17 @@
 import chai from "chai";
 import { validateData } from "../../validations/validateData";
 import { userData } from "../fixtures/models/userData";
-import { signUpSchema } from "../../validationSchemas/user";
+import {
+  signUpSchema,
+  updateProfileSchema
+} from "../../validationSchemas/user";
 import models from "../../models";
 import app from "../../index";
 
 const { User } = models;
 
-const { firstName, lastName, email, password } = userData;
+const { firstName, lastName, email, password } = userData[0];
+const { middleName, gender, biography, mobileNumber, imageURL } = userData[2];
 const { expect } = chai;
 
 beforeEach(async () => {
@@ -67,5 +71,40 @@ describe("POST <API /api/v1/auth/signup>", () => {
     expect(res.statusCode).to.equal(409);
     expect(res.body.success).to.be.false;
     expect(res.body.message).to.equal("Email has already been used");
+  });
+});
+
+describe("Update profile schema validation", () => {
+  let inputData = {
+    firstName,
+    middleName,
+    lastName,
+    gender,
+    biography,
+    mobileNumber,
+    imageURL
+  };
+
+  it("should not return an error when all the inputs are valid", async () => {
+    const result = await validateData(inputData, updateProfileSchema);
+    expect(result).to.be.true;
+  });
+
+  it("should return an error when the biography and mobileNumber are invalid", async () => {
+    inputData.biography = "    A son from the sun     ";
+    inputData.mobileNumber = "  12345678909  ";
+    const result = await validateData(inputData, updateProfileSchema);
+    expect(result.errorMessages)
+      .to.be.an("array")
+      .that.include(
+        "Biography must not have leading or trailing whitespace",
+        "Mobile number must not have leading or trailing whitespace"
+      );
+  });
+
+  it("should return an error when all input are invalid", async () => {
+    inputData = {};
+    const result = await validateData(inputData, updateProfileSchema);
+    expect(result.errorMessages).to.be.an("array");
   });
 });

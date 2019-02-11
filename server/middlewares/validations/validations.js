@@ -1,7 +1,11 @@
 import isEmpty from "lodash.isempty";
 import models from "../../models";
 import { validateData } from "../../validations/validateData";
-import { signUpSchema, signInSchema } from "../../validationSchemas/user";
+import {
+  signUpSchema,
+  signInSchema,
+  updateProfileSchema
+} from "../../validationSchemas/user";
 import { httpResponse, serverError } from "../../helpers/http";
 import { articleSchema } from "../../validationSchemas/article";
 
@@ -21,10 +25,14 @@ export const validateInput = async (req, res, next) => {
   const schemas = {
     "/signup": signUpSchema,
     "/signin": signInSchema,
-    "/articles": articleSchema
+    "/articles": articleSchema,
+    "/updateProfile": updateProfileSchema
   };
 
-  const validation = await validateData(req.body, schemas[req.path]);
+  const validation = await validateData(
+    req.body,
+    schemas[`/${req.path.split("/").pop()}`]
+  );
   if (validation.hasError) {
     return httpResponse(res, {
       statusCode: 400,
@@ -32,7 +40,7 @@ export const validateInput = async (req, res, next) => {
     });
   }
   req.body = validation.fields;
-  next();
+  return next();
 };
 
 /**

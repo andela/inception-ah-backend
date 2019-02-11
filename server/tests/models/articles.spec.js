@@ -15,7 +15,7 @@ beforeEach(async () => {
 });
 
 const articleDependencies = async () => {
-  const createdUser = await Users.create(userData);
+  const createdUser = await Users.create(userData[0]);
   const userId = createdUser.get("id");
   const articleTemplate = Object.assign(articleData, { authorId: userId });
   const articleInstance = await Articles.create(articleTemplate);
