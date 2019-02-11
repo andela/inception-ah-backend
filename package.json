@@ -65,6 +65,7 @@
     "uuid": "^3.3.2"
   },
   "devDependencies": {
+    "extend": ">=3.0.2",
     "@babel/cli": "^7.2.3",
     "@babel/core": "^7.2.2",
     "@babel/node": "^7.2.2",

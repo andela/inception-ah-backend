@@ -1,10 +1,9 @@
 import { assert } from "chai";
-import models from "../../models";
-import { userData } from "../fixtures/models/userData";
-import { articleData } from "../fixtures/models/articleData";
+import models from "@models";
+import { userData, articleData, category } from "@fixtures";
 
 const sequelize = models.sequelize;
-const { Favorites, Articles, Users } = models;
+const { Favorites, Articles, Users, Categories } = models;
 
 beforeEach(async () => {
   await sequelize.sync({ force: true });
@@ -13,7 +12,12 @@ beforeEach(async () => {
 const favoriteDependencies = async () => {
   const createdUser = await Users.create(userData[0]);
   const userId = createdUser.get("id");
-  const articleTemplate = Object.assign(articleData, { authorId: userId });
+  const articleCategory = await Categories.create(category);
+  const categoryId = articleCategory.get("id");
+  const articleTemplate = Object.assign(articleData, {
+    authorId: userId,
+    categoryId
+  });
   const articleInstance = await Articles.create(articleTemplate);
   const articleId = articleInstance.get("id");
   const articleSlug = articleInstance.get("slug");
@@ -58,5 +62,4 @@ describe("Favorites table model ", () => {
 
 after(async () => {
   sequelize.drop({ force: true });
-  await sequelize.close();
 });

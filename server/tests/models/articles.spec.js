@@ -1,13 +1,11 @@
 import chai from "chai";
 import chaiAsPromise from "chai-as-promised";
-import models from "../../models";
-import { userData } from "../fixtures/models/userData";
-import { articleData } from "../fixtures/models/articleData";
+import models from "@models";
+import { userData, articleData, category } from "@fixtures";
 
 chai.use(chaiAsPromise);
-const { assert } = chai;
-const { Articles, Users } = models;
-const { expect } = chai;
+const { assert, expect } = chai;
+const { Articles, Users, Categories } = models;
 
 beforeEach(async () => {
   await models.sequelize.sync({ force: true });
@@ -16,7 +14,14 @@ beforeEach(async () => {
 const articleDependencies = async () => {
   const createdUser = await Users.create(userData[0]);
   const userId = createdUser.get("id");
-  const articleTemplate = Object.assign(articleData, { authorId: userId });
+  const articleCategory = await Categories.create(category);
+  const categoryId = articleCategory.get("id");
+
+  const articleTemplate = Object.assign(articleData, {
+    authorId: userId,
+    categoryId
+  });
+
   const articleInstance = await Articles.create(articleTemplate);
   const articleId = articleInstance.get("id");
 
@@ -32,7 +37,7 @@ describe("Articles", () => {
   it("should create an instance of Articles", async () => {
     const dependencies = await articleDependencies();
     assert.instanceOf(dependencies.article, Articles);
-    assert.lengthOf(Object.keys(dependencies.article.dataValues), 13);
+    assert.lengthOf(Object.keys(dependencies.article.dataValues), 12);
   });
 
   it("should delete an articleData table", async () => {
@@ -43,4 +48,8 @@ describe("Articles", () => {
       Articles.findOne({ where: { id: dependencies.articleId } })
     ).to.rejectedWith(Error);
   });
+});
+
+after(async () => {
+  await models.sequelize.drop({ force: true });
 });

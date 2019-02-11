@@ -51,20 +51,36 @@ app.use((error, req, res, next) => {
 
 db.sequelize
   .authenticate()
-  .then(() => {
+  .then(async () => {
     console.log("Connection to DB has been established successfully.");
+    await db.sequelize.sync();
   })
   .catch(err => {
     console.error("Unable to connect to the database:", err);
   });
 
-(async () => {
-  await db.sequelize.sync({});
-})();
 app.listen(port, () => {
   console.log(`Listening on port ${port}`);
 });
 
-app.db = db;
+// (() => {
+//   db.sequelize.sync()
+//   .then(() => {
+//     console.log("Database connection initialized");
+//   })
+//   .then(() => {
+//     try {
+//       app.listen(port, () => console.log(`Listening on port ${port}`));
+//     } catch ( err) {
+//       console.log("Cannot start server on port");
+//     }
+//   })
+//   .catch((err) => {
+//     const message = (process.env === 'developmemnt') ? err :
+//     `Connection to database failed${err.message}`;
+//     console.log(message);
+//   });
+// })();
 
+app.db = db;
 export default app;

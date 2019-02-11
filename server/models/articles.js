@@ -18,10 +18,6 @@ const getArticleModel = (sequelize, DataTypes) => {
       type: DataTypes.UUID,
       allowNull: false
     },
-    categoryId: {
-      type: DataTypes.UUID,
-      allowNull: false
-    },
     content: {
       type: DataTypes.TEXT,
       allowNull: false
@@ -35,9 +31,8 @@ const getArticleModel = (sequelize, DataTypes) => {
       defaultValue: 0,
       allowNull: false
     },
-    commentsCount: {
-      type: DataTypes.INTEGER,
-      defaultValue: 0,
+    categoryId: {
+      type: DataTypes.UUID,
       allowNull: false
     },
     numberOfReads: {

@@ -1,7 +1,7 @@
 import chai from "chai";
 import chaiHttp from "chai-http";
 import models from "@models";
-import { validUserData, articleSeed } from "@fixtures";
+import { validUserData } from "@fixtures";
 import app from "@app";
 
 chai.use(chaiHttp);
