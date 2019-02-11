@@ -8,7 +8,8 @@ const getUserModel = (sequelize, Sequelize) => {
       defaultValue: Sequelize.UUIDV4,
       primaryKey: true,
       unique: true,
-      allowNull: false
+      allowNull: false,
+      onDelete: "CASCADE"
     },
     firstName: {
       type: Sequelize.STRING,
@@ -26,9 +27,12 @@ const getUserModel = (sequelize, Sequelize) => {
       allowNull: false,
       unique: true
     },
-    gender: {
+    password: {
       type: Sequelize.STRING,
       allowNull: false
+    },
+    gender: {
+      type: Sequelize.STRING
     },
     biography: {
       type: Sequelize.TEXT
@@ -61,8 +65,12 @@ const getUserModel = (sequelize, Sequelize) => {
 
   const User = sequelize.define("Users", userSchema, flags);
   User.associate = db => {
-    // Add association between user and article
-    User.hasMany(db["Articles"]);
+    // Add association between user and Favourites table
+    User.hasMany(db["Favourites"], {
+      foreignKey: "userId",
+      target: "id",
+      onUpdate: "CASCADE"
+    });
   };
   return User;
 };

@@ -1,3 +1,4 @@
+import "./model/articles.specs";
+import "./model/usersModel.specs";
+import "./model/favourites.specs";
 import "./miscellaneous/connection.spec";
-import "./model.specs/userModel.specs";
-import "./model.specs/articles.specs";

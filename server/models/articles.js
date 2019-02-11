@@ -8,7 +8,8 @@ const getArticleModel = (sequelize, DataTypes) => {
       defaultValue: DataTypes.UUIDV4,
       primaryKey: true,
       unique: true,
-      allowNull: false
+      allowNull: false,
+      onDelete: "CASCADE"
     },
     title: {
       type: DataTypes.TEXT,
@@ -45,13 +46,19 @@ const getArticleModel = (sequelize, DataTypes) => {
       allowNull: false
     }
   };
-  const Article = sequelize.define("Articles", articleSchema);
-  Article.associates = db => {
+  const Article = sequelize.define("Articles", articleSchema, flags);
+
+  Article.associate = db => {
     Article.belongsTo(db["Users"], {
-      foreignKey: {
-        name: "authorId",
-        target: "id"
-      }
+      foreignKey: "authorId",
+      target: "id",
+      onDelete: "CASCADE"
+    });
+
+    Article.hasMany(db["Favourites"], {
+      foreignKey: "articleId",
+      target: "id",
+      hooks: true
     });
   };
 
