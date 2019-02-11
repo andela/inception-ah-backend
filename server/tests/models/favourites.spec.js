@@ -1,11 +1,9 @@
-import mocha from "mocha";
-import chai from "chai";
+import { assert } from "chai";
 import database from "../../models/index";
-import user from "../fixtures/model/userData";
-import article from "../fixtures/model/articleData";
+import user from "../fixtures/models/userData";
+import article from "../fixtures/models/articleData";
 
 const sequelize = database.sequelize;
-const assert = chai.assert;
 const { Favourites, Articles, Users } = database;
 
 beforeEach(async () => {

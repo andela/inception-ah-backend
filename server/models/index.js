@@ -1,14 +1,19 @@
 import fs from "fs";
 import path from "path";
 import Sequelize from "sequelize";
-import configuration from "../configs/config";
+import { dbConfig } from "../configs/config";
 
 const basename = path.basename(__filename);
 const env = process.env.NODE_ENV || "development";
-const config = configuration[env];
+const config = dbConfig[env];
 const db = {};
 const configPath = env === "test" ? config : config.url;
-const sequelize = new Sequelize(configPath);
+
+let sequelize;
+sequelize =
+  env === "development"
+    ? new Sequelize(configPath, { logging: false })
+    : new Sequelize(configPath);
 
 fs.readdirSync(__dirname)
   .filter(file => {

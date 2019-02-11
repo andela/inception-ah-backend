@@ -1,35 +1,46 @@
 import Joi from "joi";
 
-const firstName = Joi.string()
-  .min(2)
-  .required()
-  .label("First name");
-const lastName = Joi.string()
-  .min(2)
-  .required()
-  .label("Last name");
+/**
+ * @description Get name validation schema
+ *
+ * @param {string} label the text to use instead of field name in the error message;
+ 
+ * @returns {string} Instance of JOI validation schema
+ * @method getNameSchema
+ */
+const getNameSchema = label => {
+  const exp = /^[\w'\-,.][^0-9_¡?÷?¿/\\+=@#$%ˆ&*(){}|~<>;:[\]]{2,}$/;
+  return Joi.string()
+    .required()
+    .trim()
+    .min(2)
+    .regex(exp)
+    .lowercase()
+    .label(label)
+    .error(errors => formatError(errors, label));
+};
+
+const firstName = getNameSchema("First name");
+const lastName = getNameSchema("Last name");
 const email = Joi.string()
   .email()
   .required()
-  .label("Email");
-const password = Joi.string()
-  .regex(/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[_#?!@$%^&*-.]).{6,}$/)
-  .min(6)
-  .error(() => {
-    return {
-      message:
-        "Password must be atleast 6 chars with atleast 1 uppercase, 1 number, & 1 special char"
-    };
-  })
-  .required();
+  .trim()
+  .label("Email")
+  .lowercase();
 
-const confirmPassword = Joi.string()
-  .valid(Joi.ref("password"))
+const password = Joi.string()
+  .regex(/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-.]).{6,}$/)
+  .min(6)
   .required()
-  .error(() => {
-    return {
-      message: "Password must match"
-    };
+  .trim()
+  .label("Password")
+  .error(errors => {
+    return formatError(
+      errors,
+      "Password",
+      "Password must be atleast 6 chars with atleast 1 uppercase, 1 number, & 1 special char"
+    );
   });
 
 export const signUpSchema = Joi.object().keys({
@@ -40,15 +51,16 @@ export const signUpSchema = Joi.object().keys({
 });
 
 export const signInSchema = Joi.object().keys({
-  email,
-  password
+  email: Joi.string().trim().required(),
+  password: Joi.string().trim().required()
 });
 
-export const passwordResetRequestSchema = Joi.object().keys({
-  email
-});
-
-export const passwordResetSchema = Joi.object().keys({
-  password,
-  confirmPassword
-});
+export const formatError = (errors, label, message) => {
+  const err = errors[0];
+  switch (err.type) {
+    case "string.regex.base":
+      return message || `${label || err.path} is inavlid`;
+    default:
+      return err;
+  }
+};

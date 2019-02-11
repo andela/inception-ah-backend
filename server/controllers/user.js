@@ -1,13 +1,14 @@
 import isEmpty from "lodash.isempty";
-import { validateData } from "../validations/validateData";
-import { signInSchema } from "../validationSchemas/user";
 import { comparePassword } from "../helpers/password";
-import { httpResponse, serverError } from "../helpers/http";
-import { getBaseUrl } from "../helpers/userHelpers";
-import userResponse from "../helpers/userResponse";
+import { serverError, httpResponse } from "../helpers/http";
+import { generateJWT, decodeJWT, getJWTConfigs } from "../helpers/jwt";
+import { userResponse } from "../helpers/userResponse";
+import { getBaseUrl, sanitize } from "../helpers/users";
 import models from "../models";
 
 const { Users } = models;
+const tokenConfigs = getJWTConfigs();
+
 /**
  * @description Generate login access token for a user
  *
@@ -18,20 +19,18 @@ const { Users } = models;
 export const userLogin = async (req, res) => {
   const { email, password } = req.body;
   try {
-    const validated = await validateData({ email, password }, signInSchema);
-    if (isEmpty(validated)) {
-      const user = await Users.findOne({ where: { email } });
-      if (user) {
-        const foundUser = user.get("password");
-        const matchedPassword = await comparePassword(password, foundUser);
-        if (matchedPassword) {
-          return httpResponse(res, {
-            statusCode: 200,
-            success: true,
-            message: "login successful",
-            data: userResponse(user)
-          });
-        }
+    const user = await Users.findOne({ where: { email } });
+    if (user) {
+      const foundUser = user.get("password");
+      const matchedPassword = await comparePassword(password, foundUser);
+      if (matchedPassword) {
+        const token = await generateJWT(user.get("id"), tokenConfigs);
+        return httpResponse(res, {
+          statusCode: 200,
+          success: true,
+          message: "login successful",
+          data: { token }
+        });
       }
     }
     return httpResponse(res, {
@@ -41,7 +40,12 @@ export const userLogin = async (req, res) => {
       data: null
     });
   } catch (err) {
-    return serverError(res, err);
+    return httpResponse(res, {
+      statusCode: 500,
+      success: false,
+      message: "An Internal server occured",
+      data: null
+    });
   }
 };
 
@@ -81,18 +85,18 @@ export const resetPassword = async (req, res) => {
   const { token } = req.params;
 
   try {
-    const user = await Users.findOne({
+    const foundUser = await Users.findOne({
       where: {
         resetToken: token
       }
     });
-    if (user) {
-      await user.resetPassword(password, token);
+    if (foundUser) {
+      await foundUser.resetPassword(password, token);
       return httpResponse(res, {
         success: true,
         statusCode: 200,
         message: "Password changed Successfully",
-        data: userResponse(user)
+        data: userResponse(foundUser)
       });
     }
     return httpResponse(res, {
@@ -101,5 +105,76 @@ export const resetPassword = async (req, res) => {
     });
   } catch (error) {
     return serverError(res, error);
+  }
+};
+
+/**
+ * @description Sign up a new user
+ *
+ * @param {object} req HTTP request object
+ * @param {object} res HTTP response object
+ * @returns {object} HTTP response
+ * @method userSignUp
+ */
+export const userSignUp = async (req, res) => {
+  const { firstName, lastName, email } = req.body;
+  try {
+    const newUser = await Users.create({
+      firstName,
+      lastName,
+      email,
+      password: req.body.password
+    });
+    const { password, ...user } = newUser.dataValues;
+    const token = generateJWT(user.id, tokenConfigs);
+    newUser.sendVerificationEmail(
+      `${getBaseUrl(req)}/auth/verification/${token}`
+    );
+    const message = `Sign up was successfull. Please check your email to activate your account!
+      If you don't find it in your inbox, please check your spam messages.`;
+    return httpResponse(res, {
+      statusCode: 201,
+      // backtick preserves white spaces and add a newline character;
+      // so, we need to sanitize the message being returned to the client
+      message: sanitize(message, false).replace("\n", ""),
+      user
+    });
+  } catch (error) {
+    return serverError(res, error);
+  }
+};
+
+/**
+ * Verifies a new user registration
+ *
+ * @param {object} req HTTP request object
+ * @param {object} res HTTP response object
+ * @returns {object} HTTP response
+ */
+export const verifyUserAccount = async (req, res) => {
+  try {
+    const decoded = decodeJWT(req.params.token, tokenConfigs);
+    let foundUser = await Users.findByPk(decoded.userId);
+    if (!isEmpty(foundUser)) {
+      // If account has previously been verified
+      // return the appropriate message
+      if (foundUser.get("isVerified")) {
+        return httpResponse(res, {
+          statusCode: 200,
+          message: "Account has been verified"
+        });
+      }
+      return httpResponse(res, {
+        message: "Account verification was successfull",
+        // activate user account and return response to client
+        user: userResponse(await foundUser.activateAccount())
+      });
+    }
+    return httpResponse(res, {
+      statusCode: 404,
+      message: "Sorry, user does not exist"
+    });
+  } catch (error) {
+    serverError(res, error);
   }
 };

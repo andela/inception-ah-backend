@@ -9,7 +9,7 @@ import setPassportMiddleware from "./middlewares/passport/passport";
 
 dotenv.config();
 const isProduction = process.env.NODE_ENV === "production";
-const port = process.env.PORT;
+const port = process.env.PORT || 6000;
 
 // Create global app object
 const app = express();

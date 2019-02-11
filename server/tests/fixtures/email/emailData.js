@@ -4,13 +4,7 @@ export const validUser = {
   userEmail: "lateefat.amud@andela.com",
   url: "wwww.google.com"
 };
-export const invalidUser1 = {
-  firstName: "Lateefat",
-  lastName: "Amuda",
-  userEmail: "lateefat.amud",
-  url: "google.com"
-};
-export const invalidUser2 = {
+export const invalidUser = {
   firstName: "Lateefat",
   lastName: "Amuda",
   url: "google.com"

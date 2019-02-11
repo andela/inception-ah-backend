@@ -25,7 +25,6 @@ export const httpResponse = (res, options) => {
  * @method serverError
  */
 export const serverError = (res, error) => {
-  console.log(error.message);
   return res.status(error.status || 500).json({
     success: false,
     message: isProd

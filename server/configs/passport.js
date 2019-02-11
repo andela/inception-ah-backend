@@ -14,7 +14,7 @@ const {
   PORT
 } = process.env;
 
-const socialAuthConfig = {
+export const socialAuthConfig = {
   facebook: isProd
     ? {
         clientID: FACEBOOK_CLIENT_ID_PROD,
@@ -36,4 +36,3 @@ const socialAuthConfig = {
       : `http://localhost:${PORT}/api/v1/auth/google/redirect`
   }
 };
-export default socialAuthConfig;

@@ -1,3 +1,4 @@
+import bcrypt from "bcrypt";
 import { hashPassword } from "../helpers/password";
 import {
   decryptToken,
@@ -7,11 +8,9 @@ import {
 import { expiryTime } from "../configs/config";
 import { sendEmail } from "../emails/email";
 import { resetConstants } from "../emails/constants/passwordReset";
+import { verifyConstants } from "../emails/constants/accountVerification";
 
 export default (sequelize, Sequelize) => {
-  const flags = {
-    freezeTableName: true
-  };
   const userSchema = {
     id: {
       type: Sequelize.UUID,
@@ -80,9 +79,25 @@ export default (sequelize, Sequelize) => {
     }
   };
 
-  const User = sequelize.define("Users", userSchema, flags);
+  const User = sequelize.define("Users", userSchema, {
+    freezeTableName: true,
+    // Hash password before creating instance
+    hooks: {
+      beforeCreate: (user, options) => {
+        user.password = bcrypt.hashSync(user.password, bcrypt.genSaltSync(10));
+        return user.password;
+      }
+    }
+  });
   User.associate = db => {
-    // Add association between user and Favourites table
+    // Add association between Users and Articles table
+    User.hasMany(db["Articles"], {
+      foreignKey: "authorId",
+      target: "id",
+      onDelete: "CASCADE"
+    });
+
+    // Add association between Users and Favourites table
     User.hasMany(db["Favourites"], {
       foreignKey: "userId",
       target: "id",
@@ -95,16 +110,17 @@ export default (sequelize, Sequelize) => {
     });
   };
 
-  User.prototype.generateResetToken = function() {
+  User.prototype.generateResetToken = async function() {
     this.resetToken = encryptToken();
     this.save();
-    this.reload();
+    await this.reload();
     return this.resetToken;
   };
 
-  User.prototype.sendPasswordResetEmail = function(url) {
+  User.prototype.sendPasswordResetEmail = async function(url) {
     const { firstName, lastName, email } = this;
-    const resetUrl = `${url}/${this.generateResetToken()}`;
+    const resetToken = await this.generateResetToken();
+    const resetUrl = `${url}/${resetToken}`;
     sendEmail(
       firstName,
       lastName,
@@ -115,14 +131,34 @@ export default (sequelize, Sequelize) => {
     );
   };
 
-  User.prototype.resetPassword = function(password, token) {
-    if (getTimeDifference(decryptToken(token)) > parseInt(expiryTime, 10)) {
+  User.prototype.resetPassword = async function(password, token) {
+    if (getTimeDifference(decryptToken(token)) > Number(expiryTime)) {
       throw new Error("The Link has expired");
     }
     this.password = hashPassword(password);
     this.resetToken = "";
     this.save();
-    this.reload();
+    await this.reload();
+  };
+
+  User.prototype.sendVerificationEmail = async function(url) {
+    const { firstName, lastName, email } = this;
+    await sendEmail(
+      firstName,
+      lastName,
+      email,
+      "Verification Email",
+      url,
+      verifyConstants
+    );
+  };
+
+  User.prototype.activateAccount = async function() {
+    this.isVerified = true;
+    this.lastLogin = new Date();
+    this.save();
+    await this.reload();
+    return this;
   };
 
   return User;

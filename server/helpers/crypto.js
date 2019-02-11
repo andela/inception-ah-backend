@@ -30,5 +30,5 @@ export const getTimeDifference = time => {
   const timeIssued = new Date(time);
   const presentTime = new Date();
   const timeDifference = presentTime.getTime() - timeIssued.getTime();
-  return Number(timeDifference / 1000);
+  return timeDifference / 1000;
 };

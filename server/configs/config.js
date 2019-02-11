@@ -2,26 +2,41 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-const { EXPIRY_TIME, EXPIRY_TIME_TEST, NODE_ENV } = process.env;
+const {
+  NODE_ENV,
+  EXPIRY_TIME_TEST,
+  EXPIRY_TIME,
+  DEV_DIALECT,
+  TEST_DIALECT,
+  TEST_STORAGE,
+  DEV_DATABASE_URL,
+  PROD_DATABASE_URL,
+  PROD_DIALECT,
+  JWT_ISSUER,
+  JWT_SECRET,
+  JWT_SUBJECT
+} = process.env;
 
-const config = {
+export const dbConfig = {
   development: {
-    url: process.env.DEV_DATABASE_URL,
-    dialect: process.env.DEV_DIALECT,
-    logging: false
+    url: DEV_DATABASE_URL,
+    dialect: DEV_DIALECT
   },
   test: {
-    dialect: process.env.TEST_DIALECT,
-    storage: process.env.TEST_STORAGE,
+    dialect: TEST_DIALECT,
+    storage: TEST_STORAGE,
     logging: false
   },
   production: {
-    url: process.env.PROD_DATABASE_URL,
-    dialect: process.env.PROD_DIALECT,
-    logging: false
+    url: PROD_DATABASE_URL,
+    dialect: PROD_DIALECT
   }
 };
 
-export const expiryTime = NODE_ENV === "test" ? EXPIRY_TIME_TEST : EXPIRY_TIME;
+export const jwtConfigs = {
+  issuer: JWT_ISSUER,
+  secret: JWT_SECRET,
+  subject: JWT_SUBJECT
+};
 
-export default config;
+export const expiryTime = NODE_ENV === "test" ? EXPIRY_TIME_TEST : EXPIRY_TIME;
