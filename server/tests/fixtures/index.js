@@ -1,5 +1,5 @@
 import { validUser, invalidUser } from "./email/emailData";
-import { articleData, articleSeed, articleSpec } from "./models/articleData";
+import { articleData, articleSpec } from "./models/articleData";
 import { commentData } from "./models/commentData";
 import {
   userData,
@@ -8,6 +8,8 @@ import {
   registerUser
 } from "./models/userData";
 
+import { category } from "./models/categories";
+
 export {
   validUser,
   invalidUser,
@@ -15,8 +17,8 @@ export {
   userData,
   socialUser,
   validUserData,
-  articleSeed,
   articleSpec,
   commentData,
-  registerUser
+  registerUser,
+  category
 };
