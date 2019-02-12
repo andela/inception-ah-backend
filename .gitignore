@@ -2,8 +2,8 @@
 logs
 *.log
 .DS_Store
-.vscode
 npm-debug.log*
+.vscode
 
 # Runtime data
 pids
@@ -48,3 +48,4 @@ dist
 .env
 
 *.sqlite
+
