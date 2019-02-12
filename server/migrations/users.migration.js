@@ -8,62 +8,62 @@ export default {
           defaultValue: Sequelize.UUIDV4,
           primaryKey: true,
           unique: true,
-          allowNull: false
+          allowNull: false,
         },
         firstName: {
           type: Sequelize.STRING,
-          allowNull: false
+          allowNull: false,
         },
         middleName: {
-          type: Sequelize.STRING
+          type: Sequelize.STRING,
         },
         lastName: {
           type: Sequelize.STRING,
-          allowNull: false
+          allowNull: false,
         },
         email: {
           type: Sequelize.STRING,
           allowNull: false,
-          unique: true
+          unique: true,
         },
         password: {
           type: Sequelize.STRING,
-          allowNull: false
+          allowNull: false,
         },
         gender: {
           type: Sequelize.STRING
         },
         biography: {
-          type: Sequelize.TEXT
+          type: Sequelize.TEXT,
         },
         mobileNumber: {
-          type: Sequelize.CHAR
+          type: Sequelize.CHAR,
         },
         imageURL: {
-          type: Sequelize.TEXT
+          type: Sequelize.TEXT,
         },
         isVerified: {
           type: Sequelize.BOOLEAN,
-          defaultValue: false
+          defaultValue: false,
         },
         isNotifiable: {
           type: Sequelize.BOOLEAN,
-          defaultValue: false
+          defaultValue: false,
         },
         isAdmin: {
           type: Sequelize.BOOLEAN,
-          defaultValue: false
+          defaultValue: false,
         },
         lastLogin: {
           type: Sequelize.DATE,
           defaultValue: Date.now,
-          allowNull: false
-        }
+          allowNull: false,
+        },
       },
       { freezeTable: true }
     );
   },
   down(queryInterface, Sequelize) {
     return queryInterface.DropTable("Users");
-  }
+  },
 };
