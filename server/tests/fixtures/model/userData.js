@@ -6,7 +6,7 @@ export default {
   middleName: "Mark",
   lastName: "Drew",
   email: "user@email.com",
-  password: "make_me_proud",
+  password: "make.meProud2",
   gender: "male",
   biography: "A son from the sun",
   mobileNumber: 12345678909,
