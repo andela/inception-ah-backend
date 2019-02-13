@@ -3,5 +3,6 @@ import "./model/usersModel.specs";
 import "./model/favourites.specs";
 import "./miscellaneous/connection.spec";
 import "./miscellaneous/emails/verification/email.specs";
-import "./ouath/social.auth.spec";
+import "./oauth/social.auth.spec";
+import "./controller/userController";
 import "./validations/user.spec";

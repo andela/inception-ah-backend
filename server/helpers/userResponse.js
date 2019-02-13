@@ -1,17 +1,18 @@
-import generateJwtToken from "./jwt";
+import { generateJWT } from "./jwt";
 /**
  * @param  {object} dbUserModel
  * @returns {object} responseObject
  */
 const userResponse = ({ dataValues }) => {
-  const userToken = generateJwtToken(dataValues);
+  const userToken = generateJWT(dataValues.id);
   const { id, email, biography, imageURL } = dataValues;
   return {
     id,
     email,
     token: userToken,
-    bio: biography,
-    image: imageURL
+    biography,
+    imageURL
   };
 };
+
 export default userResponse;

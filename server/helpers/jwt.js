@@ -3,19 +3,14 @@ import jwt from "jsonwebtoken";
 /**
  * @description This method accepts user object and 
  returns the requested token for the user
- * @param {object}  user
+
+ * @param {object}  userId
  * @returns {String}  jwtToken  
  */
-const generateJwtToken = user => {
-  const { id, email, isAdmin } = user;
-  return jwt.sign(
-    {
-      id,
-      email,
-      isAdmin
-    },
-    process.env.JWT_SECRET
-  );
+export const generateJWT = userId => {
+  return jwt.sign({ userId }, process.env.JWT_SECRET);
 };
 
-export default generateJwtToken;
+export const verifyJWT = (token, secret = process.env.JWT_SECRET) => {
+  return jwt.verify(token, secret);
+};
