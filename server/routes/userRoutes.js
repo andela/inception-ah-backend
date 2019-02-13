@@ -1,8 +1,9 @@
 import { Router } from "express";
-import { userLogin } from "../controllers/user";
+import { passwordResetRequest, resetPassword } from "../controllers/user";
 
 const userRoutes = Router();
 
-userRoutes.post("/", userLogin);
+userRoutes.post("/resetPassword", passwordResetRequest);
+userRoutes.put("/resetPassword/:token", resetPassword);
 
 export default userRoutes;

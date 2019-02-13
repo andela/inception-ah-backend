@@ -1,14 +1,19 @@
 import { Strategy as facebookStrategy } from "passport-facebook";
 import { Strategy as googleStrategy } from "passport-google-oauth20";
-import performCallback from "../../helpers/passportCallback";
-import getAuthCredentials from "../../helpers/passportCredentials";
+import {
+  getUserProfileFromApis,
+  getOAuthCredentials
+} from "../../helpers/passportCallback";
 
 const setPassportMiddleware = passport => {
   passport.use(
-    new googleStrategy(getAuthCredentials("google"), performCallback)
+    new googleStrategy(getOAuthCredentials("google"), getUserProfileFromApis)
   );
   passport.use(
-    new facebookStrategy(getAuthCredentials("facebook"), performCallback)
+    new facebookStrategy(
+      getOAuthCredentials("facebook"),
+      getUserProfileFromApis
+    )
   );
 };
 export default setPassportMiddleware;

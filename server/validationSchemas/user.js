@@ -9,11 +9,11 @@ const lastName = Joi.string()
   .required()
   .label("Last name");
 const email = Joi.string()
-  .min(2)
+  .email()
   .required()
   .label("Email");
 const password = Joi.string()
-  .regex(/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-.]).{6,}$/)
+  .regex(/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[_#?!@$%^&*-.]).{6,}$/)
   .min(6)
   .error(() => {
     return {
@@ -22,6 +22,15 @@ const password = Joi.string()
     };
   })
   .required();
+
+const confirmPassword = Joi.string()
+  .valid(Joi.ref("password"))
+  .required()
+  .error(() => {
+    return {
+      message: "Password must match"
+    };
+  });
 
 export const signUpSchema = Joi.object().keys({
   firstName,
@@ -33,4 +42,13 @@ export const signUpSchema = Joi.object().keys({
 export const signInSchema = Joi.object().keys({
   email,
   password
+});
+
+export const passwordResetRequestSchema = Joi.object().keys({
+  email
+});
+
+export const passwordResetSchema = Joi.object().keys({
+  password,
+  confirmPassword
 });

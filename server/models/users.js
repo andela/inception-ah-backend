@@ -1,6 +1,16 @@
-const getUserModel = (sequelize, Sequelize) => {
+import { hashPassword } from "../helpers/password";
+import {
+  decryptToken,
+  getTimeDifference,
+  encryptToken
+} from "../helpers/crypto";
+import { expiryTime } from "../configs/config";
+import { sendEmail } from "../emails/email";
+import { resetConstants } from "../emails/constants/passwordReset";
+
+export default (sequelize, Sequelize) => {
   const flags = {
-    freezeTableName: true,
+    freezeTableName: true
   };
   const userSchema = {
     id: {
@@ -13,54 +23,61 @@ const getUserModel = (sequelize, Sequelize) => {
     },
     firstName: {
       type: Sequelize.STRING,
-      allowNull: false,
+      allowNull: false
     },
     middleName: {
-      type: Sequelize.STRING,
+      type: Sequelize.STRING
     },
     lastName: {
       type: Sequelize.STRING,
-      allowNull: false,
+      allowNull: false
     },
     email: {
       type: Sequelize.STRING,
       allowNull: false,
-      unique: true,
+      unique: true
     },
     password: {
       type: Sequelize.STRING,
-      allowNull: false,
+      allowNull: false
     },
     gender: {
       type: Sequelize.STRING
     },
     biography: {
-      type: Sequelize.TEXT,
+      type: Sequelize.TEXT
     },
     mobileNumber: {
-      type: Sequelize.CHAR,
+      type: Sequelize.CHAR
     },
     imageURL: {
-      type: Sequelize.TEXT,
+      type: Sequelize.TEXT
     },
     isVerified: {
       type: Sequelize.BOOLEAN,
-      defaultValue: false,
+      defaultValue: false
     },
     isNotifiable: {
       type: Sequelize.BOOLEAN,
       defaultValue: false,
-      allowNull: false,
+      allowNull: false
     },
     isAdmin: {
       type: Sequelize.BOOLEAN,
-      defaultValue: false,
+      defaultValue: false
     },
     lastLogin: {
       type: Sequelize.DATE,
       defaultValue: Date.now,
-      allowNull: false,
+      allowNull: false
     },
+    resetToken: {
+      type: Sequelize.TEXT
+    },
+    isBlocked: {
+      type: Sequelize.BOOLEAN,
+      defaultValue: false
+    }
   };
 
   const User = sequelize.define("Users", userSchema, flags);
@@ -71,8 +88,42 @@ const getUserModel = (sequelize, Sequelize) => {
       target: "id",
       onUpdate: "CASCADE"
     });
+    User.hasMany(db["Articles"], {
+      foreignKey: "authorId",
+      target: "id",
+      onDelete: "CASCADE"
+    });
   };
+
+  User.prototype.generateResetToken = function() {
+    this.resetToken = encryptToken();
+    this.save();
+    this.reload();
+    return this.resetToken;
+  };
+
+  User.prototype.sendPasswordResetEmail = function(url) {
+    const { firstName, lastName, email } = this;
+    const resetUrl = `${url}/${this.generateResetToken()}`;
+    sendEmail(
+      firstName,
+      lastName,
+      email,
+      "RESET EMAIL",
+      resetUrl,
+      resetConstants
+    );
+  };
+
+  User.prototype.resetPassword = function(password, token) {
+    if (getTimeDifference(decryptToken(token)) > parseInt(expiryTime, 10)) {
+      throw new Error("The Link has expired");
+    }
+    this.password = hashPassword(password);
+    this.resetToken = "";
+    this.save();
+    this.reload();
+  };
+
   return User;
 };
-
-export default getUserModel;

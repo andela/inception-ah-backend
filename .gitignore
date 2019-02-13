@@ -48,4 +48,5 @@ dist
 .env
 
 *.sqlite
+db.lite
 

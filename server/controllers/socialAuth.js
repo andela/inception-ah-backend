@@ -1,3 +1,4 @@
+import { httpResponse } from "../helpers/http";
 /**
  * @description This takes in the HTTP server request,
  performs the logic and returns the server response with the user object.
@@ -6,9 +7,9 @@
  * @returns {HttpResponse} Server Response
  */
 const socialAuth = (req, res) => {
-  return res.status(200).json({
-    success: true,
-    user: req.user
+  return httpResponse(res, {
+    statusCode: 200,
+    data: req.user
   });
 };
 
