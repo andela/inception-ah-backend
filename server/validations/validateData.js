@@ -4,14 +4,15 @@ import Joi from "joi";
  * Validate User Input
  * @param {object} inputData
  * @param {object} schema
- * @returns {boolean|array} true if no error | array of errors
+ * @returns Promise(object|array)true if no error | array of errors
  */
+
 export const validateData = async (inputData, schema) => {
   try {
     await Joi.validate(inputData, schema, {
       abortEarly: false
     });
-    return true;
+    return {};
   } catch (errors) {
     const errorMessages = errors.details.map(error => {
       return error.message.replace(/"/g, "");

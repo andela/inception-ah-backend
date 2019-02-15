@@ -1,4 +1,5 @@
 import { expect } from "chai";
+import isEmpty from "lodash.isempty";
 import { validateData } from "../../validations/validateData";
 import userData from "../fixtures/model/userData";
 import { signUpSchema, signInSchema } from "../../validationSchemas/user";
@@ -16,7 +17,7 @@ describe("Input validation function", () => {
 
     it("should not return an error when all the inputs are valid", async () => {
       const result = await validateData(value, signUpSchema);
-      expect(result).to.be.equal(true);
+      expect(isEmpty(result)).to.be.equal(true);
     });
 
     it("should return an error when firstname is invalid", async () => {
@@ -69,7 +70,7 @@ describe("Input validation function", () => {
 
     it("should not return an error when all the inputs are valid", async () => {
       const result = await validateData(inputDate, signInSchema);
-      expect(result).to.be.equal(true);
+      expect(isEmpty(result)).to.be.true;
     });
 
     it("should return an error when email is invalid", async () => {

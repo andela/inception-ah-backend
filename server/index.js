@@ -59,8 +59,8 @@ db.sequelize
   });
 
 (async () => {
-  await db.sequelize.sync();
-  const server = app.listen(port, () => {
+  const server = app.listen(port, async () => {
+    await db.sequelize.sync();
     console.log(`Listening on port ${server.address().port}`);
   });
 })();
