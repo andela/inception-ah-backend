@@ -1,16 +1,21 @@
 import mocha from "mocha";
 import chai from "chai";
 import chaiAsPromise from "chai-as-promised";
-import database from "../../models/index";
-import user from "../fixtures/models/userData";
+import models from "../../models";
+import { userData } from "../fixtures/models/userData";
 import article from "../fixtures/models/articleData";
 
 chai.use(chaiAsPromise);
 const { assert } = chai;
-const { Articles, Users } = database;
+const { Articles, Users } = models;
+const { expect } = chai;
+
+beforeEach(async () => {
+  await models.sequelize.sync({ force: true }).catch(() => {});
+});
 
 const articleDependencies = async () => {
-  const createdUser = await Users.create(user);
+  const createdUser = await Users.create(userData);
   const userId = createdUser.get("id");
   const articleTemplate = Object.assign(article, { authorId: userId });
   const articleInstance = await Articles.create(articleTemplate);
@@ -35,8 +40,8 @@ describe("Articles", () => {
     const dependencies = await articleDependencies();
     assert.instanceOf(dependencies.article, Articles);
     await Articles.drop({ cascade: true });
-    chai
-      .expect(Articles.findOne({ where: { id: dependencies.articleId } }))
-      .to.rejectedWith(Error);
+    expect(
+      Articles.findOne({ where: { id: dependencies.articleId } })
+    ).to.rejectedWith(Error);
   });
 });

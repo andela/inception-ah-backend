@@ -58,7 +58,7 @@ const getArticleModel = (sequelize, DataTypes) => {
     Article.hasMany(db["Favourites"], {
       foreignKey: "articleId",
       target: "id",
-      hooks: true
+      onDelete: "CASCADE"
     });
   };
 

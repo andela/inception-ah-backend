@@ -1,8 +1,8 @@
-export default {
+export const userData = {
   firstName: "John",
   middleName: "Mark",
   lastName: "Drew",
-  email: "user@email.com",
+  email: "obasajujoshua31@gmail.com",
   password: "make.meProud2",
   gender: "male",
   biography: "A son from the sun",
@@ -26,6 +26,7 @@ export const validUser = {
   isNotifiable: true,
   isAdmin: false
 };
+
 export const socialUser = {
   id: "10828801445254545653",
   displayName: "Obasaju Joshua Fredrick",

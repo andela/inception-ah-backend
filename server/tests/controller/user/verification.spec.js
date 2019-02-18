@@ -3,7 +3,7 @@ import uniqid from "uniqid";
 import chaiHttp from "chai-http";
 import app from "../../../index";
 import models from "../../../models";
-import userData from "../../fixtures/models/userData";
+import { userData } from "../../fixtures/models/userData";
 import { generateJWT, decodeJWT, getJWTConfigs } from "../../../helpers/jwt";
 import { userDependencies } from "../../helpers/depenencies";
 

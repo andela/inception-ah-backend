@@ -1,4 +1,4 @@
-import uuid4 from "uniqid";
+import uuid4 from "uuid/v4";
 
 export default {
   authorId: null /*TODO: required. Should be provided by a Users Table */,

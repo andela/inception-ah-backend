@@ -1,7 +1,6 @@
 import chai from "chai";
-import { chaiHttp } from "chai-http";
 import { validateData } from "../../validations/validateData";
-import userData from "../fixtures/models/userData";
+import { userData } from "../fixtures/models/userData";
 import { signUpSchema } from "../../validationSchemas/user";
 import models from "../../models";
 import app from "../../index";

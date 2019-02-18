@@ -18,6 +18,10 @@ const getTimeout = (func, delay) => {
   });
 };
 
+beforeEach(async () => {
+  await models.sequelize.sync({ force: true });
+});
+
 let resetLink = "";
 const baseUrl = "/api/v1/users/resetPassword";
 chai.use(chaiHttp);
