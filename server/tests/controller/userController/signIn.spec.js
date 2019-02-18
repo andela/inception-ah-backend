@@ -1,22 +1,22 @@
-import chai from "chai";
+import chai, { expect } from "chai";
 import chaiHttp from "chai-http";
-import app from "../../index";
-import database from "../../models/index";
-import userData from "../fixtures/model/userData";
-import { hashPassword } from "../../helpers/password";
+import app from "../../../index";
+import models from "../../../models";
+import userData from "../../fixtures/model/userData";
+import { hashPassword } from "../../../helpers/password";
 
+const { Users } = models;
 chai.use(chaiHttp);
-const { expect } = chai;
 
 beforeEach(async () => {
-  await database.sequelize.sync({ force: true });
+  await models.sequelize.sync({ force: true });
 });
 
 const userDependencies = async () => {
   const { email, password } = userData;
   const hashedPassword = await hashPassword(password);
   const updatedUserData = Object.assign(userData, { password: hashedPassword });
-  await database["Users"].create(updatedUserData);
+  await Users.create(updatedUserData);
   return {
     loginEmail: email,
     loginPassword: password

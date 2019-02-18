@@ -1,3 +1,4 @@
+import { isProd } from "../configs/passport";
 /**
  * @description Returns message to client
  *
@@ -8,11 +9,27 @@
  */
 export const httpResponse = (res, options) => {
   let { statusCode, message, success, ...data } = options;
-  const response = res.status(statusCode).json({
-    success,
+  statusCode = statusCode || 200;
+  return res.status(statusCode).json({
+    success: success || statusCode < 400,
     message,
     ...data
   });
-  res.end();
-  return response;
+};
+/**
+ * @description Returns an server error
+ *
+ * @param {object} res HTTP response object
+ * @param {object} error error object
+ * @returns {object} HTTP response
+ * @method serverError
+ */
+export const serverError = (res, error) => {
+  console.log(error.message);
+  return res.status(error.status || 500).json({
+    success: false,
+    message: isProd
+      ? `Sorry, internal error occured, try again later!`
+      : error.stack
+  });
 };

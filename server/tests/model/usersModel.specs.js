@@ -1,13 +1,12 @@
-import mocha from "mocha";
 import chai from "chai";
 import chaiAsPromise from "chai-as-promised";
-import database from "../../models/index";
+import models from "../../models";
 import user from "../fixtures/model/userData";
 
 chai.use(chaiAsPromise);
-const sequelize = database.sequelize;
+const sequelize = models.sequelize;
 const assert = chai.assert;
-const Users = database["Users"];
+const { Users } = models;
 
 beforeEach(async () => {
   await sequelize.sync({ force: true }).catch(() => {});

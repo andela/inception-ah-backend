@@ -1,11 +1,13 @@
 import isEmpty from "lodash.isempty";
-import database from "../models/index";
 import { validateData } from "../validations/validateData";
 import { signInSchema } from "../validationSchemas/user";
-import { generateJWT } from "../helpers/jwt";
 import { comparePassword } from "../helpers/password";
-import { httpResponse } from "../helpers/http";
+import { httpResponse, serverError } from "../helpers/http";
+import { getBaseUrl } from "../helpers/userHelpers";
+import userResponse from "../helpers/userResponse";
+import models from "../models";
 
+const { Users } = models;
 /**
  * @description Generate login access token for a user
  *
@@ -18,17 +20,16 @@ export const userLogin = async (req, res) => {
   try {
     const validated = await validateData({ email, password }, signInSchema);
     if (isEmpty(validated)) {
-      const user = await database["Users"].findOne({ where: { email } });
+      const user = await Users.findOne({ where: { email } });
       if (user) {
         const foundUser = user.get("password");
         const matchedPassword = await comparePassword(password, foundUser);
         if (matchedPassword) {
-          const jwtoken = await generateJWT(user.get("id"));
           return httpResponse(res, {
             statusCode: 200,
             success: true,
             message: "login successful",
-            data: { token: jwtoken }
+            data: userResponse(user)
           });
         }
       }
@@ -40,11 +41,65 @@ export const userLogin = async (req, res) => {
       data: null
     });
   } catch (err) {
-    return httpResponse(res, {
-      statusCode: 500,
-      success: false,
-      message: "An Internal server occured",
-      data: null
+    return serverError(res, err);
+  }
+};
+
+export const passwordResetRequest = async (req, res) => {
+  const { email } = req.body;
+  try {
+    const verifiedUser = await Users.findOne({
+      where: {
+        email,
+        isVerified: true
+      }
     });
+    if (verifiedUser) {
+      const url = `${getBaseUrl(req)}/users/resetPassword`;
+      await verifiedUser.sendPasswordResetEmail(url);
+      return httpResponse(res, {
+        success: true,
+        statusCode: 200,
+        message: `Email Sent Successfully to your email, `.concat(
+          "check your Spam in case you did not find it in your inbox"
+        ),
+        data: await verifiedUser.generateResetToken()
+      });
+    }
+    return httpResponse(res, {
+      success: false,
+      statusCode: 404,
+      message: "Invalid Email or You are not verified"
+    });
+  } catch (error) {
+    return serverError(res, error);
+  }
+};
+
+export const resetPassword = async (req, res) => {
+  const { password } = req.body;
+  const { token } = req.params;
+
+  try {
+    const user = await Users.findOne({
+      where: {
+        resetToken: token
+      }
+    });
+    if (user) {
+      await user.resetPassword(password, token);
+      return httpResponse(res, {
+        success: true,
+        statusCode: 200,
+        message: "Password changed Successfully",
+        data: userResponse(user)
+      });
+    }
+    return httpResponse(res, {
+      statusCode: 400,
+      message: "Password Reset Failed, try again"
+    });
+  } catch (error) {
+    return serverError(res, error);
   }
 };
