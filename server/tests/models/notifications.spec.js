@@ -1,11 +1,11 @@
 import chai from "chai";
 import chaiAsPromise from "chai-as-promised";
-import database from "../../models/index";
+import models from "../../models";
 import { userData } from "../fixtures/models/userData";
 import { articleData } from "../fixtures/models/articleData";
 
 chai.use(chaiAsPromise);
-const { Users, Articles, Notifications } = database;
+const { Users, Articles, Notifications } = models;
 const { expect } = chai;
 
 const notificationDependencies = async () => {
@@ -24,7 +24,7 @@ const notificationDependencies = async () => {
 };
 
 beforeEach(async () => {
-  await database.sequelize.sync({ force: true });
+  await models.sequelize.sync({ force: true });
 });
 
 describe("Notifications model", () => {

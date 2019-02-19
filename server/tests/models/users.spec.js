@@ -1,16 +1,16 @@
 import chai, { assert } from "chai";
 import chaiAsPromise from "chai-as-promised";
-import database from "../../models";
+import models from "../../models";
 import { userData } from "../fixtures/models/userData";
 import { comparePassword } from "../../helpers/password";
 
 chai.use(chaiAsPromise);
-const sequelize = database.sequelize;
-const Users = database["Users"];
+const sequelize = models.sequelize;
+const { Users } = models;
 const { expect } = chai;
 
 beforeEach(async () => {
-  await sequelize.sync({ force: true }).catch(() => {});
+  await sequelize.sync({ force: true });
 });
 
 describe("User table Model", async () => {

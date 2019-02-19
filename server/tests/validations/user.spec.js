@@ -15,7 +15,7 @@ const { middleName, gender, biography, mobileNumber, imageURL } = userData[2];
 const { expect } = chai;
 
 beforeEach(async () => {
-  await models.sequelize.sync({ force: true }).catch(() => {});
+  await models.sequelize.sync({ force: true });
 });
 
 describe("Sign validation", () => {

@@ -1,10 +1,10 @@
 import { assert } from "chai";
-import database from "../../models/index";
+import models from "../../models";
 import { userData } from "../fixtures/models/userData";
-import article from "../fixtures/models/articleData";
+import { articleData } from "../fixtures/models/articleData";
 
-const sequelize = database.sequelize;
-const { Favorites, Articles, Users } = database;
+const sequelize = models.sequelize;
+const { Favorites, Articles, Users } = models;
 
 beforeEach(async () => {
   await sequelize.sync({ force: true });
@@ -13,7 +13,7 @@ beforeEach(async () => {
 const favoriteDependencies = async () => {
   const createdUser = await Users.create(userData[0]);
   const userId = createdUser.get("id");
-  const articleTemplate = Object.assign(article, { authorId: userId });
+  const articleTemplate = Object.assign(articleData, { authorId: userId });
   const articleInstance = await Articles.create(articleTemplate);
   const articleId = articleInstance.get("id");
   const articleSlug = articleInstance.get("slug");
