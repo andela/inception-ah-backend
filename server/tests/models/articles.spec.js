@@ -11,7 +11,7 @@ const { Articles, Users } = models;
 const { expect } = chai;
 
 beforeEach(async () => {
-  await models.sequelize.sync({ force: true }).catch(() => {});
+  await models.sequelize.sync({ force: true });
 });
 
 const articleDependencies = async () => {
@@ -33,7 +33,7 @@ describe("Articles", () => {
   it("should create an instance of Articles", async () => {
     const dependencies = await articleDependencies();
     assert.instanceOf(dependencies.article, Articles);
-    assert.lengthOf(Object.keys(dependencies.article.dataValues), 11);
+    assert.lengthOf(Object.keys(dependencies.article.dataValues), 12);
   });
 
   it("should delete an article table", async () => {

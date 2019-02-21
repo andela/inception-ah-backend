@@ -29,6 +29,6 @@ export const serverError = (res, error) => {
     success: false,
     message: isProd
       ? `Sorry, internal error occured, try again later!`
-      : error.stack
+      : error.message
   });
 };

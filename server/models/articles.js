@@ -31,7 +31,7 @@ const getArticleModel = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: false
     },
-    favouriteCount: {
+    favoriteCount: {
       type: DataTypes.INTEGER,
       defaultValue: 0,
       allowNull: false
@@ -42,27 +42,32 @@ const getArticleModel = (sequelize, DataTypes) => {
       allowNull: false
     },
     readTime: {
-      type: DataTypes.TIME,
+      type: DataTypes.INTEGER,
       allowNull: false
+    },
+    slug: {
+      type: DataTypes.STRING
+    },
+    isPublished: {
+      type: DataTypes.BOOLEAN,
+      default: false
     }
   };
   const Article = sequelize.define("Articles", articleSchema, flags);
 
   Article.associate = db => {
-    Article.belongsTo(db["Users"], {
+    Article.belongsTo(db.Users, {
       foreignKey: "authorId",
       target: "id",
       onDelete: "CASCADE"
     });
 
-    Article.hasMany(db["Favourites"], {
+    Article.hasMany(db.Favorites, {
       foreignKey: "articleId",
       target: "id",
       onDelete: "CASCADE"
     });
   };
-
   return Article;
 };
-
 export default getArticleModel;

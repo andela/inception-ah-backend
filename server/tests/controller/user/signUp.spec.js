@@ -1,21 +1,18 @@
 import chai from "chai";
-import uniqid from "uniqid";
 import chaiHttp from "chai-http";
 import app from "../../../index";
 import models from "../../../models";
 import { userData } from "../../fixtures/models/userData";
-import { generateJWT, decodeJWT, getJWTConfigs } from "../../../helpers/jwt";
 
 chai.use(chaiHttp);
-const { expect, assert } = chai;
+const { expect } = chai;
 
 beforeEach(async () => {
-  await models.sequelize.sync({ force: true }).catch(() => {});
+  await models.sequelize.sync({ force: true });
 });
 
 chai.use(chaiHttp);
 const { firstName, lastName, password } = userData;
-const verificationConfig = getJWTConfigs();
 
 describe("POST <API /api/v1/auth/signup>", () => {
   it("should not sign up a user if all required fields are not present", async () => {

@@ -29,21 +29,21 @@ beforeEach(async () => {
 
 describe("Notifications model", () => {
   it("should create a notification model with valid user and article", async () => {
-    const { userId, articleId, user } = await notificationDependencies();
+    const { userId, articleId } = await notificationDependencies();
     const notification = await Notifications.create({
       userId,
-      source: articleId,
+      articleId,
       message: "An article is liked"
     });
     expect(notification.get("userId")).equals(userId);
-    expect(notification.get("source")).equals(articleId);
+    expect(notification.get("articleId")).equals(articleId);
   });
 
   it("should remove notification when user is not reachable", async () => {
     const { userId, articleId, user } = await notificationDependencies();
     await Notifications.create({
       userId,
-      source: articleId,
+      articleId,
       message: "An article is liked"
     });
     const notificationBefore = await Notifications.find({ Where: { userId } });
@@ -57,7 +57,7 @@ describe("Notifications model", () => {
     const { userId, articleId, article } = await notificationDependencies();
     await Notifications.create({
       userId,
-      source: articleId,
+      articleId,
       message: "An article is liked"
     });
     const notificationBefore = await Notifications.findOne({
@@ -66,7 +66,7 @@ describe("Notifications model", () => {
     expect(notificationBefore).to.not.be.null;
     await article.destroy();
     const notificationAfter = await Notifications.find({
-      Where: { source: articleId }
+      Where: { articleId }
     });
     expect(notificationAfter).to.be.null;
   });

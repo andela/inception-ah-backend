@@ -1,18 +1,18 @@
 import chai from "chai";
-import uniqid from "uniqid";
+import uniqid from "uuid/v4";
 import chaiHttp from "chai-http";
 import app from "../../../index";
 import models from "../../../models";
 import { userData } from "../../fixtures/models/userData";
 import { generateJWT, decodeJWT, getJWTConfigs } from "../../../helpers/jwt";
-import { userDependencies } from "../../helpers/depenencies";
+import { userDependencies } from "../../helpers/dependencies";
 
 let token;
 chai.use(chaiHttp);
 const { expect, assert } = chai;
 
 beforeEach(async () => {
-  await models.sequelize.sync({ force: true }).catch(() => {});
+  await models.sequelize.sync({ force: true });
 });
 
 chai.use(chaiHttp);

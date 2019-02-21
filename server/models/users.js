@@ -91,14 +91,14 @@ export default (sequelize, Sequelize) => {
   });
   User.associate = db => {
     // Add association between Users and Articles table
-    User.hasMany(db["Articles"], {
+    User.hasMany(db.Articles, {
       foreignKey: "authorId",
       target: "id",
       onDelete: "CASCADE"
     });
 
     // Add association between Users and Favourites table
-    User.hasMany(db["Favourites"], {
+    User.hasMany(db.Favorites, {
       foreignKey: "userId",
       target: "id",
       onUpdate: "CASCADE"

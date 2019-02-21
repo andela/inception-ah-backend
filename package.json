@@ -60,7 +60,7 @@
     "sinon": "^7.2.3",
     "slug": "^0.9.3",
     "underscore": "^1.9.1",
-    "uniqid": "^5.0.3"
+    "uuid": "^3.3.2"
   },
   "devDependencies": {
     "@babel/cli": "^7.2.3",
