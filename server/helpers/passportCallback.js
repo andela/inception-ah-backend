@@ -1,6 +1,6 @@
-import userResponse from "./userResponse";
+import { userResponse } from "./userResponse";
 import models from "../models";
-import socialAuthConfig from "../configs/passport";
+import { socialAuthConfig } from "../configs/passport";
 
 const { Users } = models;
 
@@ -20,8 +20,8 @@ export const getUserProfileFromApis = (token, tokenSecret, profile, done) => {
           firstName: displayName[1],
           middleName: displayName[2] || "",
           imageURL: profile.photos[0].value,
-          gender: profile.gender || "",
           isVerified: true,
+          gender: profile.gender || "",
           password: ""
         });
         return done(null, userResponse(newUser));

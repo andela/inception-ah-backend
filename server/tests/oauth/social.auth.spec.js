@@ -2,9 +2,9 @@ import chai, { expect } from "chai";
 import chaiHttp from "chai-http";
 import sinon from "sinon";
 import app from "../../index";
-import userResponse from "../../helpers/userResponse";
+import { userResponse } from "../../helpers/userResponse";
 import models from "../../models";
-import testUser, { socialUser } from "../fixtures/model/userData";
+import testUser, { socialUser } from "../fixtures/models/userData";
 import { getUserProfileFromApis } from "../../helpers/passportCallback";
 
 const { Users } = models;

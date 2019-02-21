@@ -2,8 +2,8 @@ import mocha from "mocha";
 import chai from "chai";
 import chaiAsPromise from "chai-as-promised";
 import database from "../../models/index";
-import user from "../fixtures/model/userData";
-import article from "../fixtures/model/articleData";
+import user from "../fixtures/models/userData";
+import article from "../fixtures/models/articleData";
 
 chai.use(chaiAsPromise);
 const { assert } = chai;

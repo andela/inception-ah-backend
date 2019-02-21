@@ -2,7 +2,7 @@ import chai, { expect } from "chai";
 import chaiHttp from "chai-http";
 import app from "../../../index";
 import models from "../../../models";
-import { validUser } from "../../fixtures/model/userData";
+import { validUser } from "../../fixtures/models/userData";
 
 const { Users } = models;
 
@@ -70,6 +70,6 @@ describe("Test for Password Reset", () => {
         .put(`${baseUrl}/${resetLink}`)
         .send({ password: "four-figure-table" });
       expect(userResponse.statusCode).to.equal(500);
-    }, 12000);
+    }, 2000);
   });
 });
