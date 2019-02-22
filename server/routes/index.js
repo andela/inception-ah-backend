@@ -1,7 +1,7 @@
 import { Router } from "express";
 import authRouter from "./auth";
 import userRoutes from "./userRoutes";
-import articleRoutes from "./Article";
+import articleRoutes from "./article";
 
 const mainAppRouter = Router();
 mainAppRouter.get("/", (req, res, next) => {

@@ -1,8 +1,9 @@
 import isEmpty from "lodash.isempty";
+import models from "../../models";
 import { validateData } from "../../validations/validateData";
 import { signUpSchema, signInSchema } from "../../validationSchemas/user";
 import { httpResponse, serverError } from "../../helpers/http";
-import models from "../../models";
+import { articleSchema } from "../../validationSchemas/article";
 
 const { Users } = models;
 
@@ -19,8 +20,10 @@ export const validateInput = async (req, res, next) => {
   //This willenable us access the specific schema we need for the current validation
   const schemas = {
     "/signup": signUpSchema,
-    "/signin": signInSchema
+    "/signin": signInSchema,
+    "/articles": articleSchema
   };
+
   const validation = await validateData(req.body, schemas[req.path]);
   if (validation.hasError) {
     return httpResponse(res, {
@@ -56,4 +59,42 @@ export const checkUniqueEmail = async (req, res, next) => {
   } catch (error) {
     serverError(res, error);
   }
+};
+
+/* eslint-disable no-restricted-globals */
+/**
+ * @description - Method to validate the query param for pagination
+ *
+ * @param {object} req - request sent to the server
+ * @param {object} res - response gotten from the server
+ * @param {function} next - callback function to continue execution
+ * @returns {object} - object representing response message
+ */
+export const validatePaginationParameters = (req, res, next) => {
+  const { pageNumber, pageLimit } = req.query;
+  if (pageNumber && isNaN(pageNumber)) {
+    return res.status(400).json({
+      success: false,
+      message: "Page number can only be an Integer"
+    });
+  }
+  if (pageLimit && isNaN(pageLimit)) {
+    return res.status(400).json({
+      success: false,
+      message: "Page limit can only be an Integer"
+    });
+  }
+  if (pageLimit < 0) {
+    return res.status(400).json({
+      success: false,
+      message: "Page limit must not be negative"
+    });
+  }
+  if (pageNumber < 0) {
+    return res.status(400).json({
+      success: false,
+      message: "Page number must not be negative"
+    });
+  }
+  return next();
 };

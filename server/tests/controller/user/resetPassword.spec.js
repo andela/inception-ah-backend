@@ -2,6 +2,9 @@ import chai, { expect } from "chai";
 import chaiHttp from "chai-http";
 import app from "../../../index";
 import models from "../../../models";
+import { validUser } from "../../fixtures/models/userData";
+
+const { Users } = models;
 
 beforeEach(async () => {
   await models.sequelize.sync({ force: true });
@@ -37,10 +40,11 @@ describe("Test for Password Reset", () => {
   });
 
   it("should successfully send a link to a registered User with a status code of 200", async () => {
+    await Users.create(validUser);
     const response = await chai
       .request(app)
       .post(baseUrl)
-      .send({ email: "obasajujoshua31@gmail.com" });
+      .send({ email: validUser.email });
     resetLink = response.body.data;
     expect(response.statusCode).to.equal(200);
 
@@ -57,13 +61,14 @@ describe("Test for Password Reset", () => {
     expect(userResponse.statusCode).to.equal(400);
   });
 
-  it(`should successfully send a link to a registered 
-  User with a status code of 200 and fail when the 
-  request delays for password reset`, async () => {
+  it(`should successfully send a link to a registered
+User with a status code of 200 and fail when the
+request delays for password reset`, async () => {
+    await Users.create(validUser);
     const response = await chai
       .request(app)
       .post(baseUrl)
-      .send({ email: "obasajujoshua31@gmail.com" });
+      .send({ email: validUser.email });
     resetLink = response.body.data;
     expect(response.statusCode).to.equal(200);
 
