@@ -4,8 +4,13 @@ import sinon from "sinon";
 import app from "../../index";
 import { userResponse } from "../../helpers/userResponse";
 import models from "../../models";
-import testUser, { socialUser } from "../fixtures/models/userData";
+import testUser, { userData, socialUser } from "../fixtures/models/userData";
 import { getUserProfileFromApis } from "../../helpers/passportCallback";
+import database from "../../models/index";
+
+beforeEach(async () => {
+  await database.sequelize.sync({ force: true }).catch(() => {});
+});
 
 const { Users } = models;
 
@@ -26,6 +31,7 @@ describe("Social Platform Authentication Test", () => {
     const response = await chai.request(app).get(baseUrl);
     expect(response.statusCode).to.equal(200);
   });
+
   it("should successfully authenticate via google ", async () => {
     const response = await chai.request(app).get(`${baseUrl}/auth/google`);
     expect(response.statusCode).to.equal(200);
@@ -47,7 +53,7 @@ describe("Social Platform Authentication Test", () => {
     expect(await confirmSocialUser()).to.not.be.undefined;
   });
   it("User Response function should return an object with 5 keys", async () => {
-    const newUser = await Users.create(testUser);
+    const newUser = await Users.create(userData);
     expect(userResponse(newUser)).to.have.all.keys([
       "id",
       "email",

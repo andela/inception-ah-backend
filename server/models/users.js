@@ -103,11 +103,6 @@ export default (sequelize, Sequelize) => {
       target: "id",
       onUpdate: "CASCADE"
     });
-    User.hasMany(db["Articles"], {
-      foreignKey: "authorId",
-      target: "id",
-      onDelete: "CASCADE"
-    });
   };
 
   User.prototype.generateResetToken = async function() {

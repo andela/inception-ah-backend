@@ -1,6 +1,6 @@
 import { assert } from "chai";
 import database from "../../models/index";
-import user from "../fixtures/models/userData";
+import { userData } from "../fixtures/models/userData";
 import article from "../fixtures/models/articleData";
 
 const sequelize = database.sequelize;
@@ -11,7 +11,7 @@ beforeEach(async () => {
 });
 
 const favouriteDependencies = async () => {
-  const createdUser = await Users.create(user);
+  const createdUser = await Users.create(userData);
   const userId = createdUser.get("id");
   const articleTemplate = Object.assign(article, { authorId: userId });
   const articleInstance = await Articles.create(articleTemplate);

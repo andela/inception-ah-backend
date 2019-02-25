@@ -3,10 +3,9 @@ import uniqid from "uniqid";
 import chaiHttp from "chai-http";
 import app from "../../../index";
 import models from "../../../models";
-import userData from "../../fixtures/models/userData";
+import { userData } from "../../fixtures/models/userData";
 import { generateJWT, decodeJWT, getJWTConfigs } from "../../../helpers/jwt";
 
-let token;
 chai.use(chaiHttp);
 const { expect, assert } = chai;
 
@@ -44,7 +43,6 @@ describe("POST <API /api/v1/auth/signup>", () => {
         email: "solo.biggie@gmail.com",
         password
       });
-    token = generateJWT(res.body.user.id, verificationConfig);
     expect(res.statusCode).to.equal(201);
     expect(res.body.success).to.equal(true);
     expect(res.body)

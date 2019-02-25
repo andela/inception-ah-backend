@@ -1,42 +1,41 @@
-import chai from "chai";
+import chai, { expect } from "chai";
 import chaiHttp from "chai-http";
 import app from "../../../index";
 import models from "../../../models";
-import userData from "../../fixtures/models/userData";
+import { userData } from "../../fixtures/models/userData";
 
 chai.use(chaiHttp);
-const { expect } = chai;
-const { Users } = models;
-beforeEach(async () => {
-  await models.sequelize.sync({ force: true }).catch(() => {});
-});
-const userDependencies = async () => {
-  const user = await Users.create(userData);
-  const userId = user.get("id");
+const { firstName, lastName, email, password } = userData;
 
-  return Promise.resolve({ userId, email: user.get("email") });
+beforeEach(async () => {
+  await models.sequelize.sync({ force: true });
+});
+
+const signUp = async () => {
+  const res = await chai
+    .request(app)
+    .post("/api/v1/auth/signup")
+    .send({ firstName, lastName, email, password });
 };
+
 describe("POST <API /api/v1/auth/signin>", () => {
   it("should login a valid user", async () => {
-    const { email } = await userDependencies();
+    await signUp();
     const res = await chai
       .request(app)
       .post("/api/v1/auth/signin")
-      .send({ email, password: userData.password });
+      .send({ email, password });
     expect(res.statusCode).to.equal(200);
     expect(res.body.success).to.be.true;
     expect(res.body.data).to.not.be.null;
   });
 
   it("should not login an invalid user", async () => {
-    const { email } = await userDependencies();
+    await signUp();
     const res = await chai
       .request(app)
       .post("/api/v1/auth/signin")
-      .send({
-        email,
-        password: "Pasdfggh4565@"
-      });
+      .send({ email, password: "bad password" });
     expect(res.statusCode).to.equal(401);
     expect(res.body.data).to.be.null;
     expect(res.body.success).to.be.false;
