@@ -1,8 +1,6 @@
 import { generateJWT, getJWTConfigs } from "./jwt";
 
-const jwtConfigs = getJWTConfigs({
-  subject: "Authentication token"
-});
+const jwtConfigs = getJWTConfigs();
 /**
  * @param  {object} dbUserModel
  * @returns {object} responseObject

@@ -2,9 +2,10 @@ import chai, { expect } from "chai";
 import chaiHttp from "chai-http";
 import app from "../../../index";
 import models from "../../../models";
-import { validUser } from "../../fixtures/models/userData";
 
-const { Users } = models;
+beforeEach(async () => {
+  await models.sequelize.sync({ force: true });
+});
 
 const getTimeout = (func, delay) => {
   return new Promise((resolve, reject) => {
@@ -36,7 +37,6 @@ describe("Test for Password Reset", () => {
   });
 
   it("should successfully send a link to a registered User with a status code of 200", async () => {
-    await Users.create(validUser);
     const response = await chai
       .request(app)
       .post(baseUrl)
@@ -60,7 +60,6 @@ describe("Test for Password Reset", () => {
   it(`should successfully send a link to a registered 
   User with a status code of 200 and fail when the 
   request delays for password reset`, async () => {
-    await Users.create(validUser);
     const response = await chai
       .request(app)
       .post(baseUrl)
@@ -76,4 +75,9 @@ describe("Test for Password Reset", () => {
       expect(userResponse.statusCode).to.equal(500);
     }, 2000);
   });
+});
+
+after(async () => {
+  models.sequelize.drop();
+  models.sequelize.close();
 });

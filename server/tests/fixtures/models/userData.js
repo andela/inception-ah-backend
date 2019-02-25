@@ -2,7 +2,7 @@ export const userData = {
   firstName: "John",
   middleName: "Mark",
   lastName: "Drew",
-  email: "obasajujoshua31@gmail.com",
+  email: "obasajujoshua@gmail.com",
   password: "make.meProud2",
   gender: "male",
   biography: "A son from the sun",
