@@ -11,7 +11,6 @@ beforeEach(async () => {
   await models.sequelize.sync({ force: true });
 });
 
-chai.use(chaiHttp);
 const { firstName, lastName, password } = userData[0];
 
 describe("POST <API /api/v1/auth/signup>", () => {

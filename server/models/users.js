@@ -152,10 +152,11 @@ export default (sequelize, Sequelize) => {
 
   User.prototype.updateProfile = async function(user) {
     Object.keys(user).forEach(key => {
-      this[key] = user[key] || this[key];
+      this[key] = ["firstName", "lastName"].includes(key)
+        ? user[key] || this[key]
+        : user[key];
     });
     this.save();
-    await this.reload();
     return this;
   };
 
