@@ -26,7 +26,7 @@ export const getJWTConfigs = configs => {
  * @returns {string} the generated token
  * @method generateJWT
  */
-export const generateJWT = (userId, configs) => {
+export const generateJWT = (userId, configs = getJWTConfigs()) => {
   const { secret, ...config } = configs;
   try {
     return jwt.sign({ userId }, secret, config);

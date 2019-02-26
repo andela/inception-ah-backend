@@ -13,7 +13,7 @@ describe("Send Email", () => {
       fistName,
       lastName,
       userEmail,
-      null,
+      "email subject",
       null,
       {}
     );

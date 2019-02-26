@@ -57,5 +57,4 @@ describe("User table Model", async () => {
 
 after(async () => {
   sequelize.drop();
-  sequelize.close();
 });
