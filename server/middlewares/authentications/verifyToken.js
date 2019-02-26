@@ -2,7 +2,7 @@ import dotenv from "dotenv";
 import { getJWTConfigs, decodeJWT } from "../../helpers/jwt";
 import { httpResponse, serverError } from "../../helpers/http";
 
-const tokenConfigs = getJWTConfigs({ subject: "Authentication Token" });
+const tokenConfigs = getJWTConfigs();
 dotenv.config();
 /**
  * @description A middleware to verify if Token is supplied,
