@@ -1,7 +1,7 @@
 import { Router } from "express";
-import authRouter from "./auth";
-import userRoutes from "./userRoutes";
-import articleRoutes from "./article";
+import { authRouter } from "@routes/auth";
+import { userRoutes } from "@routes/userRoutes";
+import { articleRoutes } from "@routes/articleRoutes";
 
 const mainAppRouter = Router();
 mainAppRouter.get("/", (req, res, next) => {
@@ -10,8 +10,7 @@ mainAppRouter.get("/", (req, res, next) => {
     message: "Welcome to Authors Haven API"
   });
 });
-
 mainAppRouter.use("/auth", authRouter);
 mainAppRouter.use("/users", userRoutes);
 mainAppRouter.use("/", articleRoutes);
-export default mainAppRouter;
+export { mainAppRouter };

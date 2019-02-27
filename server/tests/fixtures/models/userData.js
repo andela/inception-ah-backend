@@ -1,18 +1,42 @@
-export const userData = {
-  firstName: "John",
-  middleName: "Mark",
-  lastName: "Drew",
-  email: "obasajujoshua@gmail.com",
-  password: "make.meProud2",
-  gender: "male",
-  biography: "A son from the sun",
-  mobileNumber: 12345678909,
-  imageURL: "http://image.jpg",
-  isNotifiable: true,
-  isAdmin: true
-};
+export const userData = [
+  {
+    firstName: "John",
+    middleName: "Mark",
+    lastName: "Drew",
+    email: "obasajujoshua@gmail.com",
+    password: "make.meProud2",
+    gender: "male",
+    biography: "A son from the sun",
+    mobileNumber: "12345678909",
+    imageURL: "http://image.jpg",
+    isNotifiable: true,
+    isAdmin: true
+  },
+  {
+    firstName: "Lateefat",
+    middleName: "Bisola",
+    lastName: "Amuda",
+    email: "lateefat@gmail.com",
+    password: "me.meLove2",
+    gender: "female",
+    biography: "A daughter from the sun",
+    mobileNumber: "22345678909",
+    imageURL: "http://image.jpg",
+    isNotifiable: true,
+    isAdmin: false
+  },
+  {
+    firstName: "John",
+    middleName: "Mark",
+    lastName: "Drew",
+    gender: "male",
+    biography: "A son from the sun",
+    mobileNumber: "12345678909",
+    imageURL: "http://image.jpg"
+  }
+];
 
-export const validUser = {
+export const validUserData = {
   firstName: "John",
   middleName: "Mark",
   lastName: "Drew",
@@ -21,7 +45,7 @@ export const validUser = {
   gender: "male",
   isVerified: true,
   biography: "A son from the sun",
-  mobileNumber: 12345678909,
+  mobileNumber: "22345678909",
   imageURL: "http://image.jpg",
   isNotifiable: true,
   isAdmin: false

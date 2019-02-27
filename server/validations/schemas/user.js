@@ -1,4 +1,5 @@
 import Joi from "joi";
+import { errorFormatter } from "../errorFormatter";
 
 /**
  * @description Get name validation schema
@@ -17,10 +18,11 @@ const getNameSchema = label => {
     .regex(exp)
     .lowercase()
     .label(label)
-    .error(errors => formatError(errors, label));
+    .error(errors => errorFormatter(errors, label));
 };
 
 const firstName = getNameSchema("First name");
+const middleName = getNameSchema("Middle name");
 const lastName = getNameSchema("Last name");
 const email = Joi.string()
   .email()
@@ -36,7 +38,7 @@ const password = Joi.string()
   .trim()
   .label("Password")
   .error(errors => {
-    return formatError(
+    return errorFormatter(
       errors,
       "Password",
       "Password must be atleast 6 chars with atleast 1 uppercase, 1 number, & 1 special char"
@@ -59,12 +61,36 @@ export const signInSchema = Joi.object().keys({
     .required()
 });
 
-export const formatError = (errors, label, message) => {
-  const err = errors[0];
-  switch (err.type) {
-    case "string.regex.base":
-      return message || `${label || err.path} is inavlid`;
-    default:
-      return err;
-  }
-};
+const gender = Joi.string()
+  .allow("")
+  .trim()
+  .strict()
+  .label("Gender");
+
+const biography = Joi.string()
+  .allow("")
+  .trim()
+  .strict()
+  .label("Biography");
+
+const mobileNumber = Joi.string()
+  .allow("")
+  .trim()
+  .strict()
+  .label("Mobile number");
+
+const imageURL = Joi.string()
+  .allow("")
+  .trim()
+  .strict()
+  .label("Image URL");
+
+export const updateProfileSchema = Joi.object().keys({
+  firstName,
+  middleName,
+  lastName,
+  gender,
+  biography,
+  mobileNumber,
+  imageURL
+});

@@ -1,6 +1,6 @@
-import { userResponse } from "./userResponse";
-import models from "../models";
-import { socialAuthConfig } from "../configs/passport";
+import { userResponse } from "@helpers/users";
+import models from "@models";
+import { socialAuthConfig } from "@configs/passport";
 
 const { Users } = models;
 

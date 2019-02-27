@@ -1,14 +1,9 @@
 import bcrypt from "bcrypt";
-import { hashPassword } from "../helpers/password";
-import {
-  decryptToken,
-  getTimeDifference,
-  encryptToken
-} from "../helpers/crypto";
-import { expiryTime } from "../configs/config";
-import { sendEmail } from "../emails/email";
-import { resetConstants } from "../emails/constants/passwordReset";
-import { verifyConstants } from "../emails/constants/accountVerification";
+import { expiryTime } from "@configs/config";
+import { hashPassword } from "@helpers/password";
+import { decryptToken, getTimeDifference, encryptToken } from "@helpers/crypto";
+import { sendEmail } from "@emails/email";
+import { resetConstants, verifyConstants } from "@emails/constants";
 
 export default (sequelize, Sequelize) => {
   const userSchema = {
@@ -50,7 +45,8 @@ export default (sequelize, Sequelize) => {
       type: Sequelize.CHAR
     },
     imageURL: {
-      type: Sequelize.TEXT
+      type: Sequelize.TEXT,
+      defaultValue: process.env.IMAGE_URL
     },
     isVerified: {
       type: Sequelize.BOOLEAN,
@@ -90,14 +86,12 @@ export default (sequelize, Sequelize) => {
     }
   });
   User.associate = db => {
-    // Add association between Users and Articles table
     User.hasMany(db.Articles, {
       foreignKey: "authorId",
       target: "id",
       onDelete: "CASCADE"
     });
 
-    // Add association between Users and Favourites table
     User.hasMany(db.Favorites, {
       foreignKey: "userId",
       target: "id",
@@ -151,6 +145,15 @@ export default (sequelize, Sequelize) => {
   User.prototype.activateAccount = async function() {
     this.isVerified = true;
     this.lastLogin = new Date();
+    this.save();
+    await this.reload();
+    return this;
+  };
+
+  User.prototype.updateProfile = async function(user) {
+    Object.keys(user).forEach(key => {
+      this[key] = user[key] || this[key];
+    });
     this.save();
     await this.reload();
     return this;

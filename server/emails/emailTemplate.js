@@ -8,7 +8,7 @@ const mailGenerator = new Mailgen({
   }
 });
 
-const generateEmailTemplate = (
+export const generateEmailTemplate = (
   firstName,
   lastName,
   url,
@@ -31,5 +31,3 @@ const generateEmailTemplate = (
   };
   return mailGenerator.generate(email);
 };
-
-export default generateEmailTemplate;

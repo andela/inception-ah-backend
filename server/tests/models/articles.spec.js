@@ -1,26 +1,22 @@
-import mocha from "mocha";
 import chai from "chai";
 import chaiAsPromise from "chai-as-promised";
-import models from "../../models";
-import { userData } from "../fixtures/models/userData";
-import { articleData } from "../fixtures/models/articleData";
+import models from "@models";
+import { articleData, userData } from "@fixtures";
 
 chai.use(chaiAsPromise);
-const { assert } = chai;
+const { assert, expect } = chai;
 const { Articles, Users } = models;
-const { expect } = chai;
 
 beforeEach(async () => {
-  await models.sequelize.sync({ force: true });
+  await models.sequelize.sync({ force: true }).catch(() => {});
 });
 
 const articleDependencies = async () => {
-  const createdUser = await Users.create(userData);
+  const createdUser = await Users.create(userData[0]);
   const userId = createdUser.get("id");
   const articleTemplate = Object.assign(articleData, { authorId: userId });
   const articleInstance = await Articles.create(articleTemplate);
   const articleId = articleInstance.get("id");
-
   return Promise.resolve({
     userId,
     articleId,
@@ -33,7 +29,6 @@ describe("Articles", () => {
   it("should create an instance of Articles", async () => {
     const dependencies = await articleDependencies();
     assert.instanceOf(dependencies.article, Articles);
-    assert.lengthOf(Object.keys(dependencies.article.dataValues), 13);
   });
 
   it("should delete an article table", async () => {

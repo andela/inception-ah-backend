@@ -1,5 +1,4 @@
-import { generateUniqueSlug } from "../helpers/generateUniqueSlug";
-import { calculateReadTime } from "../helpers/calculateReadTime";
+import { generateUniqueSlug, calculateReadTime } from "@helpers/articles";
 
 const getArticleModel = (sequelize, DataTypes) => {
   const articleSchema = {

@@ -3,7 +3,7 @@ import crypto from "crypto";
 export const encryptToken = () => {
   const timeEncoded = crypto.createCipher(
     "aes-128-cbc",
-    process.env.JWT_SECRET
+    process.env.JWT_AUTH_SECRET
   );
   const timeIssued = new Date();
   let encodedTimeStamp = timeEncoded.update(
@@ -18,7 +18,7 @@ export const encryptToken = () => {
 export const decryptToken = token => {
   const timeDecoded = crypto.createDecipher(
     "aes-128-cbc",
-    process.env.JWT_SECRET
+    process.env.JWT_AUTH_SECRET
   );
   let decodedTime = timeDecoded.update(token, "hex", "utf8");
   decodedTime += timeDecoded.final("utf8");

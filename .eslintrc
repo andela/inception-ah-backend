@@ -44,19 +44,40 @@
     "prefer-destructuring": 0,
     "no-trailing-spaces": 0,
     "comma-dangle": 0,
-    "max-len": [1, 100, 2],
+    "max-len": [
+      1,
+      100,
+      2
+    ],
     "no-useless-escape": 0,
     "one-var-declaration-per-line": 0,
     "consistent-return": 0,
     "no-param-reassign": 0,
     "linebreak-style": 0,
     "object-shorthand": 0,
-    "curly": ["error", "multi-line"],
+    "curly": [
+      "error",
+      "multi-line"
+    ],
     "object-curly-newline": 0,
     "quotes": 0,
-    "import/no-unresolved": [2, { "commonjs": true }],
+    "import/no-unresolved": [
+      2,
+      {
+        "commonjs": true
+      }
+    ],
     "import/prefer-default-export": 0,
-    "no-shadow": ["error", { "allow": ["req", "res", "err"] }],
+    "no-shadow": [
+      "error",
+      {
+        "allow": [
+          "req",
+          "res",
+          "err"
+        ]
+      }
+    ],
     "valid-jsdoc": [
       "error",
       {

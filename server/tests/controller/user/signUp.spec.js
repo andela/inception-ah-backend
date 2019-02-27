@@ -1,8 +1,8 @@
 import chai from "chai";
 import chaiHttp from "chai-http";
-import app from "../../../index";
-import models from "../../../models";
-import { userData } from "../../fixtures/models/userData";
+import app from "@app";
+import models from "@models";
+import { userData } from "@fixtures";
 
 chai.use(chaiHttp);
 const { expect } = chai;
@@ -12,7 +12,7 @@ beforeEach(async () => {
 });
 
 chai.use(chaiHttp);
-const { firstName, lastName, password } = userData;
+const { firstName, lastName, password } = userData[0];
 
 describe("POST <API /api/v1/auth/signup>", () => {
   it("should not sign up a user if all required fields are not present", async () => {
@@ -51,7 +51,7 @@ describe("POST <API /api/v1/auth/signup>", () => {
     const res = await chai
       .request(app)
       .post("/api/v1/auth/signup")
-      .send(userData);
+      .send(userData[0]);
     expect(res.statusCode).to.equal(400);
     expect(res.body).to.be.an("object");
   });

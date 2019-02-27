@@ -1,11 +1,11 @@
 import chai from "chai";
 import uniqid from "uuid/v4";
 import chaiHttp from "chai-http";
-import app from "../../../index";
-import models from "../../../models";
-import { userData } from "../../fixtures/models/userData";
-import { generateJWT, decodeJWT, getJWTConfigs } from "../../../helpers/jwt";
-import { userDependencies } from "../../helpers/dependencies";
+import { generateJWT, decodeJWT, getJWTConfigs } from "@helpers/jwt";
+import app from "@app";
+import models from "@models";
+import { userData } from "@fixtures";
+import { userDependencies } from "@dependencies";
 
 let token;
 chai.use(chaiHttp);
@@ -16,12 +16,12 @@ beforeEach(async () => {
 });
 
 chai.use(chaiHttp);
-const verificationConfig = getJWTConfigs();
+const verificationConfig = getJWTConfigs({ option: "verification" });
 
 describe("GET <API /api/v1/auth/verification/:token>", () => {
   it("should verify a user registration", async () => {
-    const user = await userDependencies(userData);
-    token = generateJWT(user.id, verificationConfig);
+    const user = await userDependencies(userData[0]);
+    token = generateJWT({ userId: user.id }, verificationConfig);
     const res1 = await chai
       .request(app)
       .get(`/api/v1/auth/verification/${token}`);
@@ -55,7 +55,7 @@ describe("GET <API /api/v1/auth/verification/:token>", () => {
 describe("User Helpers", () => {
   it("should not generate a token and throw an exception", () => {
     try {
-      generateJWT(uniqid(), getJWTConfigs({ expiresIn: [] }));
+      generateJWT({ userId: uniqid() }, getJWTConfigs({ expiresIn: [] }));
     } catch (error) {
       assert.instanceOf(error, Error);
     }
@@ -76,13 +76,13 @@ describe("User Helpers", () => {
   });
 
   it("should return JWT configs", () => {
-    const configs = getJWTConfigs();
+    const configs = getJWTConfigs({ option: "verification" });
     assert.isObject(configs);
     assert.hasAllKeys(configs, ["secret", "subject", "issuer"]);
   });
 
   it("should return JWT configs with expiresIn", () => {
-    const configs = getJWTConfigs({ expiresIn: "7d", subject: "Subject" });
+    const configs = getJWTConfigs({ expiresIn: "7d", option: "verification" });
     assert.isObject(configs);
     assert.hasAllKeys(configs, ["secret", "subject", "issuer", "expiresIn"]);
   });

@@ -3,7 +3,7 @@ import bcrypt from "bcrypt";
 /**
  * @description Hash a string
  *
- * @param {string} password the password to ecrypt
+ * @param {string} password the password to encrypt
  * @returns {string} the encypted password
  * @method hashPassword
  */

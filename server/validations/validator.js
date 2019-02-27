@@ -8,7 +8,7 @@ import Joi from "joi";
  * @returns {object} true if no error | array of errors
  */
 
-export const validateData = async (inputData, schema) => {
+export const validator = async (inputData, schema) => {
   try {
     const fields = await Joi.validate(inputData, schema, {
       abortEarly: false

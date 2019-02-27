@@ -1,15 +1,14 @@
 import chai from "chai";
 import chaiAsPromise from "chai-as-promised";
-import database from "../../models/index";
-import { userData } from "../fixtures/models/userData";
-import { articleData } from "../fixtures/models/articleData";
+import database from "@models";
+import { userData, articleData } from "@fixtures";
 
 chai.use(chaiAsPromise);
 const { Users, Articles, Notifications } = database;
 const { expect } = chai;
 
 const notificationDependencies = async () => {
-  const createdUser = await Users.create(userData);
+  const createdUser = await Users.create(userData[0]);
   const userId = createdUser.get("id");
   articleData.authorId = userId;
   const articleInstance = await Articles.create(articleData);
@@ -46,10 +45,14 @@ describe("Notifications model", () => {
       articleId,
       message: "An article is liked"
     });
-    const notificationBefore = await Notifications.find({ Where: { userId } });
+    const notificationBefore = await Notifications.findOne({
+      Where: { userId }
+    });
     expect(notificationBefore).to.not.be.null;
     await user.destroy();
-    const notificationAfter = await Notifications.find({ Where: { userId } });
+    const notificationAfter = await Notifications.findOne({
+      Where: { userId }
+    });
     expect(notificationAfter).to.be.null;
   });
 
@@ -65,7 +68,7 @@ describe("Notifications model", () => {
     });
     expect(notificationBefore).to.not.be.null;
     await article.destroy();
-    const notificationAfter = await Notifications.find({
+    const notificationAfter = await Notifications.findOne({
       Where: { articleId }
     });
     expect(notificationAfter).to.be.null;

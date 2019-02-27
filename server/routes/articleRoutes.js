@@ -101,4 +101,4 @@ articleRoutes.delete(
   deleteArticle
 );
 
-export default articleRoutes;
+export { articleRoutes };
