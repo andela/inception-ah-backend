@@ -29,7 +29,7 @@ const userProfileDependencies = async () => {
   });
 };
 
-before(async () => {
+beforeEach(async () => {
   await db.sequelize.sync({ force: true });
 });
 

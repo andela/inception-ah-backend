@@ -31,17 +31,17 @@ const articleDependencies = async () => {
 
 describe("Articles", () => {
   it("should create an instance of Articles", async () => {
-    const dependencies = await articleDependencies();
-    assert.instanceOf(dependencies.article, Articles);
-    assert.lengthOf(Object.keys(dependencies.article.dataValues), 13);
+    const { article } = await articleDependencies();
+    assert.instanceOf(article, Articles);
+    assert.lengthOf(Object.keys(article.dataValues), 13);
   });
 
   it("should delete an article table", async () => {
-    const dependencies = await articleDependencies();
-    assert.instanceOf(dependencies.article, Articles);
-    await Articles.drop({ cascade: true });
-    expect(
-      Articles.findOne({ where: { id: dependencies.articleId } })
-    ).to.rejectedWith(Error);
+    const { article } = await articleDependencies();
+    await article.destroy();
+    const foundArticle = await Articles.findOne({
+      where: { id: article.get("id") }
+    });
+    expect(foundArticle).to.be.null;
   });
 });

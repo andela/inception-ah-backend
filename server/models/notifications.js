@@ -3,7 +3,7 @@ const getNotificationsModel = (sequelize, DataTypes) => {
     freezeTableName: true
   };
 
-  const NotificationShema = {
+  const NotificationSchema = {
     id: {
       type: DataTypes.UUID,
       primaryKey: true,
@@ -30,7 +30,7 @@ const getNotificationsModel = (sequelize, DataTypes) => {
 
   const Notification = sequelize.define(
     "Notifications",
-    NotificationShema,
+    NotificationSchema,
     flags
   );
 

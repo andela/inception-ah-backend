@@ -13,3 +13,4 @@ import "./controller/favorite/favorites.spec";
 import "./models/notifications.spec";
 import "./controller/article/article.spec";
 import "./controller/article/pagination.spec";
+// import "./models/followers.specs";

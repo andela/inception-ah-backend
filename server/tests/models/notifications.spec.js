@@ -46,10 +46,14 @@ describe("Notifications model", () => {
       articleId,
       message: "An article is liked"
     });
-    const notificationBefore = await Notifications.find({ Where: { userId } });
+    const notificationBefore = await Notifications.findOne({
+      Where: { userId }
+    });
     expect(notificationBefore).to.not.be.null;
     await user.destroy();
-    const notificationAfter = await Notifications.find({ Where: { userId } });
+    const notificationAfter = await Notifications.findOne({
+      Where: { userId }
+    });
     expect(notificationAfter).to.be.null;
   });
 
@@ -65,7 +69,7 @@ describe("Notifications model", () => {
     });
     expect(notificationBefore).to.not.be.null;
     await article.destroy();
-    const notificationAfter = await Notifications.find({
+    const notificationAfter = await Notifications.findOne({
       Where: { articleId }
     });
     expect(notificationAfter).to.be.null;
