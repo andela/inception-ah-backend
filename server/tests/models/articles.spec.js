@@ -3,7 +3,7 @@ import chai from "chai";
 import chaiAsPromise from "chai-as-promised";
 import models from "../../models";
 import { userData } from "../fixtures/models/userData";
-import article from "../fixtures/models/articleData";
+import { articleData } from "../fixtures/models/articleData";
 
 chai.use(chaiAsPromise);
 const { assert } = chai;
@@ -17,7 +17,7 @@ beforeEach(async () => {
 const articleDependencies = async () => {
   const createdUser = await Users.create(userData);
   const userId = createdUser.get("id");
-  const articleTemplate = Object.assign(article, { authorId: userId });
+  const articleTemplate = Object.assign(articleData, { authorId: userId });
   const articleInstance = await Articles.create(articleTemplate);
   const articleId = articleInstance.get("id");
 
@@ -33,7 +33,7 @@ describe("Articles", () => {
   it("should create an instance of Articles", async () => {
     const dependencies = await articleDependencies();
     assert.instanceOf(dependencies.article, Articles);
-    assert.lengthOf(Object.keys(dependencies.article.dataValues), 12);
+    assert.lengthOf(Object.keys(dependencies.article.dataValues), 13);
   });
 
   it("should delete an article table", async () => {

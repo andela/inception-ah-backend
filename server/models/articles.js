@@ -1,7 +1,7 @@
+import { generateUniqueSlug } from "../helpers/generateUniqueSlug";
+import { calculateReadTime } from "../helpers/calculateReadTime";
+
 const getArticleModel = (sequelize, DataTypes) => {
-  const flags = {
-    freezeTableName: true
-  };
   const articleSchema = {
     id: {
       type: DataTypes.UUID,
@@ -36,14 +36,18 @@ const getArticleModel = (sequelize, DataTypes) => {
       defaultValue: 0,
       allowNull: false
     },
+    commentsCount: {
+      type: DataTypes.INTEGER,
+      defaultValue: 0,
+      allowNull: false
+    },
     numberOfReads: {
       type: DataTypes.INTEGER,
       defaultValue: 0,
       allowNull: false
     },
     readTime: {
-      type: DataTypes.INTEGER,
-      allowNull: false
+      type: DataTypes.INTEGER
     },
     slug: {
       type: DataTypes.STRING
@@ -53,18 +57,30 @@ const getArticleModel = (sequelize, DataTypes) => {
       default: false
     }
   };
-  const Article = sequelize.define("Articles", articleSchema, flags);
+
+  const Article = sequelize.define("Articles", articleSchema, {
+    freezeTableName: true,
+    hooks: {
+      beforeCreate: (article, options) => {
+        article.slug = generateUniqueSlug(article.title);
+        article.readTime = calculateReadTime(article.content);
+        return article;
+      }
+    }
+  });
 
   Article.associate = db => {
     Article.belongsTo(db.Users, {
       foreignKey: "authorId",
       target: "id",
+      as: "author",
       onDelete: "CASCADE"
     });
 
     Article.hasMany(db.Favorites, {
       foreignKey: "articleId",
       target: "id",
+      as: "favourite",
       onDelete: "CASCADE"
     });
   };
