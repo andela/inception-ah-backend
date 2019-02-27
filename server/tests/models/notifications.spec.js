@@ -9,7 +9,7 @@ const { Users, Articles, Notifications } = database;
 const { expect } = chai;
 
 const notificationDependencies = async () => {
-  const createdUser = await Users.create(userData);
+  const createdUser = await Users.create(userData[0]);
   const userId = createdUser.get("id");
   articleData.authorId = userId;
   const articleInstance = await Articles.create(articleData);

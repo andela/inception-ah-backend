@@ -20,7 +20,7 @@ const verificationConfig = getJWTConfigs();
 
 describe("GET <API /api/v1/auth/verification/:token>", () => {
   it("should verify a user registration", async () => {
-    const user = await userDependencies(userData);
+    const user = await userDependencies(userData[0]);
     token = generateJWT(user.id, verificationConfig);
     const res1 = await chai
       .request(app)

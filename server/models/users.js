@@ -50,7 +50,8 @@ export default (sequelize, Sequelize) => {
       type: Sequelize.CHAR
     },
     imageURL: {
-      type: Sequelize.TEXT
+      type: Sequelize.TEXT,
+      defaultValue: process.env.IMAGE_URL
     },
     isVerified: {
       type: Sequelize.BOOLEAN,
@@ -153,6 +154,28 @@ export default (sequelize, Sequelize) => {
     this.lastLogin = new Date();
     this.save();
     await this.reload();
+    return this;
+  };
+
+  User.prototype.updateProfile = async function(user) {
+    const {
+      firstName,
+      lastName,
+      gender,
+      biography,
+      mobileNumber,
+      middleName,
+      imageURL
+    } = user;
+    this.firstName = firstName || this.firstName;
+    this.middleName = middleName;
+    this.lastName = lastName || this.lastName;
+    this.gender = gender;
+    this.biography = biography;
+    this.mobileNumber = mobileNumber;
+    this.imageURL = imageURL;
+    this.save;
+    await this.reload;
     return this;
   };
 

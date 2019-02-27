@@ -2,14 +2,13 @@ import chai, { expect } from "chai";
 import chaiHttp from "chai-http";
 import sinon from "sinon";
 import app from "../../index";
-import { userResponse } from "../../helpers/userResponse";
-import models from "../../models";
-import testUser, { userData, socialUser } from "../fixtures/models/userData";
+import { userResponse, userProfileResponse } from "../../helpers/userResponses";
+import models from "../../models/index";
+import { userData, socialUser } from "../fixtures/models/userData";
 import { getUserProfileFromApis } from "../../helpers/passportCallback";
-import database from "../../models/index";
 
 beforeEach(async () => {
-  await database.sequelize.sync({ force: true }).catch(() => {});
+  await models.sequelize.sync({ force: true }).catch(() => {});
 });
 
 const { Users } = models;
@@ -52,13 +51,28 @@ describe("Social Platform Authentication Test", () => {
     getUserProfileFromApis(null, null, socialUser, done);
     expect(await confirmSocialUser()).to.not.be.undefined;
   });
+
   it("User Response function should return an object with 5 keys", async () => {
-    const newUser = await Users.create(userData);
+    const newUser = await Users.create(userData[0]);
     expect(userResponse(newUser)).to.have.all.keys([
       "id",
       "email",
       "biography",
       "token",
+      "imageURL"
+    ]);
+  });
+
+  it("User Profile Response function should return an object with 8 keys", async () => {
+    const newUser = await Users.create(userData[0]);
+    expect(userProfileResponse(newUser)).to.have.all.keys([
+      "id",
+      "firstName",
+      "middleName",
+      "lastName",
+      "gender",
+      "biography",
+      "mobileNumber",
       "imageURL"
     ]);
   });
