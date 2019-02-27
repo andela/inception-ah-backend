@@ -38,3 +38,10 @@ export const socialUser = {
     }
   ]
 };
+
+export const registerUser = {
+  firstName: "John",
+  lastName: "Doe",
+  email: "john.doe@gmail.com",
+  password: "john.doe2"
+};
