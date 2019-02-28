@@ -1,5 +1,4 @@
 import "./models/users.spec";
-
 import "./models/favourites.spec";
 import "./miscellaneous/miscellaneous.spec";
 import "./oauth/social.auth.spec";
