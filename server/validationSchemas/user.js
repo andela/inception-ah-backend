@@ -43,6 +43,38 @@ const password = Joi.string()
     );
   });
 
+const middleName = Joi.string()
+  .allow("")
+  .trim()
+  .strict()
+  .label("Middle name");
+
+const gender = Joi.string()
+  .allow("")
+  .trim()
+  .strict()
+  .label("Gender");
+
+const biography = Joi.string()
+  .allow("")
+  .trim()
+  .strict()
+  .label("Biography");
+
+const mobileNumber = Joi.string()
+  .allow("")
+  .trim()
+  .strict()
+  .label("Mobile number");
+
+const imageURL = Joi.string()
+  .allow("")
+  .trim()
+  .strict()
+  .label("Image URL");
+
+export const uuidSchema = Joi.string().uuid();
+
 export const signUpSchema = Joi.object().keys({
   firstName,
   lastName,
@@ -51,8 +83,12 @@ export const signUpSchema = Joi.object().keys({
 });
 
 export const signInSchema = Joi.object().keys({
-  email: Joi.string().trim().required(),
-  password: Joi.string().trim().required()
+  email: Joi.string()
+    .trim()
+    .required(),
+  password: Joi.string()
+    .trim()
+    .required()
 });
 
 export const formatError = (errors, label, message) => {
@@ -64,3 +100,13 @@ export const formatError = (errors, label, message) => {
       return err;
   }
 };
+
+export const updateProfileSchema = Joi.object().keys({
+  firstName,
+  middleName,
+  lastName,
+  gender,
+  biography,
+  mobileNumber,
+  imageURL
+});

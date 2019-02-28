@@ -11,7 +11,7 @@ beforeEach(async () => {
 });
 
 const favoriteDependencies = async () => {
-  const createdUser = await Users.create(userData);
+  const createdUser = await Users.create(userData[0]);
   const userId = createdUser.get("id");
   const articleTemplate = Object.assign(article, { authorId: userId });
   const articleInstance = await Articles.create(articleTemplate);

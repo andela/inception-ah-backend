@@ -10,8 +10,8 @@ mainAppRouter.get("/", (req, res, next) => {
     message: "Welcome to Authors Haven API"
   });
 });
-
 mainAppRouter.use("/auth", authRouter);
 mainAppRouter.use("/users", userRoutes);
 mainAppRouter.use("/", articleRoutes);
+
 export default mainAppRouter;

@@ -5,7 +5,7 @@ import models from "../../../models";
 import { userData } from "../../fixtures/models/userData";
 
 chai.use(chaiHttp);
-const { firstName, lastName, email, password } = userData;
+const { firstName, lastName, email, password } = userData[0];
 
 beforeEach(async () => {
   await models.sequelize.sync({ force: true });

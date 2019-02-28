@@ -2,8 +2,8 @@ import isEmpty from "lodash.isempty";
 import { comparePassword } from "../helpers/password";
 import { serverError, httpResponse } from "../helpers/http";
 import { generateJWT, decodeJWT, getJWTConfigs } from "../helpers/jwt";
-import { userResponse } from "../helpers/userResponse";
 import { getBaseUrl, sanitize } from "../helpers/users";
+import { userResponse, userProfileResponse } from "../helpers/userResponses";
 import models from "../models";
 
 const { Users } = models;
@@ -29,6 +29,7 @@ export const userLogin = async (req, res) => {
           statusCode: 200,
           success: true,
           message: "login successful",
+          userId: user.get("id"),
           data: { token }
         });
       }
@@ -176,5 +177,54 @@ export const verifyUserAccount = async (req, res) => {
     });
   } catch (error) {
     serverError(res, error);
+  }
+};
+
+/**
+ * @description Fetch user profile
+ *
+ * @param {Request}  req
+ * @param {httpResponse} res
+ * @returns {object} HttpResponse {statusCode:int, success:boolean, data:object, message:string}
+ */
+export const getUserProfile = async (req, res) => {
+  const { userDetails } = req;
+  return httpResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: "User profile retrieved",
+    data: userProfileResponse(userDetails)
+  });
+};
+
+/**
+ * @description Update User Profile
+ *
+ * @param {Request}  req
+ * @param {httpResponse} res
+ * @returns {object} HttpResponse {statusCode:int, success:boolean, data:object, message:string}
+ */
+export const updateUserProfile = async (req, res) => {
+  const { user } = req;
+  try {
+    const { userDetails } = req;
+    const userIdFromToken = user.userId;
+    if (userIdFromToken === userDetails.id) {
+      const updatedUserProfile = await userDetails.updateProfile(req.body);
+      return httpResponse(res, {
+        statusCode: 200,
+        success: true,
+        message: "User profile updated",
+        data: userProfileResponse(updatedUserProfile)
+      });
+    }
+
+    return httpResponse(res, {
+      statusCode: 401,
+      success: false,
+      message: "Unauthorized. Can not update another user's profile"
+    });
+  } catch (error) {
+    return serverError(res, error);
   }
 };

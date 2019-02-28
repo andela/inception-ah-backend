@@ -15,7 +15,7 @@ beforeEach(async () => {
 
 describe("User table Model", async () => {
   it("should create a User model", async () => {
-    const createdUser = await Users.create(userData);
+    const createdUser = await Users.create(userData[0]);
     const {
       firstName,
       lastName,
@@ -27,31 +27,35 @@ describe("User table Model", async () => {
       mobileNumber,
       isNotifiable
     } = createdUser;
-    assert.equal(firstName, userData.firstName, "firstName");
-    assert.equal(lastName, userData.lastName, "last");
-    assert.equal(email, userData.email, "email");
-    assert.equal(gender, userData.gender, "gender");
-    assert.equal(biography, userData.biography, "biography");
+    assert.equal(firstName, userData[0].firstName, "firstName");
+    assert.equal(lastName, userData[0].lastName, "last");
+    assert.equal(email, userData[0].email, "email");
+    assert.equal(gender, userData[0].gender, "gender");
+    assert.equal(biography, userData[0].biography, "biography");
 
     const validPassword = await comparePassword(
-      userData.password,
+      userData[0].password,
       createdUser.get("password")
     );
     assert.isTrue(validPassword);
 
-    assert.equal(mobileNumber, userData.mobileNumber, "mobileNumber");
-    assert.equal(imageURL, userData.imageURL, "imageURL");
-    assert.equal(isNotifiable, userData.isNotifiable, "isNotifiable");
-    assert.equal(createdUser.dataValues.isAdmin, userData.isAdmin, "isAdmin");
+    assert.equal(mobileNumber, userData[0].mobileNumber, "mobileNumber");
+    assert.equal(imageURL, userData[0].imageURL, "imageURL");
+    assert.equal(isNotifiable, userData[0].isNotifiable, "isNotifiable");
+    assert.equal(
+      createdUser.dataValues.isAdmin,
+      userData[0].isAdmin,
+      "isAdmin"
+    );
   });
 
   it("should delete a User model", async () => {
-    const createdUser = await Users.create(userData);
-    assert.equal(createdUser.dataValues.email, userData.email);
+    const createdUser = await Users.create(userData[0]);
+    assert.equal(createdUser.dataValues.email, userData[0].email);
     await Users.drop({ cascade: true });
-    expect(Users.findOne({ where: { email: userData.email } })).to.rejectedWith(
-      Error
-    );
+    expect(
+      Users.findOne({ where: { email: userData[0].email } })
+    ).to.rejectedWith(Error);
   });
 });
 
