@@ -83,6 +83,12 @@ const getArticleModel = (sequelize, DataTypes) => {
       as: "favourite",
       onDelete: "CASCADE"
     });
+    
+    Article.hasMany(db.Comments, {
+      foreignKey: "articleId",
+      target: "id",
+      onDelete: "CASCADE"
+    });
   };
   return Article;
 };

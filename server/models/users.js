@@ -102,7 +102,18 @@ export default (sequelize, Sequelize) => {
     User.hasMany(db.Favorites, {
       foreignKey: "userId",
       target: "id",
-      onUpdate: "CASCADE"
+      onUpdate: "CASCADE",
+      onDelete: "CASCADE"
+    });
+    User.hasMany(db.Articles, {
+      foreignKey: "authorId",
+      target: "id",
+      onDelete: "CASCADE"
+    });
+    User.hasMany(db.Comments, {
+      foreignKey: "userId",
+      target: "id",
+      onDelete: "CASCADE"
     });
   };
 

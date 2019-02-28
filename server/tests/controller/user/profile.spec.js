@@ -1,7 +1,7 @@
 import chai from "chai";
 import chaiHttp from "chai-http";
 import app from "../../../index";
-import db from "../../../models";
+import models from "../../../models";
 import { userData } from "../../fixtures/models/userData";
 import { updateProfileDependencies } from "../../helpers/dependencies";
 
@@ -30,7 +30,7 @@ const userProfileDependencies = async () => {
 };
 
 before(async () => {
-  await db.sequelize.sync({ force: true });
+  await models.sequelize.sync({ force: true });
 });
 
 const wrongId = "bc302642-83e8-4c1b-80b4-c9ed35b6f908";
