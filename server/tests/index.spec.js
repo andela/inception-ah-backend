@@ -15,3 +15,4 @@ import "./models/notifications.spec";
 import "./controller/article/article.spec";
 import "./validations/user.spec";
 import "./controller/article/pagination.spec";
+import "./models/followers.spec";
