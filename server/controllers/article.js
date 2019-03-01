@@ -1,11 +1,10 @@
 import { Op } from "sequelize";
 import isEmpty from "lodash.isempty";
 
-import models from "../models";
-import { httpResponse, serverError } from "../helpers/http";
-import { pagination } from "../helpers/pagination";
-import { generateUniqueSlug } from "../helpers/generateUniqueSlug";
-import { calculateReadTime } from "../helpers/calculateReadTime";
+import models from "@models";
+import { httpResponse, serverError } from "@helpers/http";
+import { pagination } from "@helpers/pagination";
+import { generateUniqueSlug, calculateReadTime } from "@helpers/articles";
 
 const { Articles, Users } = models;
 

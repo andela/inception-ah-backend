@@ -1,12 +1,13 @@
 import chai, { expect } from "chai";
 import chaiHttp from "chai-http";
 
-import app from "../../../index";
-import models from "../../../models";
-import { generateJWT } from "../../../helpers/jwt";
-import { jwtConfigs } from "../../../configs/config";
-import { registerUser } from "../../fixtures/models/userData";
-import { articleSpec } from "../../fixtures/models/articleData";
+import app from "@app";
+import models from "@models";
+import { generateJWT, getJWTConfigs } from "@helpers/jwt";
+
+import { registerUser, articleSpec } from "@fixtures";
+
+const jwtConfigs = getJWTConfigs({ option: "authentication" });
 
 chai.use(chaiHttp);
 const { Articles, Users } = models;
@@ -24,7 +25,7 @@ describe("CRUD Article Feature </api/v1/article>", done => {
   const slug = "the-man-of-man-that-man-1550835108565";
   it("should create an article", async () => {
     const user = await userDependencies();
-    const token = generateJWT(user.userId, jwtConfigs);
+    const token = generateJWT({ userId: user.userId }, jwtConfigs);
     const res = await chai
       .request(app)
       .post("/api/v1/articles")
@@ -36,7 +37,7 @@ describe("CRUD Article Feature </api/v1/article>", done => {
 
   it("should return all articles by an author", async () => {
     const user = await userDependencies();
-    const token = generateJWT(user.userId, jwtConfigs);
+    const token = generateJWT({ userId: user.userId }, jwtConfigs);
     articleSpec.authorId = user.userId;
     const article = await Articles.create(articleSpec);
     const res = await chai
@@ -48,7 +49,7 @@ describe("CRUD Article Feature </api/v1/article>", done => {
 
   it("should return 404 error if authors articles are not found", async () => {
     const user = await userDependencies();
-    const token = generateJWT(user.userId, jwtConfigs);
+    const token = generateJWT({ userId: user.userId }, jwtConfigs);
     articleSpec.authorId = user.userId;
     const res = await chai
       .request(app)
@@ -64,7 +65,9 @@ describe("CRUD Article Feature </api/v1/article>", done => {
     const update = await articles.update({
       isPublished: true
     });
-    const res = await chai.request(app).get("/api/v1/articles/?pageNumber=1&pageLimit=20");
+    const res = await chai
+      .request(app)
+      .get("/api/v1/articles/?pageNumber=1&pageLimit=20");
     expect(res.statusCode).to.equal(200);
   });
 
@@ -94,7 +97,7 @@ describe("CRUD Article Feature </api/v1/article>", done => {
 
   it("should update an article", async () => {
     const user = await userDependencies();
-    const token = generateJWT(user.userId, jwtConfigs);
+    const token = generateJWT({ userId: user.userId }, jwtConfigs);
     articleSpec.authorId = user.userId;
     const article = await Articles.create(articleSpec);
     const res = await chai
@@ -107,7 +110,7 @@ describe("CRUD Article Feature </api/v1/article>", done => {
 
   it("should return 404 error if article to update is not found", async () => {
     const user = await userDependencies();
-    const token = generateJWT(user.userId, jwtConfigs);
+    const token = generateJWT({ userId: user.userId }, jwtConfigs);
     articleSpec.authorId = user.userId;
     const article = await Articles.create(articleSpec);
     const res = await chai
@@ -123,13 +126,15 @@ describe("CRUD Article Feature </api/v1/article>", done => {
     const user = await userDependencies();
     articleSpec.authorId = user.userId;
     let articles = await Articles.create(articleSpec);
-    const res = await chai.request(app).get(`/api/v1/categories/${articles.categoryId}/articles`);
+    const res = await chai
+      .request(app)
+      .get(`/api/v1/categories/${articles.categoryId}/articles`);
     expect(res.statusCode).to.equal(200);
   });
 
   it("should publish an unpublished article", async () => {
     const user = await userDependencies();
-    const token = generateJWT(user.userId, jwtConfigs);
+    const token = generateJWT({ userId: user.userId }, jwtConfigs);
     articleSpec.authorId = user.userId;
     const article = await Articles.create(articleSpec);
     const res = await chai
@@ -142,7 +147,7 @@ describe("CRUD Article Feature </api/v1/article>", done => {
 
   it("should return 404 error if article to publish is not found", async () => {
     const user = await userDependencies();
-    const token = generateJWT(user.userId, jwtConfigs);
+    const token = generateJWT({ userId: user.userId }, jwtConfigs);
     articleSpec.authorId = user.userId;
     const article = await Articles.create(articleSpec);
     const res = await chai
@@ -155,7 +160,7 @@ describe("CRUD Article Feature </api/v1/article>", done => {
 
   it("should delete an article", async () => {
     const user = await userDependencies();
-    const token = generateJWT(user.userId, jwtConfigs);
+    const token = generateJWT({ userId: user.userId }, jwtConfigs);
     articleSpec.authorId = user.userId;
     const article = await Articles.create(articleSpec);
     const res = await chai
@@ -167,7 +172,7 @@ describe("CRUD Article Feature </api/v1/article>", done => {
 
   it("should return 404 error if article to delete is not found", async () => {
     const user = await userDependencies();
-    const token = generateJWT(user.userId, jwtConfigs);
+    const token = generateJWT({ userId: user.userId }, jwtConfigs);
     articleSpec.authorId = user.userId;
     const article = await Articles.create(articleSpec);
     const res = await chai

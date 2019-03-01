@@ -1,8 +1,8 @@
 import dotenv from "dotenv";
-import { getJWTConfigs, decodeJWT } from "../../helpers/jwt";
-import { httpResponse, serverError } from "../../helpers/http";
+import { getJWTConfigs, decodeJWT } from "@helpers/jwt";
+import { httpResponse, serverError } from "@helpers/http";
 
-const tokenConfigs = getJWTConfigs();
+const authJWTConfigs = getJWTConfigs({ option: "authentication" });
 dotenv.config();
 
 /**
@@ -23,7 +23,7 @@ export const verifyToken = async (req, res, next) => {
     });
   }
   try {
-    const decodedToken = await decodeJWT(token, tokenConfigs);
+    const decodedToken = await decodeJWT(token, authJWTConfigs);
     req.user = decodedToken;
     return next();
   } catch (error) {

@@ -1,7 +1,7 @@
 import Joi from "joi";
-import models from "../../models/index";
-import { serverError, httpResponse } from "../../helpers/http";
-import { uuidSchema } from "../../validationSchemas/user";
+import models from "@models";
+import { serverError, httpResponse } from "@helpers/http";
+import { uuidSchema } from "@schemas";
 
 const { Users } = models;
 

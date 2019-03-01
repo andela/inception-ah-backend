@@ -36,10 +36,10 @@ export const userData = [
   }
 ];
 
-export const validUser = {
-  firstName: "Tiku",
-  middleName: "Susan",
-  lastName: "Kemi",
+export const validUserData = {
+  firstName: "John",
+  middleName: "Mark",
+  lastName: "Drew",
   email: "obasajujoshua31@gmail.com",
   password: "make.meProud2",
   gender: "male",

@@ -1,11 +1,11 @@
 import chai, { expect } from "chai";
 import chaiHttp from "chai-http";
 import sinon from "sinon";
-import app from "../../index";
-import { userResponse, userProfileResponse } from "../../helpers/userResponses";
-import models from "../../models";
-import { userData, socialUser } from "../fixtures/models/userData";
-import { getUserProfileFromApis } from "../../helpers/passportCallback";
+import app from "@app";
+import { userResponse, userProfileResponse } from "@helpers/users";
+import models from "@models";
+import { userData, socialUser } from "@fixtures";
+import { getUserProfileFromApis } from "@helpers/passportCallback";
 
 beforeEach(async () => {
   await models.sequelize.sync({ force: true });

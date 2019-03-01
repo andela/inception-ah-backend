@@ -1,4 +1,4 @@
-import { isProd } from "../configs/passport";
+import { isProd } from "@configs/passport";
 /**
  * @description Returns message to client
  *

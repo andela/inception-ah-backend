@@ -1,5 +1,4 @@
-import { generateUniqueSlug } from "../helpers/generateUniqueSlug";
-import { calculateReadTime } from "../helpers/calculateReadTime";
+import { generateUniqueSlug, calculateReadTime } from "@helpers/articles";
 
 const getArticleModel = (sequelize, DataTypes) => {
   const articleSchema = {
@@ -83,7 +82,7 @@ const getArticleModel = (sequelize, DataTypes) => {
       as: "favourite",
       onDelete: "CASCADE"
     });
-    
+
     Article.hasMany(db.Comments, {
       foreignKey: "articleId",
       target: "id",

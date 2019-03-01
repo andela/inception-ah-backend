@@ -1,14 +1,17 @@
 import isEmpty from "lodash.isempty";
-import { comparePassword } from "../helpers/password";
-import { serverError, httpResponse } from "../helpers/http";
-import { generateJWT, decodeJWT, getJWTConfigs } from "../helpers/jwt";
-import { getBaseUrl, sanitize } from "../helpers/users";
-import { userResponse, userProfileResponse } from "../helpers/userResponses";
-import models from "../models";
+import { comparePassword } from "@helpers/password";
+import { serverError, httpResponse } from "@helpers/http";
+import { generateJWT, decodeJWT, getJWTConfigs } from "@helpers/jwt";
+import models from "@models";
+import {
+  getBaseUrl,
+  sanitize,
+  userResponse,
+  userProfileResponse
+} from "@helpers/users";
 
 const { Users } = models;
-const tokenConfigs = getJWTConfigs();
-
+const verificationJWTConfigs = getJWTConfigs({ option: "verification" });
 /**
  * @description Generate login access token for a user
  *
@@ -24,7 +27,11 @@ export const userLogin = async (req, res) => {
       const foundUser = user.get("password");
       const matchedPassword = await comparePassword(password, foundUser);
       if (matchedPassword) {
-        const token = await generateJWT(user.get("id"), tokenConfigs);
+        const authJWTConfings = getJWTConfigs({ option: "authentication" });
+        const payload = {
+          userId: user.get("id")
+        };
+        const token = await generateJWT(payload, authJWTConfings);
         return httpResponse(res, {
           statusCode: 200,
           success: true,
@@ -127,7 +134,7 @@ export const userSignUp = async (req, res) => {
       password: req.body.password
     });
     const { password, ...user } = newUser.dataValues;
-    const token = generateJWT(user.id, tokenConfigs);
+    const token = generateJWT({ userId: user.id }, verificationJWTConfigs);
     newUser.sendVerificationEmail(
       `${getBaseUrl(req)}/auth/verification/${token}`
     );
@@ -154,7 +161,7 @@ export const userSignUp = async (req, res) => {
  */
 export const verifyUserAccount = async (req, res) => {
   try {
-    const decoded = decodeJWT(req.params.token, tokenConfigs);
+    const decoded = decodeJWT(req.params.token, verificationJWTConfigs);
     let foundUser = await Users.findByPk(decoded.userId);
     if (!isEmpty(foundUser)) {
       // If account has previously been verified
