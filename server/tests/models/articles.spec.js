@@ -1,4 +1,3 @@
-import mocha from "mocha";
 import chai from "chai";
 import chaiAsPromise from "chai-as-promised";
 import models from "../../models";
@@ -36,7 +35,7 @@ describe("Articles", () => {
     assert.lengthOf(Object.keys(dependencies.article.dataValues), 13);
   });
 
-  it("should delete an article table", async () => {
+  it("should delete an articleData table", async () => {
     const dependencies = await articleDependencies();
     assert.instanceOf(dependencies.article, Articles);
     await Articles.drop({ cascade: true });

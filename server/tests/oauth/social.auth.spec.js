@@ -3,12 +3,12 @@ import chaiHttp from "chai-http";
 import sinon from "sinon";
 import app from "../../index";
 import { userResponse, userProfileResponse } from "../../helpers/userResponses";
-import models from "../../models/index";
+import models from "../../models";
 import { userData, socialUser } from "../fixtures/models/userData";
 import { getUserProfileFromApis } from "../../helpers/passportCallback";
 
 beforeEach(async () => {
-  await models.sequelize.sync({ force: true }).catch(() => {});
+  await models.sequelize.sync({ force: true });
 });
 
 const { Users } = models;
@@ -35,7 +35,6 @@ describe("Social Platform Authentication Test", () => {
     const response = await chai.request(app).get(`${baseUrl}/auth/google`);
     expect(response.statusCode).to.equal(200);
   });
-
   it("should successfully authenticate via facebook ", async () => {
     const response = await chai.request(app).get(`${baseUrl}/auth/facebook`);
     expect(response.statusCode).to.equal(200);
@@ -45,7 +44,6 @@ describe("Social Platform Authentication Test", () => {
       .get(`${baseUrl}/auth/facebook/redirect`);
     expect(redirectResponse.statusCode).to.equal(200);
   });
-
   it("should save a socially authenticated users data into the database", async () => {
     const done = sinon.spy();
     getUserProfileFromApis(null, null, socialUser, done);
