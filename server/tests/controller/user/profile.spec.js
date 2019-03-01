@@ -1,12 +1,16 @@
 import chai from "chai";
 import chaiHttp from "chai-http";
-import app from "../../../index";
-import models from "../../../models";
-import { userData } from "../../fixtures/models/userData";
-import { updateProfileDependencies } from "../../helpers/dependencies";
+import app from "@app";
+import db from "@models";
+import { userData } from "@fixtures";
+import { updateProfileDependencies } from "@dependencies";
 
 chai.use(chaiHttp);
 const { expect } = chai;
+
+beforeEach(async () => {
+  await db.sequelize.sync({ force: true });
+});
 
 const userProfileDependencies = async () => {
   const user1 = await updateProfileDependencies(
@@ -28,10 +32,6 @@ const userProfileDependencies = async () => {
     token2: user2.token
   });
 };
-
-before(async () => {
-  await models.sequelize.sync({ force: true });
-});
 
 const wrongId = "bc302642-83e8-4c1b-80b4-c9ed35b6f908";
 const invalidToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ";

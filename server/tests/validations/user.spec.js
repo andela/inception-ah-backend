@@ -1,24 +1,24 @@
+/* eslint-disable import/no-unresolved */
 import chai from "chai";
-import { validateData } from "../../validations/validateData";
-import { userData } from "../fixtures/models/userData";
-import {
-  signUpSchema,
-  updateProfileSchema
-} from "../../validationSchemas/user";
-import models from "../../models";
-import app from "../../index";
+import chaiHttp from "chai-http";
+import { validator, errorFormatter } from "@validations/validator";
+import { userData } from "@fixtures";
+import { signUpSchema, updateProfileSchema } from "@schemas";
+import models from "@models";
+import app from "@app";
 
-const { User } = models;
+const { Users } = models;
 
 const { firstName, lastName, email, password } = userData[0];
 const { middleName, gender, biography, mobileNumber, imageURL } = userData[2];
 const { expect } = chai;
 
+chai.use(chaiHttp);
 beforeEach(async () => {
-  await models.sequelize.sync({ force: true });
+  await models.sequelize.sync({ force: true }).catch(() => {});
 });
 
-describe("Sign validation", () => {
+describe("Sign in validation", () => {
   let value = {
     firstName,
     lastName,
@@ -27,13 +27,13 @@ describe("Sign validation", () => {
   };
 
   it("should not return an error when all the inputs are valid", async () => {
-    const result = await validateData(value, signUpSchema);
-    expect(result.hasError).to.be.false;
+    const { hasError } = await validator(value, signUpSchema);
+    expect(hasError).to.be.false;
   });
 
   it("should return an error when firstname is invalid", async () => {
     value.firstName = "";
-    const { errors } = await validateData(value, signUpSchema);
+    const { errors } = await validator(value, signUpSchema);
     expect(errors).to.be.an("object");
     expect(errors).to.haveOwnProperty("firstName");
     expect(errors.firstName).to.equal("First name is not allowed to be empty");
@@ -41,7 +41,7 @@ describe("Sign validation", () => {
 
   it("should return an error when firstname and lastname is invalid", async () => {
     value.lastName = "";
-    const { errors } = await validateData(value, signUpSchema);
+    const { errors } = await validator(value, signUpSchema);
     expect(errors).to.be.an("object");
     expect(errors.lastName).to.equal("Last name is not allowed to be empty");
     expect(errors.firstName).to.equal("First name is not allowed to be empty");
@@ -49,7 +49,7 @@ describe("Sign validation", () => {
 
   it("should return an error when sign up inputs are undefined", async () => {
     value = {};
-    const { errors } = await validateData(value, signUpSchema);
+    const { errors } = await validator(value, signUpSchema);
     expect(errors).to.be.an("object");
     expect(errors).to.have.any.keys(
       "firstName",
@@ -58,12 +58,20 @@ describe("Sign validation", () => {
       "password"
     );
   });
+
+  it("should return a custom error message", async () => {
+    const data = { firstName, lastName, email, password: "etrtyy" };
+    const { hasError, errors } = await validator(data, signUpSchema);
+    const msg = `Password must be atleast 6 chars with atleast 1 uppercase,`;
+    expect(hasError).to.be.true;
+    expect(errors.password).to.equal(`${msg} 1 number, & 1 special char`);
+  });
 });
 
 describe("POST <API /api/v1/auth/signup>", () => {
   it("should return email has been used", async () => {
-    const user = { firstName, lastName, email, password };
-    await User.create(user);
+    const user = { firstName, lastName, email: "you@gmail.com", password };
+    await Users.create(user);
     const res = await chai
       .request(app)
       .post("/api/v1/auth/signup")
@@ -85,26 +93,10 @@ describe("Update profile schema validation", () => {
     imageURL
   };
 
-  it("should not return an error when all the inputs are valid", async () => {
-    const result = await validateData(inputData, updateProfileSchema);
-    expect(result).to.be.true;
-  });
-
-  it("should return an error when the biography and mobileNumber are invalid", async () => {
-    inputData.biography = "    A son from the sun     ";
-    inputData.mobileNumber = "  12345678909  ";
-    const result = await validateData(inputData, updateProfileSchema);
-    expect(result.errorMessages)
-      .to.be.an("array")
-      .that.include(
-        "Biography must not have leading or trailing whitespace",
-        "Mobile number must not have leading or trailing whitespace"
-      );
-  });
-
   it("should return an error when all input are invalid", async () => {
     inputData = {};
-    const result = await validateData(inputData, updateProfileSchema);
-    expect(result.errorMessages).to.be.an("array");
+    const result = await validator(inputData, updateProfileSchema);
+    expect(result.hasError).to.be.true;
+    expect(Object.keys(result.errors)).to.deep.equal(["firstName", "lastName"]);
   });
 });

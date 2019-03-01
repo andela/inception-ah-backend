@@ -1,6 +1,6 @@
 import isEmpty from "lodash.isempty";
 import sgMail from "@sendgrid/mail";
-import generateEmailTemplate from "./emailTemplate";
+import generateEmailTemplate from "@emails/emailTemplate";
 
 const isTest = process.env.NODE_ENV === "test";
 

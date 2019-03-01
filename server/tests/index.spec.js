@@ -13,4 +13,5 @@ import "./controller/user/resetPassword.spec";
 import "./controller/favorite/favorites.spec";
 import "./models/notifications.spec";
 import "./controller/article/article.spec";
+import "./validations/user.spec";
 import "./controller/article/pagination.spec";

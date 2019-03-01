@@ -1,3 +1,5 @@
+import { generateJWT, getJWTConfigs } from "@helpers/jwt";
+
 /**
  * @description Removes all white space character, if any
  *
@@ -27,4 +29,53 @@ export const getBaseUrl = httpRequestOrResponseObj => {
   return `${httpRequestOrResponseObj.protocol}://${httpRequestOrResponseObj.get(
     "host"
   )}/api/v1`;
+};
+
+/**
+ * @description format the user JSON
+ *
+ * @param  {object} user instance of User model
+ * @returns {object} responseObject
+ */
+export const userResponse = user => {
+  const { id, email, biography, imageURL } = user.dataValues;
+  return {
+    id,
+    email,
+    biography,
+    imageURL,
+    token: generateJWT(
+      { userId: id },
+      getJWTConfigs({ option: "authentication" })
+    )
+  };
+};
+
+/**
+ * @description get user profile
+ *
+ * @param  {object} user instance of User
+ * @returns {object} responseObject
+ */
+export const userProfileResponse = user => {
+  const {
+    id,
+    firstName,
+    middleName,
+    biography,
+    lastName,
+    gender,
+    mobileNumber,
+    imageURL
+  } = user.dataValues;
+  return {
+    id,
+    firstName,
+    middleName,
+    lastName,
+    gender,
+    biography,
+    mobileNumber,
+    imageURL
+  };
 };

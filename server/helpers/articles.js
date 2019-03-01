@@ -1,4 +1,15 @@
+import slug from "slug";
+import { getTime } from "date-fns";
 import { readingTime } from "reading-time-estimator";
+
+/**
+ * @description function to generate unique slug
+ * @param {string} title - article title
+ * @returns {function} random string
+ */
+export const generateUniqueSlug = title => {
+  return `${slug(title.toLowerCase())}-${getTime(new Date())}`;
+};
 
 /**
  * @description function to calculate estimated amount of time to read an article
