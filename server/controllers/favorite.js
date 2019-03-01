@@ -1,6 +1,6 @@
 import { Op } from "sequelize";
-import models from "../models";
-import { httpResponse } from "../helpers/http";
+import models from "@models";
+import { httpResponse } from "@helpers/http";
 
 const { Favorites } = models;
 /**

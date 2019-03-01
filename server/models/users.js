@@ -1,14 +1,9 @@
 import bcrypt from "bcrypt";
-import { hashPassword } from "../helpers/password";
-import {
-  decryptToken,
-  getTimeDifference,
-  encryptToken
-} from "../helpers/crypto";
-import { expiryTime } from "../configs/config";
-import { sendEmail } from "../emails/email";
-import { resetConstants } from "../emails/constants/passwordReset";
-import { verifyConstants } from "../emails/constants/accountVerification";
+import { expiryTime } from "@configs/config";
+import { hashPassword } from "@helpers/password";
+import { decryptToken, getTimeDifference, encryptToken } from "@helpers/crypto";
+import { sendEmail } from "@emails/email";
+import { resetConstants, verifyConstants } from "@emails/constants";
 
 export default (sequelize, Sequelize) => {
   const userSchema = {
@@ -169,24 +164,12 @@ export default (sequelize, Sequelize) => {
   };
 
   User.prototype.updateProfile = async function(user) {
-    const {
-      firstName,
-      lastName,
-      gender,
-      biography,
-      mobileNumber,
-      middleName,
-      imageURL
-    } = user;
-    this.firstName = firstName || this.firstName;
-    this.middleName = middleName;
-    this.lastName = lastName || this.lastName;
-    this.gender = gender;
-    this.biography = biography;
-    this.mobileNumber = mobileNumber;
-    this.imageURL = imageURL;
-    this.save;
-    await this.reload;
+    Object.keys(user).forEach(key => {
+      this[key] = ["firstName", "lastName"].includes(key)
+        ? user[key] || this[key]
+        : user[key];
+    });
+    this.save();
     return this;
   };
 

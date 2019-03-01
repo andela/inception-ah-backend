@@ -1,4 +1,4 @@
-import { httpResponse } from "../helpers/http";
+import { httpResponse } from "@helpers/http";
 /**
  * @description This takes in the HTTP server request,
  performs the logic and returns the server response with the user object.

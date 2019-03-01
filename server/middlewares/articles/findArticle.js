@@ -1,8 +1,8 @@
 import { Op } from "sequelize";
 import isEmpty from "lodash.isempty";
 
-import models from "../../models";
-import { serverError, httpResponse } from "../../helpers/http";
+import models from "@models";
+import { serverError, httpResponse } from "@helpers/http";
 
 const { Articles } = models;
 export const findArticle = async (req, res, next) => {

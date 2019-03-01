@@ -1,22 +1,20 @@
 import chai from "chai";
 import chaiHttp from "chai-http";
-import models from "../../models";
-import { validUser } from "../fixtures/models/userData";
-import app from "../../index";
-import { articleSeed } from "../fixtures/models/articleData";
+import models from "@models";
+import { validUserData, articleSeed } from "@fixtures";
+import app from "@app";
 
 chai.use(chaiHttp);
 
-const { Users, Articles } = models;
+const { Users } = models;
 
 export const userDependencies = async data => {
-  const { firstName, lastName, email, password } = data;
   const user = await Users.create(data);
   return user.dataValues;
 };
 
 export const logInUserDependencies = async (email, password) => {
-  await Users.create(validUser);
+  await Users.create(validUserData);
   const response = await chai
     .request(app)
     .post("/api/v1/auth/signin")

@@ -1,16 +1,15 @@
 import chai, { expect } from "chai";
 import chaiHttp from "chai-http";
-import models from "../../../models";
-import app from "../../../index";
-import { logInUserDependencies } from "../../helpers/dependencies";
-import { articleSeed } from "../../fixtures/models/articleData";
-import { decodeJWT, getJWTConfigs } from "../../../helpers/jwt";
+import models from "@models";
+import app from "@app";
+import { logInUserDependencies } from "@dependencies";
+import { articleSeed } from "@fixtures";
+import { decodeJWT, getJWTConfigs } from "@helpers/jwt";
 
 const { Articles } = models;
 
 chai.use(chaiHttp);
 const baseUrl = "/api/v1/articles";
-
 beforeEach(async () => {
   await models.sequelize.sync({ force: true });
 });
@@ -21,7 +20,10 @@ const favoriteDependency = async () => {
     "make.meProud2"
   );
   const token = userLoginResponse.token;
-  const { userId } = await decodeJWT(token, getJWTConfigs());
+  const { userId } = await decodeJWT(
+    token,
+    getJWTConfigs({ option: "authentication" })
+  );
 
   const articleTemplate = Object.assign(articleSeed, { authorId: userId });
   const article = await Articles.create(articleTemplate);
@@ -54,8 +56,8 @@ describe("Test to Favorite an article", () => {
     expect(response.statusCode).to.equal(404);
   });
 
-  it(`should favorite an article that is not already favorited by the same user 
-  and unfavorite that article when the same user favorite the article`, async () => {
+  it(`should favorite an article that is not already favorited by the same user
+ and unfavorite that article when the same user favorite the article`, async () => {
     const { slug, token, title } = await favoriteDependency();
     const response = await chai
       .request(app)

@@ -1,4 +1,5 @@
 import Joi from "joi";
+import { errorFormatter } from "@validations/validator";
 
 /**
  * @description Get name validation schema
@@ -17,7 +18,7 @@ const getNameSchema = label => {
     .regex(exp)
     .lowercase()
     .label(label)
-    .error(errors => formatError(errors, label));
+    .error(errors => errorFormatter(errors, label));
 };
 
 const firstName = getNameSchema("First name");
@@ -36,7 +37,7 @@ const password = Joi.string()
   .trim()
   .label("Password")
   .error(errors => {
-    return formatError(
+    return errorFormatter(
       errors,
       "Password",
       "Password must be atleast 6 chars with atleast 1 uppercase, 1 number, & 1 special char"
@@ -90,16 +91,6 @@ export const signInSchema = Joi.object().keys({
     .trim()
     .required()
 });
-
-export const formatError = (errors, label, message) => {
-  const err = errors[0];
-  switch (err.type) {
-    case "string.regex.base":
-      return message || `${label || err.path} is inavlid`;
-    default:
-      return err;
-  }
-};
 
 export const updateProfileSchema = Joi.object().keys({
   firstName,

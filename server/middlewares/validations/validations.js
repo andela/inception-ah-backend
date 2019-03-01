@@ -1,13 +1,13 @@
 import isEmpty from "lodash.isempty";
-import models from "../../models";
-import { validateData } from "../../validations/validateData";
+import models from "@models";
+import { validator } from "@validations/validator";
 import {
   signUpSchema,
   signInSchema,
+  articleSchema,
   updateProfileSchema
-} from "../../validationSchemas/user";
-import { httpResponse, serverError } from "../../helpers/http";
-import { articleSchema } from "../../validationSchemas/article";
+} from "@schemas";
+import { httpResponse, serverError } from "@helpers/http";
 
 const { Users } = models;
 
@@ -29,7 +29,7 @@ export const validateInput = async (req, res, next) => {
     "/updateProfile": updateProfileSchema
   };
 
-  const validation = await validateData(
+  const validation = await validator(
     req.body,
     schemas[`/${req.path.split("/").pop()}`]
   );

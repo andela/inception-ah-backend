@@ -3,9 +3,9 @@ import dotenv from "dotenv";
 import express from "express";
 import morgan from "morgan";
 import passport from "passport";
-import db from "./models";
-import mainAppRouter from "./routes/index";
-import setPassportMiddleware from "./middlewares/passport/passport";
+import db from "@models";
+import { mainAppRouter } from "@routes/index";
+import { setPassportMiddleware } from "@passport";
 
 dotenv.config();
 const isProduction = process.env.NODE_ENV === "production";

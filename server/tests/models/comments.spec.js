@@ -1,8 +1,6 @@
 import chai from "chai";
-import models from "../../models";
-import { userData } from "../fixtures/models/userData";
-import { articleData } from "../fixtures/models/articleData";
-import comment from "../fixtures/models/commentData";
+import models from "@models";
+import { userData, articleData, commentData } from "@fixtures";
 
 const sequelize = models.sequelize;
 const { assert } = chai;
@@ -24,7 +22,7 @@ const commentDependencies = async () => {
     Object.assign(articleData, { authorId })
   );
   const articleId = articleInstance.get("id");
-  const commentTemplate = Object.assign(comment, { userId, articleId });
+  const commentTemplate = Object.assign(commentData, { userId, articleId });
 
   return Promise.resolve({
     userId,
