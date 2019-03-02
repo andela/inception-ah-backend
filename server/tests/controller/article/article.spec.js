@@ -42,6 +42,16 @@ describe("CRUD Article Feature </api/v1/article>", done => {
     expect(res.body.success).to.be.true;
   });
 
+  it("should return 500 error for wrong token", async () => {
+    const articleData = await articleDependencies();
+    const res = await chai
+      .request(app)
+      .post("/api/v1/articles")
+      .send(articleData)
+      .set({ Authorization: "okunukwe" });
+    expect(res.statusCode).to.equal(500);
+  });
+
   it("should return all articles by an author", async () => {
     const user = await userDependencies();
     const articleData = await articleDependencies();
@@ -135,6 +145,19 @@ describe("CRUD Article Feature </api/v1/article>", done => {
       .set({ Authorization: token });
     expect(res.statusCode).to.equal(404);
     expect(res.body.success).to.be.false;
+  });
+
+  it("should return 500 error, if token  is malformed", async () => {
+    const user = await userDependencies();
+    const articleData = await articleDependencies();
+    articleData.authorId = user.userId;
+    await Articles.create(articleData);
+    const res = await chai
+      .request(app)
+      .put(`/api/v1/articles/${slug}`)
+      .send({ ...articleData, title: "man of man man" })
+      .set({ Authorization: "okunkwe" });
+    expect(res.statusCode).to.equal(500);
   });
 
   it("should return articles based on their category", async () => {

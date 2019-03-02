@@ -8,7 +8,7 @@ import { mainAppRouter } from "@routes/index";
 import { setPassportMiddleware } from "@passport";
 
 dotenv.config();
-const isProduction = process.env.NODE_ENV === "production";
+const isTest = process.env.NODE_ENV === "test";
 const port = process.env.PORT || 6000;
 
 // Create global app object
@@ -41,7 +41,15 @@ app.all("*", (req, res) => {
     message: "Not Found"
   });
 });
-
+if (!isTest) {
+  (async () => {
+    try {
+      await db.sequelize.sync();
+    } catch (error) {
+      console.log("eerr", error);
+    }
+  })();
+}
 app.listen(port, () => {
   console.log(`Listening on port ${port}`);
 });

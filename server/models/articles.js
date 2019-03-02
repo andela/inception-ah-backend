@@ -43,6 +43,16 @@ const getArticleModel = (sequelize, DataTypes) => {
     readTime: {
       type: DataTypes.INTEGER
     },
+    numberOfLikes: {
+      type: DataTypes.INTEGER,
+      defaultValue: 0,
+      allowNull: false
+    },
+    numberOfDislikes: {
+      type: DataTypes.INTEGER,
+      defaultValue: 0,
+      allowNull: false
+    },
     slug: {
       type: DataTypes.STRING
     },
@@ -79,6 +89,11 @@ const getArticleModel = (sequelize, DataTypes) => {
     });
 
     Article.hasMany(db.Comments, {
+      foreignKey: "articleId",
+      target: "id",
+      onDelete: "CASCADE"
+    });
+    Article.hasMany(db.ArticleLikes, {
       foreignKey: "articleId",
       target: "id",
       onDelete: "CASCADE"

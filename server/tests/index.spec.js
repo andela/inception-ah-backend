@@ -5,6 +5,7 @@ import "./miscellaneous/miscellaneous.spec";
 import "./oauth/social.auth.spec";
 import "./models/notifications.spec";
 import "./models/articles.spec";
+import "./models/likeArticles.spec";
 import "./models/categories.spec";
 import "./models/followers.spec";
 import "./miscellaneous/emails/email.spec";

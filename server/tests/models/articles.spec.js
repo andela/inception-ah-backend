@@ -37,7 +37,7 @@ describe("Articles", () => {
   it("should create an instance of Articles", async () => {
     const dependencies = await articleDependencies();
     assert.instanceOf(dependencies.article, Articles);
-    assert.lengthOf(Object.keys(dependencies.article.dataValues), 12);
+    assert.lengthOf(Object.keys(dependencies.article.dataValues), 14);
   });
 
   it("should delete an articleData table", async () => {
