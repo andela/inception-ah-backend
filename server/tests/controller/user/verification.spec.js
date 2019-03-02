@@ -61,12 +61,10 @@ describe("User Helpers", () => {
     }
   });
 
-  it("should not decode a token and throw an exception", () => {
-    try {
-      decodeJWT(uniqid(), {});
-    } catch (error) {
-      assert.instanceOf(error, Error);
-    }
+  it("should return the default jwt configs", () => {
+    const configs = getJWTConfigs({ option: "verification" });
+    assert.isObject(configs);
+    assert.containsAllKeys(configs, ["issuer", "secret", "subject"]);
   });
 
   it("should decode a verification token", () => {

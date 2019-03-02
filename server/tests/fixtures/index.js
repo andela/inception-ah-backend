@@ -7,12 +7,11 @@ import {
   socialUser,
   registerUser
 } from "./models/userData";
+import { tagData } from "./models/tagData";
 
 import { category } from "./models/categories";
 
 export {
-  validUser,
-  invalidUser,
   articleData,
   userData,
   socialUser,
@@ -20,5 +19,8 @@ export {
   articleSpec,
   commentData,
   registerUser,
-  category
+  category,
+  validUser, 
+  invalidUser,
+  tagData
 };

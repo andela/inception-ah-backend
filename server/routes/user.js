@@ -7,12 +7,12 @@ import {
 } from "@controllers/user";
 import { verifyToken, findUserById, validateInput } from "@middlewares";
 
-const usersRouter = Router();
+const userRouter = Router();
 
-usersRouter.post("/resetPassword", passwordResetRequest);
-usersRouter.put("/resetPassword/:token", resetPassword);
-usersRouter.get("/:id", findUserById, getUserProfile);
-usersRouter.put(
+userRouter.post("/resetPassword", passwordResetRequest);
+userRouter.put("/resetPassword/:token", resetPassword);
+userRouter.get("/:id", findUserById, getUserProfile);
+userRouter.put(
   "/:id/updateProfile",
   findUserById,
   verifyToken,
@@ -20,4 +20,4 @@ usersRouter.put(
   updateUserProfile
 );
 
-export { usersRouter };
+export { userRouter };
