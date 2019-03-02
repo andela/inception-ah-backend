@@ -1,4 +1,5 @@
 import { generateUniqueSlug, calculateReadTime } from "@helpers/articles";
+import { ARTICLE_REACTION } from "@helpers/constants";
 
 const getArticleModel = (sequelize, DataTypes) => {
   const articleSchema = {
@@ -43,6 +44,16 @@ const getArticleModel = (sequelize, DataTypes) => {
     readTime: {
       type: DataTypes.INTEGER
     },
+    numberOfLikes: {
+      type: DataTypes.INTEGER,
+      defaultValue: 0,
+      allowNull: false
+    },
+    numberOfDislikes: {
+      type: DataTypes.INTEGER,
+      defaultValue: 0,
+      allowNull: false
+    },
     slug: {
       type: DataTypes.STRING
     },
@@ -51,7 +62,6 @@ const getArticleModel = (sequelize, DataTypes) => {
       default: false
     }
   };
-
   const Article = sequelize.define("Articles", articleSchema, {
     freezeTableName: true,
     hooks: {
@@ -62,7 +72,6 @@ const getArticleModel = (sequelize, DataTypes) => {
       }
     }
   });
-
   Article.associate = db => {
     Article.belongsTo(db.Users, {
       foreignKey: "authorId",
@@ -79,6 +88,21 @@ const getArticleModel = (sequelize, DataTypes) => {
     });
 
     Article.hasMany(db.Comments, {
+      foreignKey: "articleId",
+      target: "id",
+      onDelete: "CASCADE"
+    });
+    Article.hasMany(db.Reactions, {
+      scopes: {
+        articleReactions: {
+          include: [
+            {
+              model: db.Reactions,
+              where: { sourceType: ARTICLE_REACTION }
+            }
+          ]
+        }
+      },
       foreignKey: "articleId",
       target: "id",
       onDelete: "CASCADE"
