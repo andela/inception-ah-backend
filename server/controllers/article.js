@@ -113,7 +113,7 @@ export const getAllArticles = async (req, res) => {
       });
     }
     return httpResponse(res, {
-      message: "Articles retrived successfully",
+      message: "Articles retrieved successfully",
       articles
     });
   } catch (error) {
