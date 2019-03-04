@@ -1,3 +1,5 @@
+import { COMMENT_REACTION } from "@helpers/constants";
+
 const getCommentModel = (sequelize, DataTypes) => {
   const flags = {
     freezeTableName: true
@@ -32,7 +34,23 @@ const getCommentModel = (sequelize, DataTypes) => {
     });
 
     Comment.belongsTo(db.Articles, {
-      foreignKey: "articleId"
+      foreignKey: "articleId",
+      onDelete: "CASCADE"
+    });
+    Comment.hasMany(db.Reactions, {
+      scopes: {
+        commentLikes: {
+          include: [
+            {
+              model: db.Reactions,
+              where: { sourceType: COMMENT_REACTION }
+            }
+          ]
+        }
+      },
+      foreignKey: "sourceType2Id",
+      target: "id",
+      onDelete: "CASCADE"
     });
   };
 

@@ -1,7 +1,7 @@
 import chai from "chai";
 import chaiHttp from "chai-http";
-import { sendEmail } from "../../../emails/email";
-import { validUser, invalidUser } from "../../fixtures/email/emailData";
+import { sendEmail } from "@emails/email";
+import { validUser, invalidUser } from "@fixtures";
 
 chai.use(chaiHttp);
 const { expect } = chai;

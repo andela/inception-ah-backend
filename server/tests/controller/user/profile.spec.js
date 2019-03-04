@@ -83,6 +83,17 @@ describe("Test for User Profile", () => {
       expect(res.body.message).to.equal("User not found");
     });
 
+    it("should return an error message if user id is not correct", async () => {
+      const { id1, token1 } = await userProfileDependencies();
+      const res = await chai
+        .request(app)
+        .put("/api/v1/users/ldkdkkdkdk/updateProfile")
+        .set("Authorization", token1);
+      expect(res.statusCode).to.equal(400);
+      expect(res.body.success).to.be.false;
+      expect(res.body.message).to.eql("Invalid User Id");
+    });
+
     it("should update user profile if a valid user id is supplied", async () => {
       const { id1, token1 } = await userProfileDependencies();
       const res = await chai
@@ -92,7 +103,7 @@ describe("Test for User Profile", () => {
         .send(userData[2]);
       expect(res.statusCode).to.equal(200);
       expect(res.body.success).to.be.true;
-      expect(res.body.message).to.equal("User profile updated");
+      expect(res.body.message).to.eql("User profile updated");
     });
 
     it("should return an error message if user supply another user's id", async () => {
@@ -104,7 +115,7 @@ describe("Test for User Profile", () => {
         .send(userData[2]);
       expect(res.statusCode).to.equal(401);
       expect(res.body.success).to.be.false;
-      expect(res.body.message).to.equal(
+      expect(res.body.message).to.eql(
         "Unauthorized. Can not update another user's profile"
       );
     });
