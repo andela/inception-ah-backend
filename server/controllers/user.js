@@ -51,7 +51,7 @@ export const userLogin = async (req, res) => {
     return httpResponse(res, {
       statusCode: 500,
       success: false,
-      message: "An Internal server occured",
+      message: "An Internal server error occured",
       data: null
     });
   }
