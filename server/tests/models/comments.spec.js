@@ -1,10 +1,10 @@
 import chai from "chai";
 import models from "@models";
-import { userData, articleData, commentData } from "@fixtures";
+import { userData, articleData, commentData, category } from "@fixtures";
 
 const sequelize = models.sequelize;
 const { assert } = chai;
-const { Comments, Articles, Users } = models;
+const { Comments, Articles, Users, Categories } = models;
 
 beforeEach(async () => {
   await sequelize.sync({ force: true });
@@ -18,8 +18,10 @@ const commentDependencies = async () => {
   );
   const authorId = articleAuthor.get("id");
   const userId = commentUser.get("id");
+  const categoryInstance = await Categories.create(category);
+  const categoryId = categoryInstance.get("id");
   const articleInstance = await Articles.create(
-    Object.assign(articleData, { authorId })
+    Object.assign(articleData, { authorId, categoryId })
   );
   const articleId = articleInstance.get("id");
   const commentTemplate = Object.assign(commentData, { userId, articleId });
@@ -61,9 +63,12 @@ describe("Comments table model", () => {
       email: "newemail@mail.test"
     });
     const userId = newUser.id;
+    const categoryInstance = await Categories.create(category);
+    const categoryId = categoryInstance.get("id");
     const newArticle = await Articles.create({
       ...articleData,
-      authorId: userId
+      authorId: userId,
+      categoryId
     });
     const articleId = newArticle.id;
     const newComment = await Comments.create({

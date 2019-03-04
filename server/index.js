@@ -35,32 +35,13 @@ app.get("/", (req, res, next) => {
 });
 
 // catch 404 and forward to error handler
-app.use((error, req, res, next) => {
-  if (error) {
-    if (!isProduction) {
-      console.log(error.stack);
-    }
-    res.status(404).json({
-      errors: {
-        message: "Something Went Wrong",
-        error
-      }
-    });
-  }
+app.all("*", (req, res) => {
+  return res.status(404).json({
+    success: false,
+    message: "Not Found"
+  });
 });
 
-db.sequelize
-  .authenticate()
-  .then(() => {
-    console.log("Connection to DB has been established successfully.");
-  })
-  .catch(err => {
-    console.error("Unable to connect to the database:", err);
-  });
-
-(async () => {
-  await db.sequelize.sync({});
-})();
 app.listen(port, () => {
   console.log(`Listening on port ${port}`);
 });

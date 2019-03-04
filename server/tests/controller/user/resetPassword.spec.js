@@ -85,5 +85,4 @@ describe("Test for Password Reset", () => {
 
 after(async () => {
   models.sequelize.drop();
-  models.sequelize.close();
 });

@@ -1,13 +1,12 @@
-import chai, { assert } from "chai";
+import chai, { assert, expect } from "chai";
 import chaiAsPromise from "chai-as-promised";
-import models from "../../models";
-import { userData } from "../fixtures/models/userData";
-import { comparePassword } from "../../helpers/password";
+import models from "@models";
+import { userData } from "@fixtures";
+import { comparePassword } from "@helpers/password";
 
 chai.use(chaiAsPromise);
 const sequelize = models.sequelize;
 const { Users } = models;
-const { expect } = chai;
 
 beforeEach(async () => {
   await sequelize.sync({ force: true });
@@ -60,6 +59,5 @@ describe("User table Model", async () => {
 });
 
 after(async () => {
-  sequelize.drop();
-  sequelize.close();
+  await sequelize.drop();
 });

@@ -1,17 +1,22 @@
 import chai from "chai";
 import chaiAsPromise from "chai-as-promised";
 import models from "@models";
-import { userData, articleData } from "@fixtures";
+import { userData, articleData, category } from "@fixtures";
 
 chai.use(chaiAsPromise);
-const { Users, Articles, Notifications } = models;
+const { Users, Articles, Notifications, Categories } = models;
 const { expect } = chai;
 
 const notificationDependencies = async () => {
   const createdUser = await Users.create(userData[0]);
   const userId = createdUser.get("id");
-  articleData.authorId = userId;
-  const articleInstance = await Articles.create(articleData);
+  const articleCategory = await Categories.create(category);
+  const categoryId = articleCategory.get("id");
+  const articleTemplate = Object.assign(articleData, {
+    authorId: userId,
+    categoryId
+  });
+  const articleInstance = await Articles.create(articleTemplate);
   const articleId = articleInstance.get("id");
 
   return Promise.resolve({
@@ -69,7 +74,7 @@ describe("Notifications model", () => {
     expect(notificationBefore).to.not.be.null;
     await article.destroy();
     const notificationAfter = await Notifications.findOne({
-      Where: { articleId }
+      where: { articleId }
     });
     expect(notificationAfter).to.be.null;
   });
