@@ -18,9 +18,9 @@ import {
   deleteArticle
 } from "@controllers/article";
 
-const articlesRouter = Router();
+const articleRouter = Router();
 
-articlesRouter.post(
+articleRouter.post(
   "/articles/:slug/favorite",
   verifyToken,
   findArticle,
@@ -31,13 +31,13 @@ articlesRouter.post(
  * @description - Route is use to create an article
  * @returns - It returns an article object
  */
-articlesRouter.post("/articles", verifyToken, validateInput, createArticle);
+articleRouter.post("/articles", verifyToken, validateInput, createArticle);
 
 /**
  * @description - Route to get all articles by an author
  * @returns - It returns an array of articles by an author
  */
-articlesRouter.get(
+articleRouter.get(
   "/articles/feed",
   verifyToken,
   validatePaginationParameters,
@@ -48,19 +48,19 @@ articlesRouter.get(
  * @description - Route gets all published articles
  * @returns - It returns an array of all published articles
  */
-articlesRouter.get("/articles", validatePaginationParameters, getAllArticles);
+articleRouter.get("/articles", validatePaginationParameters, getAllArticles);
 
 /**
  * @description - Route to get an article by slug
  * @returns - It returns an object of the article
  */
-articlesRouter.get("/articles/:slug", getArticleBySlug);
+articleRouter.get("/articles/:slug", getArticleBySlug);
 
 /**
  * @description - Route to update an article
  * @returns - It returns an object of the updated article
  */
-articlesRouter.put(
+articleRouter.put(
   "/articles/:slug",
   verifyToken,
   findAuthorsArticle,
@@ -71,7 +71,7 @@ articlesRouter.put(
  * @description - Route gets all published articles by category
  * @returns - It returns an array of all published articles
  */
-articlesRouter.get(
+articleRouter.get(
   "/categories/:categoryId/articles",
   validatePaginationParameters,
   getArticlesByCategory
@@ -81,7 +81,7 @@ articlesRouter.get(
  * @description - Route to publish an unpublished article
  * @returns - It returns an object of the published article
  */
-articlesRouter.put(
+articleRouter.put(
   "/articles/:slug/publish",
   verifyToken,
   findAuthorsArticle,
@@ -92,11 +92,11 @@ articlesRouter.put(
  * @description - Route to delete an article
  * @returns - It returns a response
  */
-articlesRouter.delete(
+articleRouter.delete(
   "/articles/:slug",
   verifyToken,
   findAuthorsArticle,
   deleteArticle
 );
 
-export { articlesRouter };
+export { articleRouter };

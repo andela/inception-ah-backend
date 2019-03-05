@@ -6,11 +6,9 @@ import { httpResponse } from "@helpers/http";
  * @param  {HttResponse} res
  * @returns {HttpResponse} Server Response
  */
-const socialAuth = (req, res) => {
+export const socialAuth = (req, res) => {
   return httpResponse(res, {
     statusCode: 200,
     data: req.user
   });
 };
-
-export default socialAuth;

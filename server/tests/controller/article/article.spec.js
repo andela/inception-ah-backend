@@ -29,6 +29,22 @@ const articleDependencies = async () => {
 
 describe("CRUD Article Feature </api/v1/article>", done => {
   const slug = "the-man-of-man-that-man-1550835108565";
+  it("should not create an article", async () => {
+    const user = await userDependencies();
+    const articleData = await articleDependencies();
+    const token = generateJWT({ userId: user.userId }, jwtConfigs);
+    const res = await chai
+      .request(app)
+      .post("/api/v1/articles")
+      .send({ ...articleData, categoryId: "" })
+      .set({ Authorization: token });
+    expect(res.statusCode).to.equal(400);
+    expect(res.body.success).to.be.false;
+    expect(res.body.errorMessages.categoryId).to.equal(
+      "Please select a category"
+    );
+  });
+
   it("should create an article", async () => {
     const user = await userDependencies();
     const articleData = await articleDependencies();

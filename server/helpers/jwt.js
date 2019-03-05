@@ -15,15 +15,10 @@ export const getJWTConfigs = options => {
   if (!option) {
     throw new Error("An object with property option is required");
   }
-
-  if (extraOptions) {
-    return {
-      ...jwtConfigs[option],
-      ...extraOptions
-    };
-  }
-
-  return jwtConfigs[option];
+  return {
+    ...jwtConfigs[option],
+    ...extraOptions
+  };
 };
 
 /**
@@ -36,11 +31,7 @@ export const getJWTConfigs = options => {
  */
 export const generateJWT = (payload, configs) => {
   const { secret, ...config } = configs;
-  try {
-    return jwt.sign(payload, secret, config);
-  } catch (error) {
-    throw error;
-  }
+  return jwt.sign(payload, secret, config);
 };
 
 /**
