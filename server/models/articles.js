@@ -62,6 +62,7 @@ const getArticleModel = (sequelize, DataTypes) => {
       default: false
     }
   };
+
   const Article = sequelize.define("Articles", articleSchema, {
     freezeTableName: true,
     hooks: {
@@ -72,6 +73,7 @@ const getArticleModel = (sequelize, DataTypes) => {
       }
     }
   });
+  
   Article.associate = db => {
     Article.belongsTo(db.Users, {
       foreignKey: "authorId",
@@ -92,6 +94,7 @@ const getArticleModel = (sequelize, DataTypes) => {
       target: "id",
       onDelete: "CASCADE"
     });
+
     Article.hasMany(db.Reactions, {
       scopes: {
         articleReactions: {
@@ -106,6 +109,18 @@ const getArticleModel = (sequelize, DataTypes) => {
       foreignKey: "articleId",
       target: "id",
       onDelete: "CASCADE"
+    });
+
+    Article.belongsToMany(db.Tags, {
+      through: {
+        model: "ArticleTags",
+        unique: false
+      },
+      timestamps: false,
+      foreignKey: "articleId",
+      target: "id",
+      onDelete: "RESTRICT",
+      onUpdate: "CASCADE"
     });
   };
   return Article;

@@ -18,3 +18,4 @@ import "./controller/favorite/favorites.spec";
 import "./controller/article/article.spec";
 import "./validations/user.spec";
 import "./controller/article/pagination.spec";
+import "./models/tags.spec";

@@ -1,5 +1,5 @@
 import { Router } from "express";
-import socialAuth from "@controllers/socialAuth";
+import { socialAuth } from "@controllers/socialAuth";
 import {
   googleAuth,
   googleAuthRedirect,

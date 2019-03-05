@@ -4,10 +4,10 @@ import { socialAuthRouter } from "@routes/social";
 import { userSignUp, verifyUserAccount, userLogin } from "@controllers/user";
 import { validateInput, checkUniqueEmail } from "@middlewares";
 
-const authsRouter = Router();
-authsRouter.post("/signin", validateInput, userLogin);
-authsRouter.post("/signup", validateInput, checkUniqueEmail, userSignUp);
-authsRouter.get("/verification/:token", verifyUserAccount);
-authsRouter.use("/", socialAuthRouter);
+const authRouter = Router();
+authRouter.post("/signin", validateInput, userLogin);
+authRouter.post("/signup", validateInput, checkUniqueEmail, userSignUp);
+authRouter.get("/verification/:token", verifyUserAccount);
+authRouter.use("/", socialAuthRouter);
 
-export { authsRouter };
+export { authRouter };

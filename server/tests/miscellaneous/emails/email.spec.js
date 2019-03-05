@@ -5,12 +5,12 @@ import { validUser, invalidUser } from "@fixtures";
 
 chai.use(chaiHttp);
 const { expect } = chai;
-const { fistName, lastName, userEmail } = validUser;
+const { firstName, lastName, userEmail } = validUser;
 
 describe("Send Email", () => {
   it("should send an email to valid email address", async () => {
     const verifyEmail = await sendEmail(
-      fistName,
+      firstName,
       lastName,
       userEmail,
       null,

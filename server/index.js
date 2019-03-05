@@ -41,6 +41,7 @@ app.all("*", (req, res) => {
     message: "Not Found"
   });
 });
+
 if (!isTest) {
   (async () => {
     try {
@@ -50,6 +51,7 @@ if (!isTest) {
     }
   })();
 }
+
 app.listen(port, () => {
   console.log(`Listening on port ${port}`);
 });
