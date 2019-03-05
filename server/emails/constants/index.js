@@ -1,27 +1,27 @@
-const VERIFYINTRO = `Welcome to Authors Haven! 
+const VERIFY_INTRO = `Welcome to Authors Haven! 
 We’re very excited to have you on board`;
-const VERIFYCOLOR = "green";
-const VERIFYTEXT = "Confirm Your Account";
-const VERIFYOUTRO = `Need help, or have questions?
+const VERIFY_COLOR = "green";
+const VERIFY_TEXT = "Confirm Your Account";
+const VERIFY_OUTRO = `Need help, or have questions?
         Just reply to this email, we'd love to help.`;
 
 export const verifyConstants = {
-  intro: VERIFYINTRO,
-  color: VERIFYCOLOR,
-  text: VERIFYTEXT,
-  outro: VERIFYOUTRO
+  intro: VERIFY_INTRO,
+  color: VERIFY_COLOR,
+  text: VERIFY_TEXT,
+  outro: VERIFY_OUTRO
 };
 
-const RESETINTRO = `You have received this email because a password reset 
+const RESET_INTRO = `You have received this email because a password reset 
 request for your account was received`;
-const RESETCOLOR = "#DC4D2F";
-const RESETTEXT = "Reset your password";
-const RESETOUTRO = `If you did not request a password reset. 
+const RESET_COLOR = "#DC4D2F";
+const RESET_TEXT = "Reset your password";
+const RESET_OUTRO = `If you did not request a password reset. 
 No further action is required on your part.`;
 
 export const resetConstants = {
-  intro: RESETINTRO,
-  color: RESETCOLOR,
-  text: RESETTEXT,
-  outro: RESETOUTRO
+  intro: RESET_INTRO,
+  color: RESET_COLOR,
+  text: RESET_TEXT,
+  outro: RESET_OUTRO
 };

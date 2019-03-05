@@ -6,9 +6,11 @@ import passport from "passport";
 import db from "@models";
 import { mainAppRouter } from "@routes/index";
 import { setPassportMiddleware } from "@passport";
+import { Sequelize } from "sequelize";
 
 dotenv.config();
 const isProduction = process.env.NODE_ENV === "production";
+const isTest = process.env.NODE_ENV === "test";
 const port = process.env.PORT || 6000;
 
 // Create global app object
@@ -41,6 +43,17 @@ app.all("*", (req, res) => {
     message: "Not Found"
   });
 });
+
+if (!isTest) {
+  (async () => {
+    try {
+      await db.sequelize.sync();
+      console.log("Connection to database successful!");
+    } catch (error) {
+      console.log("error", error);
+    }
+  })();
+}
 
 app.listen(port, () => {
   console.log(`Listening on port ${port}`);
