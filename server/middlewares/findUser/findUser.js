@@ -6,7 +6,7 @@ import { uuidSchema } from "@schemas";
 const { Users } = models;
 
 export const findUserById = async (req, res, next) => {
-  const userId = req.params.id;
+  const userId = req.params.id || req.user.userId;
   const validateId = Joi.validate(userId, uuidSchema);
 
   try {
