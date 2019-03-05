@@ -42,6 +42,32 @@ describe("CRUD Article Feature </api/v1/article>", done => {
     expect(res.body.success).to.be.true;
   });
 
+  it("should not create an article when category Id is not provided", async () => {
+    const user = await userDependencies();
+    const articleData = await articleDependencies();
+    const token = generateJWT({ userId: user.userId }, jwtConfigs);
+    const res = await chai
+      .request(app)
+      .post("/api/v1/articles")
+      .send({ ...articleData, categoryId: "" })
+      .set({ Authorization: token });
+    expect(res.statusCode).to.equal(400);
+    expect(res.body.success).to.be.false;
+    expect(res.body.errorMessages.categoryId).to.equal(
+      "Please select a category"
+    );
+  });
+
+  it("should return an error status Code of 500 for wrong token", async () => {
+    const articleData = await articleDependencies();
+    const res = await chai
+      .request(app)
+      .post("/api/v1/articles")
+      .send(articleData)
+      .set({ Authorization: "okunukwe" });
+    expect(res.statusCode).to.equal(500);
+  });
+
   it("should return all articles by an author", async () => {
     const user = await userDependencies();
     const articleData = await articleDependencies();
@@ -135,6 +161,19 @@ describe("CRUD Article Feature </api/v1/article>", done => {
       .set({ Authorization: token });
     expect(res.statusCode).to.equal(404);
     expect(res.body.success).to.be.false;
+  });
+
+  it("should return an error status code of 500, if token  is malformed", async () => {
+    const user = await userDependencies();
+    const articleData = await articleDependencies();
+    articleData.authorId = user.userId;
+    await Articles.create(articleData);
+    const res = await chai
+      .request(app)
+      .put(`/api/v1/articles/${slug}`)
+      .send({ ...articleData, title: "man of man man" })
+      .set({ Authorization: "okunkwe" });
+    expect(res.statusCode).to.equal(500);
   });
 
   it("should return articles based on their category", async () => {
