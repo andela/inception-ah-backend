@@ -5,11 +5,13 @@ import {
   uuidSchema,
   updateProfileSchema
 } from "./user";
+import { commentSchema } from "./comment";
 
 export {
   signInSchema,
   signUpSchema,
   uuidSchema,
   articleSchema,
-  updateProfileSchema
+  updateProfileSchema,
+  commentSchema
 };

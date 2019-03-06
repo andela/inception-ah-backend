@@ -26,6 +26,19 @@ export const userData = [
     isAdmin: false
   },
   {
+    firstName: "Kingsley",
+    middleName: "Frank",
+    lastName: "Demesi",
+    email: "kingsley@gmail.com",
+    password: "kingsley.Me2",
+    gender: "male",
+    biography: "A true son from the sun",
+    mobileNumber: "081345678909",
+    imageURL: "http://image.jpg",
+    isNotifiable: true,
+    isAdmin: false
+  },
+  {
     firstName: "John",
     middleName: "Mark",
     lastName: "Drew",

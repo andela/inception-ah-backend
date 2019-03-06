@@ -1,7 +1,7 @@
 import chai from "chai";
 import chaiHttp from "chai-http";
 import models from "@models";
-import { validUserData, articleData, userData } from "@fixtures";
+import { validUserData, articleData, userData, commentData } from "@fixtures";
 import app from "@app";
 
 chai.use(chaiHttp);
@@ -101,4 +101,44 @@ export const getReportDependencies = async reportOverride => {
   const report = await Reports.create(reportData);
   const destroy = destroyDependencies.bind([report, reporter, article]);
   return Promise.resolve({ report, reporter, article, destroy });
+};
+
+export const commentDependencies = async (
+  articleAuthorData,
+  commentUserData,
+  categoryName
+) => {
+  const articleAuthor = await Users.create(articleAuthorData);
+  const authorId = articleAuthor.get("id");
+
+  const categoryInstance = await Categories.create({ category: categoryName });
+  const categoryId = categoryInstance.get("id");
+
+  const articleInstance = await Articles.create(
+    Object.assign(articleData, { authorId, categoryId })
+  );
+
+  const articleId = articleInstance.get("id");
+  const articleSlug = articleInstance.get("slug");
+
+  await Users.create(commentUserData);
+  const { email, password } = commentUserData;
+  const response = await chai
+    .request(app)
+    .post("/api/v1/auth/signin")
+    .send({ email, password });
+  const {
+    userId,
+    data: { token }
+  } = response.body;
+
+  const { content } = commentData;
+
+  return Promise.resolve({
+    token,
+    userId,
+    articleId,
+    articleSlug,
+    commentData: { content }
+  });
 };
