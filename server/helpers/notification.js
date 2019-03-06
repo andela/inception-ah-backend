@@ -24,11 +24,12 @@ export const getAuthorsFollowers = async authorId => {
  * @returns {Array} Array of users that opted in for email notification
  */
 export const getUsersForEmailNotification = async followers => {
+  console.log("tyhthhhfhfhfh", followers);
   const usersForEmailNotification = followers.map(async follower => {
-    await Users.findAll({
+    await Users.findOne({
       where: { id: follower.followerId, isNotifiable: true },
       raw: true,
-      attributes: ["email"]
+      attributes: ["email", "firstName", "lastName"]
     });
   });
   return usersForEmailNotification;

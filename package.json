@@ -19,12 +19,7 @@
     "lint:fix": "prettier-eslint '**/*{js,json}' --write && prettier-eslint server/tests/**/*.js --write",
     "heroku-postbuild": "npm run build"
   },
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged",
-      "pre-push": "npm run test"
-    }
-  },
+
   "lint-staged": {
     "*.{js,json}": [
       "prettier --write",

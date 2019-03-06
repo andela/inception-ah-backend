@@ -15,4 +15,4 @@ const pusher = new Pusher({
   useTLS: true
 });
 
-export default pusher;
+export { pusher };

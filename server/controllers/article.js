@@ -2,9 +2,11 @@ import { Op } from "sequelize";
 import isEmpty from "lodash.isempty";
 
 import models from "@models";
+import { getBaseUrl } from "@helpers/users";
 import { httpResponse, serverError } from "@helpers/http";
 import { pagination } from "@helpers/pagination";
 import { generateUniqueSlug, calculateReadTime } from "@helpers/articles";
+import { sendPublishedArticleNotification } from "./notification";
 
 const { Articles, Users } = models;
 
@@ -55,7 +57,6 @@ export const createArticle = async (req, res) => {
       content,
       description
     });
-
     return httpResponse(res, {
       statusCode: 201,
       message: "Article created successfully",
@@ -66,26 +67,35 @@ export const createArticle = async (req, res) => {
   }
 };
 
-/**
- * @description Publish an unpublished Article
- *
- * @param {object} req HTTP request object
- * @param {object} res HTTP response object
- * @returns {object}  Response message object
- */
-export const publishArticle = async (req, res) => {
-  const article = req.article;
+// /**
+//  * @description Publish an unpublished Article
+//  *
+//  * @param {object} req HTTP request object
+//  * @param {object} res HTTP response object
+//  * @returns {object}  Response message object
+//  */
+export const publishArticle = async (req, res, next) => {
+  const { article } = req;
   try {
     const publishedArticle = await article.update(
       { isPublished: true },
       { fields: ["isPublished"] }
     );
     /* TODO: Fetch followers and send email notification */
+    const url = `${getBaseUrl(req)}/articles/${article.slug}`;
+    await sendPublishedArticleNotification(
+      article.authorId,
+      article.slug,
+      article.id,
+      url,
+      next
+    );
     return httpResponse(res, {
       message: "Article published successfully",
       publishedArticle
     });
   } catch (error) {
+    console.log(error);
     return serverError(res, error);
   }
 };
