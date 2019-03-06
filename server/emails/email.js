@@ -26,6 +26,5 @@ export const sendEmail = async (
   const mail = isTest
     ? Promise.resolve("Email sent")
     : await sgMail.send(emailBody);
-
   return mail;
 };

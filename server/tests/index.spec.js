@@ -16,6 +16,7 @@ import "./controller/user/profile.spec";
 import "./controller/user/resetPassword.spec";
 import "./controller/favorite/favorites.spec";
 import "./controller/article/article.spec";
+import "./controller/notification/notification.spec";
 import "./validations/user.spec";
 import "./controller/article/pagination.spec";
 import "./models/tags.spec";

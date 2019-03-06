@@ -1,4 +1,4 @@
-import models from "@models";
+import models from "../models/index";
 import { NOTIFICATION } from "./constants";
 
 const { Users, Articles, Followers } = models;
@@ -12,9 +12,11 @@ const { Users, Articles, Followers } = models;
 export const getAuthorsFollowers = async authorId => {
   const followers = await Followers.findAll({
     where: { authorId },
-    raw: true
+    attributes: ["authorId", "followerId"]
   });
-  return followers;
+  return followers.map(follower => {
+    return follower.dataValues;
+  });
 };
 
 /**
@@ -25,13 +27,13 @@ export const getAuthorsFollowers = async authorId => {
  */
 export const getUsersForEmailNotification = async followers => {
   const usersForEmailNotification = followers.map(async follower => {
-    await Users.findAll({
+    const user = await Users.findOne({
       where: { id: follower.followerId, isNotifiable: true },
-      raw: true,
-      attributes: ["email"]
+      attributes: ["email", "firstName", "lastName"]
     });
+    return user;
   });
-  return usersForEmailNotification;
+  return Promise.all(usersForEmailNotification);
 };
 
 /**
@@ -66,7 +68,7 @@ export const createNotificationMessage = async (type, options) => {
       emailTemplate = {
         subject: "Article Notification",
         text: "Read Article",
-        intro: `${authorName} just pulished a new article 🚀`,
+        intro: `${authorName} just pulished a new article`,
         outro: `Don't need the notification? You can opt out from your profile page`,
         color
       };
@@ -74,13 +76,13 @@ export const createNotificationMessage = async (type, options) => {
     case "comment":
       data = {
         action: NOTIFICATION.comment,
-        message: `${articleTitle} article has a new comment 🎉`,
+        message: `${articleTitle} article has a new comment`,
         link: options.articleSlug ? options.articleSlug : null
       };
       emailTemplate = {
         subject: "Comment Notification",
         text: "View Comment",
-        intro: `${articleTitle} article has a new comment 🎉`,
+        intro: `${articleTitle} article has a new comment`,
         outro: `Don't need the notification? You can opt out from your profile page`,
         color
       };

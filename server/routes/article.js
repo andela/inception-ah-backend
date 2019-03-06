@@ -20,6 +20,10 @@ import {
 
 const articleRouter = Router();
 
+/**
+ * @description - Route to favorite and unfavorite an article
+ * @returns - It returns reponse message
+ */
 articleRouter.post(
   "/articles/:slug/favorite",
   verifyToken,

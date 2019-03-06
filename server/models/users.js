@@ -115,6 +115,16 @@ export default (sequelize, Sequelize) => {
       target: "id",
       onDelete: "CASCADE"
     });
+    User.hasMany(db.Followers, {
+      foreignKey: "followerId",
+      target: "id",
+      onDelete: "CASCADE"
+    });
+    User.hasMany(db.Followers, {
+      foreignKey: "authorId",
+      target: "id",
+      onDelete: "CASCADE"
+    });
   };
 
   User.prototype.generateResetToken = async function() {
