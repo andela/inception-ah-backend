@@ -67,13 +67,14 @@ export const createArticle = async (req, res) => {
   }
 };
 
-// /**
-//  * @description Publish an unpublished Article
-//  *
-//  * @param {object} req HTTP request object
-//  * @param {object} res HTTP response object
-//  * @returns {object}  Response message object
-//  */
+/**
+ * @description Publish an unpublished Article
+ *
+ * @param {object} req HTTP request object
+ * @param {object} res HTTP response object
+ * @param {function} next
+ * @returns {object}  Response message object
+ */
 export const publishArticle = async (req, res, next) => {
   const { article } = req;
   try {
@@ -122,7 +123,7 @@ export const getAllArticles = async (req, res) => {
       });
     }
     return httpResponse(res, {
-      message: "Articles retrived successfully",
+      message: "Articles retrieved successfully",
       articles
     });
   } catch (error) {

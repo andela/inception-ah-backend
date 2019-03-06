@@ -3,6 +3,7 @@ import { authRouter } from "@routes/auth";
 import { userRouter } from "@routes/user";
 import { articleRouter } from "@routes/article";
 import { notificationRouter } from "@routes/notification";
+import { commentsRouter } from "@routes/comment";
 
 const mainAppRouter = Router();
 mainAppRouter.get("/", (req, res, next) => {
@@ -15,5 +16,6 @@ mainAppRouter.use("/auth", authRouter);
 mainAppRouter.use("/users", userRouter);
 mainAppRouter.use("/", articleRouter);
 mainAppRouter.use("/", notificationRouter);
+mainAppRouter.use("/", commentsRouter);
 
 export { mainAppRouter };

@@ -10,7 +10,7 @@ import app from "@app";
 const { Users } = models;
 
 const { firstName, lastName, email, password } = userData[0];
-const { middleName, gender, biography, mobileNumber, imageURL } = userData[2];
+const { middleName, gender, biography, mobileNumber, imageURL } = userData[3];
 const { expect } = chai;
 
 chai.use(chaiHttp);

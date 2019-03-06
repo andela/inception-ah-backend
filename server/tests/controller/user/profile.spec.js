@@ -66,7 +66,7 @@ describe("Test for User Profile", () => {
       const res = await chai
         .request(app)
         .put(`/api/v1/users/${id1}/updateProfile`)
-        .send(userData[2]);
+        .send(userData[3]);
       expect(res.statusCode).to.equal(401);
       expect(res.body.success).to.be.false;
       expect(res.body.message).to.equal("No valid token provided");
@@ -100,7 +100,7 @@ describe("Test for User Profile", () => {
         .request(app)
         .put(`/api/v1/users/${id1}/updateProfile`)
         .set("Authorization", token1)
-        .send(userData[2]);
+        .send(userData[3]);
       expect(res.statusCode).to.equal(200);
       expect(res.body.success).to.be.true;
       expect(res.body.message).to.eql("User profile updated");
@@ -112,7 +112,7 @@ describe("Test for User Profile", () => {
         .request(app)
         .put(`/api/v1/users/${id1}/updateProfile`)
         .set("Authorization", token2)
-        .send(userData[2]);
+        .send(userData[3]);
       expect(res.statusCode).to.equal(401);
       expect(res.body.success).to.be.false;
       expect(res.body.message).to.eql(
@@ -145,7 +145,7 @@ describe("Test for User Profile", () => {
         .request(app)
         .put(`/api/v1/users/${id2}/updateProfile`)
         .set("Authorization", invalidToken)
-        .send(userData[2]);
+        .send(userData[3]);
       expect(res.statusCode).to.equal(500);
       expect(res.body.success).to.be.false;
       expect(res.body.message);

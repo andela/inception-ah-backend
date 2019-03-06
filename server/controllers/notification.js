@@ -64,11 +64,7 @@ export const sendPublishedArticleNotification = async (
       const usersForEmailNotification = await getUsersForEmailNotification(
         authorsFollowers
       );
-      const [data, emailTemplate] = await createNotificationMessage(
-        "article",
-        options
-      );
-
+      const [data, emailTemplate] = await createNotificationMessage(options);
       const pusherBatchEvents = authorsFollowers.map(() => ({
         channel: NOTIFICATION.notificationChannel,
         name: NOTIFICATION.publishArticle,
@@ -96,4 +92,27 @@ export const sendPublishedArticleNotification = async (
   } catch (error) {
     return next(error);
   }
+};
+
+/**
+ * @description Send notification when article receives a comment
+ *
+ * @param {uuid} authorId Id of article's author
+ * @param {uuid} articleId Article ID
+ * @param {string} articleTitle Article slug
+ * @returns {void}
+ */
+export const sendCommentNotification = async (
+  authorId,
+  articleId,
+  articleTitle
+) => {
+  await Notifications.create({
+    message: `Your article - ${articleTitle} - has a new comment 🎉`,
+    userId: authorId,
+    articleId
+  });
+  pusher.trigger(NOTIFICATION.notificationChannel, NOTIFICATION.comment, {
+    message: `Your article - ${articleTitle} - has a new comment 🎉`
+  });
 };
