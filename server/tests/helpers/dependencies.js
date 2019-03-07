@@ -5,7 +5,7 @@ import { validUserData, articleData, userData, commentData } from "@fixtures";
 import app from "@app";
 
 chai.use(chaiHttp);
-const { Users, Articles, Categories, Reports } = models;
+const { Users, Articles, Categories, Reports, Ratings } = models;
 
 export const userDependencies = async data => {
   const user = await Users.create(data);
@@ -55,14 +55,28 @@ const destroyDependencies = function() {
  * @param {object} articleOverride properties to be overrided in article fixture
  * @returns {Articles} instance of Article Model
  */
-export const getArticleInstance = async articleOverride => {
-  const category = await Categories.create({ category: "computers" });
-  const author = await getUserInstance();
-  const authorId = { authorId: author.get("id") };
-  const articleCopy = Object.assign({}, articleData);
-  const articleFixture = Object.assign(articleCopy, authorId, articleOverride);
-  articleFixture.categoryId = category.get("id");
-  const article = await Articles.create(articleFixture);
+export const getArticleInstance = async (articleOverride = {}) => {
+  let category, author, article, authorId;
+  try {
+    category = await Categories.create({ category: "computers" });
+
+    //create an authorId if it is not provided in function argument
+    if (!("authorId" in articleOverride)) {
+      author = await getUserInstance();
+      authorId = { authorId: author.get("id") };
+    }
+
+    const articleCopy = Object.assign({}, articleData);
+    const articleFixture = Object.assign(
+      articleCopy,
+      authorId,
+      articleOverride
+    );
+    articleFixture.categoryId = category.get("id");
+    article = await Articles.create(articleFixture);
+  } catch (err) {
+    throw new Error(`Failed to create Article Dependecies\n${err}`);
+  }
   const destroy = destroyDependencies.bind([category, author, article]);
   return Promise.resolve({ article, author, category, destroy });
 };
@@ -141,4 +155,28 @@ export const commentDependencies = async (
     articleSlug,
     commentData: { content }
   });
+};
+
+/**
+ * @description Create persistent Ratings data on the database.
+ * @param {object} overrideFixture properties to be overrided in users fixture
+ * @returns {Object} Depencies used to create the Rating {rating, article, author, rater }
+ */
+export const getRatingsDependencies = async (overrideFixture = {}) => {
+  let rater, rating, articleInstance, author;
+  try {
+    rater = await getUserInstance(overrideFixture);
+    const raterId = rater.get("id");
+    author = await getUserInstance({ email: "author@email.com" });
+    let { article } = await getArticleInstance({ authorId: author.get("id") });
+    articleInstance = article;
+    const ratingData = Object.assign(
+      { raterId, score: 5, articleId: article.get("id") },
+      overrideFixture
+    );
+    rating = await Ratings.create(ratingData);
+  } catch (err) {
+    throw new Error(`Failed to create Ratings Dependecies\n${err}`);
+  }
+  return Promise.resolve({ rating, rater, author, articleInstance });
 };
