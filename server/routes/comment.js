@@ -12,6 +12,10 @@ import {
   findSingleComment,
   validateInput
 } from "@middlewares";
+import {
+  likeOrDislikeACommment,
+  fetchAllCommentReactions
+} from "@controllers/reaction";
 
 const commentsRouter = Router();
 
@@ -61,5 +65,19 @@ commentsRouter.delete(
   findSingleComment,
   deleteComment
 );
+commentsRouter.post(
+  "/articles/:slug/comments/:id/reaction",
+  verifyToken,
+  findArticle,
+  findSingleComment,
+  likeOrDislikeACommment
+);
 
+commentsRouter.get(
+  "/articles/:slug/comments/:id/reaction",
+  verifyToken,
+  findArticle,
+  findSingleComment,
+  fetchAllCommentReactions
+);
 export { commentsRouter };

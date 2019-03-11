@@ -45,7 +45,7 @@ describe("Reactions table model", () => {
       articleId,
       userId,
       sourceType: ARTICLE_REACTION,
-      reactions: true
+      reaction: true
     });
     assert.instanceOf(reactionInstance, Reactions);
     assert.lengthOf(Object.keys(reactionInstance.dataValues), "7");
@@ -56,10 +56,10 @@ describe("Reactions table model", () => {
     const articleLikes = await Reactions.create({
       userId,
       articleId,
-      reactions: true,
+      reaction: true,
       sourceType: ARTICLE_REACTION
     });
-    assert.equal(articleLikes.dataValues.reactions, true);
+    assert.equal(articleLikes.dataValues.reaction, true);
   });
 
   it("should add a dislike reaction to an article", async () => {
@@ -67,10 +67,10 @@ describe("Reactions table model", () => {
     const createdArticleDislikes = await Reactions.create({
       userId,
       articleId,
-      reactions: false,
+      reaction: false,
       sourceType: ARTICLE_REACTION
     });
-    assert.equal(createdArticleDislikes.dataValues.reactions, false);
+    assert.equal(createdArticleDislikes.dataValues.reaction, false);
   });
 
   it("should add a like reaction to a comment", async () => {
@@ -78,10 +78,10 @@ describe("Reactions table model", () => {
     const createdCommentLikes = await Reactions.create({
       userId,
       commentId,
-      reactions: true,
+      reaction: true,
       sourceType: COMMENT_REACTION
     });
-    assert.equal(createdCommentLikes.dataValues.reactions, true);
+    assert.equal(createdCommentLikes.dataValues.reaction, true);
   });
 
   it("should add a dislike reaction to a comment", async () => {
@@ -89,10 +89,10 @@ describe("Reactions table model", () => {
     const createdCommentDislikes = await Reactions.create({
       userId,
       commentId,
-      reactions: false,
+      reaction: false,
       sourceType: COMMENT_REACTION
     });
-    assert.equal(createdCommentDislikes.dataValues.reactions, false);
+    assert.equal(createdCommentDislikes.dataValues.reaction, false);
   });
 
   it("should delete a Reaction column when the article is deleted", async () => {
@@ -100,7 +100,7 @@ describe("Reactions table model", () => {
     const createdArticleLikes = await Reactions.create({
       userId,
       articleId,
-      reactions: true,
+      reaction: true,
       sourceType: ARTICLE_REACTION
     });
     await Articles.destroy({ where: { id: articleId } });
@@ -113,7 +113,7 @@ describe("Reactions table model", () => {
     const createdLikes = await Reactions.create({
       userId,
       articleId,
-      reactions: true,
+      reaction: true,
       sourceType: ARTICLE_REACTION
     });
     await Users.destroy({ where: { id: userId } });
@@ -127,7 +127,7 @@ describe("Reactions table model", () => {
     const createdCommentReactions = await Reactions.create({
       userId,
       commentId,
-      reactions: true,
+      reaction: true,
       sourceType: COMMENT_REACTION
     });
     await Comments.destroy({ where: { id: commentId } });

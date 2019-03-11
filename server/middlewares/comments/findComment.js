@@ -31,10 +31,21 @@ export const findSingleComment = async (req, res, next) => {
       where: {
         id: commentId,
         articleId: article.dataValues.id
-      }
+      },
+      include: [
+        {
+          model: models.Users,
+          as: "reviewer",
+          attributes: ["firstName", "lastName", "imageURL"]
+        },
+        {
+          model: models.Reactions,
+          as: "commentReactions"
+        }
+      ]
     });
 
-    if (!comment) {
+    if (isEmpty(comment)) {
       return httpResponse(res, {
         statusCode: 404,
         message: "Comment is not found"
@@ -60,7 +71,18 @@ export const findAllComments = async (req, res, next) => {
   const { article } = req;
   try {
     const comments = await Comments.findAll({
-      where: { articleId: article.dataValues.id }
+      where: { articleId: article.dataValues.id },
+      include: [
+        {
+          model: models.Users,
+          as: "reviewer",
+          attributes: ["firstName", "lastName", "imageURL"]
+        },
+        {
+          model: models.Reactions,
+          as: "commentReactions"
+        }
+      ]
     });
     if (isEmpty(comments)) {
       return httpResponse(res, {

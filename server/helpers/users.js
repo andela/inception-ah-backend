@@ -66,7 +66,11 @@ export const userProfileResponse = user => {
     lastName,
     gender,
     mobileNumber,
-    imageURL
+    imageURL,
+    articleReactions,
+    commentReactions,
+    articles,
+    comments
   } = user.dataValues;
   return {
     id,
@@ -76,6 +80,10 @@ export const userProfileResponse = user => {
     gender,
     biography,
     mobileNumber,
-    imageURL
+    imageURL,
+    articleReactions,
+    commentReactions,
+    articles,
+    comments
   };
 };

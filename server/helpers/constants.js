@@ -10,3 +10,7 @@ export const NOTIFICATION = {
   like: "like",
   notificationChannel: "inception-authors-haven"
 };
+export const LIKE_REACTION = "like";
+export const DISLIKE_REACTION = "dislike";
+export const LIKE_COUNT = "numberOfLikes";
+export const DISLIKE_COUNT = "numberOfDislikes";

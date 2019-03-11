@@ -18,6 +18,11 @@ import {
   deleteArticle
 } from "@controllers/article";
 
+import {
+  likeOrDislikeAnArticle,
+  fetchAllArticleReactions
+} from "@controllers/reaction";
+
 const articleRouter = Router();
 
 /**
@@ -102,5 +107,17 @@ articleRouter.delete(
   findAuthorsArticle,
   deleteArticle
 );
+articleRouter.post(
+  "/articles/:slug/reaction",
+  verifyToken,
+  findArticle,
+  likeOrDislikeAnArticle
+);
 
+articleRouter.get(
+  "/articles/:slug/reaction",
+  verifyToken,
+  findArticle,
+  fetchAllArticleReactions
+);
 export { articleRouter };

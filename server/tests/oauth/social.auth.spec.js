@@ -71,7 +71,11 @@ describe("Social Platform Authentication Test", () => {
       "gender",
       "biography",
       "mobileNumber",
-      "imageURL"
+      "imageURL",
+      "articleReactions",
+      "commentReactions",
+      "articles",
+      "comments"
     ]);
   });
 });

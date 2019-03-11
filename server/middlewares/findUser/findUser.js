@@ -18,7 +18,22 @@ export const findUserById = async (req, res, next) => {
       });
     }
 
-    const user = await Users.findByPk(userId);
+    const user = await Users.findByPk(userId, {
+      include: [
+        {
+          model: models.Articles,
+          as: "articles"
+        },
+        {
+          model: models.Comments,
+          as: "reviewer"
+        },
+        {
+          model: models.Reactions,
+          as: "userReactions"
+        }
+      ]
+    });
     if (!user) {
       return httpResponse(res, {
         statusCode: 404,

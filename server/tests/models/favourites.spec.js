@@ -1,35 +1,13 @@
 import { assert } from "chai";
 import models from "@models";
-import { userData, articleData, category } from "@fixtures";
+import { favoriteDependencies } from "@dependencies";
 
 const sequelize = models.sequelize;
-const { Favorites, Articles, Users, Categories } = models;
+const { Favorites, Articles, Users } = models;
 
 beforeEach(async () => {
   await sequelize.sync({ force: true });
 });
-
-const favoriteDependencies = async () => {
-  const createdUser = await Users.create(userData[0]);
-  const userId = createdUser.get("id");
-  const articleCategory = await Categories.create(category);
-  const categoryId = articleCategory.get("id");
-  const articleTemplate = Object.assign(articleData, {
-    authorId: userId,
-    categoryId
-  });
-  const articleInstance = await Articles.create(articleTemplate);
-  const articleId = articleInstance.get("id");
-  const articleSlug = articleInstance.get("slug");
-
-  return Promise.resolve({
-    userId,
-    articleId,
-    users: createdUser,
-    articles: articleInstance,
-    articleSlug
-  });
-};
 
 describe("Favorites table model ", () => {
   it("should create a favourite table with valid userid and articleId", async () => {

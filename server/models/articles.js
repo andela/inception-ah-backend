@@ -1,5 +1,7 @@
 import { generateUniqueSlug, calculateReadTime } from "@helpers/articles";
 import { ARTICLE_REACTION } from "@helpers/constants";
+import { pagination } from "@helpers/pagination";
+import models from "@models";
 
 const getArticleModel = (sequelize, DataTypes) => {
   const articleSchema = {
@@ -73,7 +75,7 @@ const getArticleModel = (sequelize, DataTypes) => {
       }
     }
   });
-  
+
   Article.associate = db => {
     Article.belongsTo(db.Users, {
       foreignKey: "authorId",
@@ -91,6 +93,7 @@ const getArticleModel = (sequelize, DataTypes) => {
 
     Article.hasMany(db.Comments, {
       foreignKey: "articleId",
+      as: "articleComments",
       target: "id",
       onDelete: "CASCADE"
     });
@@ -108,6 +111,7 @@ const getArticleModel = (sequelize, DataTypes) => {
       },
       foreignKey: "articleId",
       target: "id",
+      as: "articleReactions",
       onDelete: "CASCADE"
     });
 
@@ -123,6 +127,32 @@ const getArticleModel = (sequelize, DataTypes) => {
       onUpdate: "CASCADE"
     });
   };
+  Article.fetchArticles = function(options) {
+    const { pageLimit, offset } = pagination(options.query);
+    return this.findAll({
+      order: [["createdAt", "DESC"]],
+      where: options.whereConditions,
+      /* TODO: Add join for ArticleTags */
+      include: [
+        {
+          model: models.Users,
+          as: "author",
+          attributes: ["firstName", "lastName", "imageURL"]
+        },
+        {
+          model: models.Reactions,
+          as: "articleReactions"
+        },
+        {
+          model: models.Comments,
+          as: "articleComments"
+        }
+      ],
+      limit: pageLimit,
+      offset
+    });
+  };
+
   return Article;
 };
 export default getArticleModel;
