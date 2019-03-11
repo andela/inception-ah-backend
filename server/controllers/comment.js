@@ -1,5 +1,6 @@
 import models from "@models";
 import { httpResponse, serverError } from "@helpers/http";
+import { sendCommentNotification } from "./notification";
 
 const { Comments } = models;
 
@@ -11,16 +12,16 @@ const { Comments } = models;
  * @returns {object}  Response message object
  */
 export const createComment = async (req, res) => {
-  const articleId = req.article.id;
-  const { content } = req.body;
+  const { id, authorId, title } = req.article;
   const { userId } = req.user;
+  const { content } = req.body;
   try {
     const newComment = await Comments.create({
-      articleId,
+      articleId: id,
       userId,
       content
     });
-
+    await sendCommentNotification(authorId, id, title);
     return httpResponse(res, {
       statusCode: 201,
       message: "Comment created successfully",
@@ -61,7 +62,6 @@ export const getAllComments = async (req, res) => {
  */
 export const updateComment = async (req, res) => {
   const { user, comment } = req;
-  const { content } = req.body;
   const userIdFromToken = user.userId;
   try {
     if (comment.userId === userIdFromToken) {
@@ -73,7 +73,6 @@ export const updateComment = async (req, res) => {
         comment: updatedComment
       });
     }
-
     return httpResponse(res, {
       statusCode: 401,
       success: false,
@@ -103,7 +102,6 @@ export const deleteComment = async (req, res) => {
         message: "Comment deleted successfully"
       });
     }
-
     return httpResponse(res, {
       statusCode: 401,
       success: false,

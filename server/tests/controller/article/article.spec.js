@@ -9,15 +9,19 @@ import { registerUser, articleSpec, category } from "@fixtures";
 const jwtConfigs = getJWTConfigs({ option: "authentication" });
 
 chai.use(chaiHttp);
-const { Articles, Users, Categories } = models;
+const { Articles, Users, Categories, Followers } = models;
 
 beforeEach(async () => {
   await models.sequelize.sync({ force: true });
 });
 
-const userDependencies = async () => {
-  const user = await Users.create(registerUser);
-  return Promise.resolve({ userId: user.get("id") });
+const userDependencies = async userDetails => {
+  const user = await Users.create(userDetails);
+  return Promise.resolve({
+    userId: user.get("id"),
+    email: user.get("email"),
+    isNotifiable: user.get("isNotifiable")
+  });
 };
 
 const articleDependencies = async () => {
@@ -30,7 +34,7 @@ const articleDependencies = async () => {
 describe("CRUD Article Feature </api/v1/article>", done => {
   const slug = "the-man-of-man-that-man-1550835108565";
   it("should not create an article", async () => {
-    const user = await userDependencies();
+    const user = await userDependencies(registerUser);
     const articleData = await articleDependencies();
     const token = generateJWT({ userId: user.userId }, jwtConfigs);
     const res = await chai
@@ -46,7 +50,7 @@ describe("CRUD Article Feature </api/v1/article>", done => {
   });
 
   it("should create an article", async () => {
-    const user = await userDependencies();
+    const user = await userDependencies(registerUser);
     const articleData = await articleDependencies();
     const token = generateJWT({ userId: user.userId }, jwtConfigs);
     const res = await chai
@@ -59,7 +63,7 @@ describe("CRUD Article Feature </api/v1/article>", done => {
   });
 
   it("should not create an article when category Id is not provided", async () => {
-    const user = await userDependencies();
+    const user = await userDependencies(registerUser);
     const articleData = await articleDependencies();
     const token = generateJWT({ userId: user.userId }, jwtConfigs);
     const res = await chai
@@ -85,7 +89,7 @@ describe("CRUD Article Feature </api/v1/article>", done => {
   });
 
   it("should return all articles by an author", async () => {
-    const user = await userDependencies();
+    const user = await userDependencies(registerUser);
     const articleData = await articleDependencies();
     const token = generateJWT({ userId: user.userId }, jwtConfigs);
     articleData.authorId = user.userId;
@@ -98,7 +102,7 @@ describe("CRUD Article Feature </api/v1/article>", done => {
   });
 
   it("should return 404 error if authors articles are not found", async () => {
-    const user = await userDependencies();
+    const user = await userDependencies(registerUser);
     const articleData = await articleDependencies();
     const token = generateJWT({ userId: user.userId }, jwtConfigs);
     articleData.authorId = user.userId;
@@ -110,7 +114,7 @@ describe("CRUD Article Feature </api/v1/article>", done => {
   });
 
   it("should return all published articles", async () => {
-    const user = await userDependencies();
+    const user = await userDependencies(registerUser);
     const articleData = await articleDependencies();
     articleData.authorId = user.userId;
     let articles = await Articles.create(articleData);
@@ -124,7 +128,7 @@ describe("CRUD Article Feature </api/v1/article>", done => {
   });
 
   it("should return 404 error if no published articles are found", async () => {
-    const user = await userDependencies();
+    const user = await userDependencies(registerUser);
     const articleData = await articleDependencies();
     articleData.authorId = user.userId;
     await Articles.create(articleData);
@@ -133,7 +137,7 @@ describe("CRUD Article Feature </api/v1/article>", done => {
   });
 
   it("should return one article if the slug is valid", async () => {
-    const user = await userDependencies();
+    const user = await userDependencies(registerUser);
     const articleData = await articleDependencies();
     articleData.authorId = user.userId;
     const article = await Articles.create(articleData);
@@ -142,7 +146,7 @@ describe("CRUD Article Feature </api/v1/article>", done => {
   });
 
   it("should return 404 if the article slug is invalid", async () => {
-    const user = await userDependencies();
+    const user = await userDependencies(registerUser);
     const articleData = await articleDependencies();
     articleData.authorId = user.userId;
     await Articles.create(articleData);
@@ -151,7 +155,7 @@ describe("CRUD Article Feature </api/v1/article>", done => {
   });
 
   it("should update an article", async () => {
-    const user = await userDependencies();
+    const user = await userDependencies(registerUser);
     const articleData = await articleDependencies();
     const token = generateJWT({ userId: user.userId }, jwtConfigs);
     articleData.authorId = user.userId;
@@ -165,7 +169,7 @@ describe("CRUD Article Feature </api/v1/article>", done => {
   });
 
   it("should return 404 error if article to update is not found", async () => {
-    const user = await userDependencies();
+    const user = await userDependencies(registerUser);
     const articleData = await articleDependencies();
     const token = generateJWT({ userId: user.userId }, jwtConfigs);
     articleData.authorId = user.userId;
@@ -180,7 +184,7 @@ describe("CRUD Article Feature </api/v1/article>", done => {
   });
 
   it("should return an error status code of 500, if token  is malformed", async () => {
-    const user = await userDependencies();
+    const user = await userDependencies(registerUser);
     const articleData = await articleDependencies();
     articleData.authorId = user.userId;
     await Articles.create(articleData);
@@ -193,7 +197,7 @@ describe("CRUD Article Feature </api/v1/article>", done => {
   });
 
   it("should return articles based on their category", async () => {
-    const user = await userDependencies();
+    const user = await userDependencies(registerUser);
     const articleData = await articleDependencies();
     articleData.authorId = user.userId;
     let articles = await Articles.create(articleData);
@@ -204,7 +208,14 @@ describe("CRUD Article Feature </api/v1/article>", done => {
   });
 
   it("should publish an unpublished article", async () => {
-    const user = await userDependencies();
+    const user = await userDependencies(registerUser);
+    registerUser.email = "okwukwe.denja@gmail.com";
+    registerUser.isNotifiable = true;
+    const user1 = await userDependencies(registerUser);
+    const follower = await Followers.create({
+      authorId: user.userId,
+      followerId: user1.userId
+    });
     const articleData = await articleDependencies();
     const token = generateJWT({ userId: user.userId }, jwtConfigs);
     articleData.authorId = user.userId;
@@ -218,7 +229,7 @@ describe("CRUD Article Feature </api/v1/article>", done => {
   });
 
   it("should return 404 error if article to publish is not found", async () => {
-    const user = await userDependencies();
+    const user = await userDependencies(registerUser);
     const articleData = await articleDependencies();
     const token = generateJWT({ userId: user.userId }, jwtConfigs);
     articleData.authorId = user.userId;
@@ -232,7 +243,7 @@ describe("CRUD Article Feature </api/v1/article>", done => {
   });
 
   it("should delete an article", async () => {
-    const user = await userDependencies();
+    const user = await userDependencies(registerUser);
     const articleData = await articleDependencies();
     const token = generateJWT({ userId: user.userId }, jwtConfigs);
     articleData.authorId = user.userId;
@@ -245,7 +256,7 @@ describe("CRUD Article Feature </api/v1/article>", done => {
   });
 
   it("should return 404 error if article to delete is not found", async () => {
-    const user = await userDependencies();
+    const user = await userDependencies(registerUser);
     const articleData = await articleDependencies();
     const token = generateJWT({ userId: user.userId }, jwtConfigs);
     articleData.authorId = user.userId;

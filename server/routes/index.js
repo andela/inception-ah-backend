@@ -4,6 +4,7 @@ import { userRouter } from "@routes/user";
 import { articleRouter } from "@routes/article";
 import { commentsRouter } from "@routes/comment";
 import { followerRouter } from "@routes/follow";
+import { notificationRouter } from "@routes/notification";
 
 const mainAppRouter = Router();
 mainAppRouter.get("/", (req, res, next) => {
@@ -17,5 +18,6 @@ mainAppRouter.use("/users", userRouter);
 mainAppRouter.use("/", articleRouter);
 mainAppRouter.use("/", commentsRouter);
 mainAppRouter.use("/profiles", followerRouter);
+mainAppRouter.use("/", notificationRouter);
 
 export { mainAppRouter };
