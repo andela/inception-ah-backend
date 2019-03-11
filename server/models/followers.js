@@ -27,12 +27,14 @@ const getFollowersModel = (sequelize, DataTypes) => {
     Followers.belongsTo(db.Users, {
       foreignKey: "followerId",
       target: "id",
+      as: "follower",
       onDelete: "CASCADE"
     });
 
     Followers.belongsTo(db.Users, {
       foreignKey: "authorId",
       target: "id",
+      as: "author",
       onDelete: "CASCADE"
     });
   };

@@ -22,3 +22,4 @@ import "./oauth/social.auth.spec";
 import "./validations/user.spec";
 import "./models/reports.spec";
 import "./models/ratings.spec";
+import "./controller/follow/follow.spec";

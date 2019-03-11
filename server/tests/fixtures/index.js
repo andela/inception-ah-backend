@@ -8,6 +8,7 @@ import {
   registerUser
 } from "./models/userData";
 import { tagData } from "./models/tagData";
+import { userDependencies } from "../helpers/followDependencies";
 
 import { category } from "./models/categories";
 
@@ -20,7 +21,8 @@ export {
   commentData,
   registerUser,
   category,
-  validUser, 
+  validUser,
   invalidUser,
-  tagData
+  tagData,
+  userDependencies
 };

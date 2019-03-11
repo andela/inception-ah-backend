@@ -178,5 +178,14 @@ export default (sequelize, Sequelize) => {
     return this;
   };
 
+  User.prototype.getFullName = async function() {
+    let { firstName, lastName } = this;
+    return [firstName, lastName]
+      .map(name => {
+        return `${name.charAt(0).toUpperCase()}${name.substr(1)}`;
+      })
+      .join(" ");
+  };
+
   return User;
 };
