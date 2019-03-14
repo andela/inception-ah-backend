@@ -1,14 +1,14 @@
 import { Op } from "sequelize";
 import isEmpty from "lodash.isempty";
-
 import models from "@models";
 import { getBaseUrl } from "@helpers/users";
 import { httpResponse, serverError } from "@helpers/http";
 import { pagination } from "@helpers/pagination";
 import { generateUniqueSlug, calculateReadTime } from "@helpers/articles";
+import { ARTICLE_SCORE_UNIT } from "@helpers/constants";
 import { sendPublishedArticleNotification } from "./notification";
 
-const { Articles, Users } = models;
+const { Articles, Users, Ratings } = models;
 
 /**
  * @description A function to fetch articles and apply pagination.
@@ -49,6 +49,7 @@ const fetchArticles = async options => {
 export const createArticle = async (req, res) => {
   const { title, content, description, categoryId } = req.body;
   const { userId } = req.user;
+  console.log(userId);
   try {
     const newArticle = await Articles.create({
       title,
@@ -279,5 +280,41 @@ export const deleteArticle = async (req, res) => {
     });
   } catch (error) {
     return serverError(res, error);
+  }
+};
+
+export const rateArticle = async (req, res) => {
+  const { slug, user } = req;
+  const article = await Articles.findOne({ where: { slug } });
+  const articleId = article.get("id");
+  const raterId = user.userId;
+  const { score } = req.body;
+  const validScore = score < 6 && score > 0;
+  const isRating = await Ratings.findOne({
+    where: { raterId: user.userId, articleId }
+  });
+  if (validScore) {
+    if (isRating) {
+      await Ratings.update({ score }, { where: { articleId } });
+      httpResponse(res, {
+        message: `Rating Updated for ${slug}`,
+        statusCode: 202,
+        data: { score }
+      });
+    } else {
+      await Ratings.create({ articleId, raterId, score });
+      httpResponse(res, {
+        message: `Rating Added for ${slug}`,
+        statusCode: 201,
+        data: { score }
+      });
+    }
+  } else {
+    httpResponse(res, {
+      success: false,
+      message: "Rating is not in range of 1 - 5",
+      statusCode: 400,
+      data: null
+    });
   }
 };

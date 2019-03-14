@@ -15,7 +15,8 @@ import {
   getAuthorsArticles,
   getArticlesByCategory,
   updateArticle,
-  deleteArticle
+  deleteArticle,
+  rateArticle
 } from "@controllers/article";
 
 const articleRouter = Router();
@@ -101,6 +102,13 @@ articleRouter.delete(
   verifyToken,
   findAuthorsArticle,
   deleteArticle
+);
+
+articleRouter.post(
+  "/articles/rate/:slug",
+  findArticle,
+  verifyToken,
+  rateArticle
 );
 
 export { articleRouter };

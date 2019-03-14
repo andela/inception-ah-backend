@@ -10,3 +10,11 @@ export const NOTIFICATION = {
   like: "like",
   notificationChannel: "inception-authors-haven"
 };
+
+export const ARTICLE_SCORE_UNIT = {
+  ONE: 1,
+  TWO: 2,
+  THREE: 3,
+  FOUR: 4,
+  FIVE: 5
+};

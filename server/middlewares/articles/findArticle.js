@@ -6,20 +6,18 @@ import { serverError, httpResponse } from "@helpers/http";
 
 const { Articles } = models;
 export const findArticle = async (req, res, next) => {
+  const slug = req.params.slug || req.body.slug;
   try {
     const article = await Articles.findOne({
-      where: {
-        slug: req.params.slug
-      }
+      where: { slug }
     });
-
-    if (isEmpty(article)) {
+    if (!article) {
       return httpResponse(res, {
         statusCode: 404,
         message: "Article is not found"
       });
     }
-    req.article = article;
+    req.slug = slug;
     return next();
   } catch (error) {
     serverError(res, error);
@@ -38,7 +36,6 @@ export const findAuthorsArticle = async (req, res, next) => {
         }
       }
     });
-
     if (isEmpty(articleDetails)) {
       return httpResponse(res, {
         statusCode: 404,

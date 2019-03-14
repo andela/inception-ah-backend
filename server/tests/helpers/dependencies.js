@@ -3,6 +3,7 @@ import chaiHttp from "chai-http";
 import models from "@models";
 import { validUserData, articleData, userData, commentData } from "@fixtures";
 import app from "@app";
+import { promises } from "fs";
 
 chai.use(chaiHttp);
 const { Users, Articles, Categories, Reports, Ratings } = models;
@@ -179,4 +180,13 @@ export const getRatingsDependencies = async (overrideFixture = {}) => {
     throw new Error(`Failed to create Ratings Dependecies\n${err}`);
   }
   return Promise.resolve({ rating, rater, author, articleInstance });
+};
+
+const { firstName, lastName, email, password } = userData[0];
+export const signUpDependencies = async () => {
+  const res = await chai
+    .request(app)
+    .post("/api/v1/auth/signup")
+    .send({ firstName, lastName, email, password });
+  return Promise.resolve({ email, password });
 };

@@ -24,3 +24,4 @@ import "./validations/user.spec";
 import "./models/reports.spec";
 import "./models/ratings.spec";
 import "./controller/follow/follow.spec";
+import "./controller/article/rateArticle.spec";

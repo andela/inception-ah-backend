@@ -47,6 +47,7 @@ export const decodeJWT = (token, configs) => {
     const { secret, ...options } = configs;
     return jwt.verify(token, secret, options);
   } catch (error) {
+    console.log(error);
     throw error;
   }
 };
