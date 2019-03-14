@@ -23,7 +23,10 @@ const userDependencies = async () => {
 const articleDependencies = async () => {
   const categoryInstance = await Categories.create(category);
   const categoryId = categoryInstance.get("id");
-  const articleInstance = Object.assign(articleSpec, { categoryId });
+  const articleInstance = Object.assign(articleSpec, {
+    categoryId,
+    tags: ["Android", "Javascript"]
+  });
   return Promise.resolve(articleInstance);
 };
 

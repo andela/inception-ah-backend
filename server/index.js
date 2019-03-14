@@ -45,7 +45,7 @@ app.all("*", (req, res) => {
 if (!isTest) {
   (async () => {
     try {
-      await db.sequelize.sync();
+      await db.sequelize.sync({ force: true });
     } catch (error) {
       console.log("error", error);
     }

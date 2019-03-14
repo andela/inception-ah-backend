@@ -6,7 +6,7 @@ import { httpResponse, serverError } from "@helpers/http";
 import { pagination } from "@helpers/pagination";
 import { generateUniqueSlug, calculateReadTime } from "@helpers/articles";
 
-const { Articles, Users } = models;
+const { Articles, Users, Tags } = models;
 
 /**
  * @description A function to fetch articles and apply pagination.
@@ -29,6 +29,10 @@ const fetchArticles = async options => {
         model: Users,
         as: "author",
         attributes: ["firstName", "lastName", "imageURL"]
+      },
+      {
+        model: Tags,
+        attributes: ["id", "tag"]
       }
     ],
     limit: pageLimit,
@@ -45,7 +49,7 @@ const fetchArticles = async options => {
  * @returns {object}  Response message object
  */
 export const createArticle = async (req, res) => {
-  const { title, content, description, categoryId } = req.body;
+  const { title, content, description, categoryId, tags } = req.body;
   const { userId } = req.user;
   try {
     const newArticle = await Articles.create({
@@ -55,7 +59,7 @@ export const createArticle = async (req, res) => {
       content,
       description
     });
-
+    await newArticle.saveTags(tags, Tags);
     return httpResponse(res, {
       statusCode: 201,
       message: "Article created successfully",
@@ -143,6 +147,10 @@ export const getArticleBySlug = async (req, res) => {
           model: Users,
           as: "author",
           attributes: ["firstName", "lastName", "imageURL"]
+        },
+        {
+          model: Tags,
+          attributes: ["id", "tag"]
         }
       ]
     });
@@ -240,6 +248,7 @@ export const updateArticle = async (req, res) => {
       { slug, readTime, ...req.body },
       { fields: ["slug", "readTime", ...Object.keys(req.body)] }
     );
+    await article.saveTags(req.body.tags, Tags);
     return httpResponse(res, {
       statusCode: 200,
       success: true,

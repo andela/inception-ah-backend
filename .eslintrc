@@ -36,6 +36,7 @@
     "class-methods-use-this": 0,
     "space-in-parens": 0,
     "spaced-comment": 0,
+    "no-await-in-loop": 0,
     "space-before-function-paren": 0,
     "dot-notation": 0,
     "import/no-extraneous-dependencies": 0,

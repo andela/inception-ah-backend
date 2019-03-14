@@ -1,11 +1,18 @@
 import chai from "chai";
 import chaiHttp from "chai-http";
 import models from "@models";
-import { validUserData, articleData, userData, commentData } from "@fixtures";
+import {
+  validUserData,
+  articleData,
+  userData,
+  commentData,
+  tagData,
+  category
+} from "@fixtures";
 import app from "@app";
 
 chai.use(chaiHttp);
-const { Users, Articles, Categories, Reports, Ratings } = models;
+const { Users, Articles, Categories, Reports, Ratings, Tags } = models;
 
 export const userDependencies = async data => {
   const user = await Users.create(data);
@@ -49,6 +56,7 @@ const destroyDependencies = function() {
     dependency.destroy();
   });
 };
+
 /**
  * @description Create persistent Article data on the database.
  * @throws {Sequelice Constraint Error } similar
@@ -56,9 +64,9 @@ const destroyDependencies = function() {
  * @returns {Articles} instance of Article Model
  */
 export const getArticleInstance = async (articleOverride = {}) => {
-  let category, author, article, authorId;
+  let categoryInstance, author, article, authorId;
   try {
-    category = await Categories.create({ category: "computers" });
+    categoryInstance = await Categories.create({ category: "computers" });
 
     //create an authorId if it is not provided in function argument
     if (!("authorId" in articleOverride)) {
@@ -72,7 +80,7 @@ export const getArticleInstance = async (articleOverride = {}) => {
       authorId,
       articleOverride
     );
-    articleFixture.categoryId = category.get("id");
+    articleFixture.categoryId = categoryInstance.get("id");
     article = await Articles.create(articleFixture);
   } catch (err) {
     throw new Error(`Failed to create Article Dependecies\n${err}`);
@@ -179,4 +187,25 @@ export const getRatingsDependencies = async (overrideFixture = {}) => {
     throw new Error(`Failed to create Ratings Dependecies\n${err}`);
   }
   return Promise.resolve({ rating, rater, author, articleInstance });
+};
+
+export const tagDependencies = async tag => {
+  const data = tag ? { tag } : tagData[0];
+  const tagInstance = await Tags.create(data);
+  const tagId = tagInstance.get("id");
+  const userInstance = await Users.create(userData[0]);
+  const categoryInstance = await Categories.create(category);
+  const articleTemplate = Object.assign(articleData, {
+    authorId: userInstance.get("id"),
+    categoryId: categoryInstance.get("id")
+  });
+  const articleInstance = await Articles.create(articleTemplate);
+  const articleId = articleInstance.get("id");
+
+  return Promise.resolve({
+    tagId,
+    articleId,
+    tagInstance,
+    articleInstance
+  });
 };

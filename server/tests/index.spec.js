@@ -16,6 +16,7 @@ import "./controller/favorite/favorites.spec";
 import "./controller/article/article.spec";
 import "./controller/article/pagination.spec";
 import "./controller/comment/comment.spec";
+import "./controller/tag/tag.spec";
 import "./miscellaneous/miscellaneous.spec";
 import "./miscellaneous/emails/email.spec";
 import "./oauth/social.auth.spec";

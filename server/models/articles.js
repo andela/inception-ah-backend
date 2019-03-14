@@ -1,5 +1,6 @@
 import { generateUniqueSlug, calculateReadTime } from "@helpers/articles";
 import { ARTICLE_REACTION } from "@helpers/constants";
+import { mapAsync } from "../helpers/utils";
 
 const getArticleModel = (sequelize, DataTypes) => {
   const articleSchema = {
@@ -73,7 +74,7 @@ const getArticleModel = (sequelize, DataTypes) => {
       }
     }
   });
-  
+
   Article.associate = db => {
     Article.belongsTo(db.Users, {
       foreignKey: "authorId",
@@ -123,6 +124,44 @@ const getArticleModel = (sequelize, DataTypes) => {
       onUpdate: "CASCADE"
     });
   };
+
+  /**
+   * @description Find or create a new instance of Tags
+   *
+   * @param {Array} tags array of tags
+   * @param {object} tagModel the tag model
+   * @returns {Promise} a promise that resolves to an array of object
+   * @method saveTags
+   */
+  Article.prototype.saveTags = async function(tags, tagModel) {
+    if (!tags) return;
+    try {
+      let tagInstance;
+      const tagIdArray = await mapAsync(tags, async tag => {
+        tag = tag.trim();
+        tagInstance = await tagModel.findOne({
+          /**
+           * We are forcing our DBMS to make comparison in lowercase
+           */
+          where: sequelize.where(
+            sequelize.fn("lower", sequelize.col("tag")),
+            sequelize.fn("lower", tag)
+          )
+        });
+        /**
+         * To avoid Cyclic Reference issue, we have chosen to pass in the Tag model
+         * as a parameter (tagModel) to this function
+         */
+        tagInstance = tagInstance || (await tagModel.create({ tag }));
+        return tagInstance.get("id");
+      });
+      const result = await this.addTags(tagIdArray);
+      return result[0];
+    } catch (error) {
+      throw error;
+    }
+  };
+
   return Article;
 };
 export default getArticleModel;
