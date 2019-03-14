@@ -19,5 +19,4 @@ userRouter.put(
   validateInput,
   updateUserProfile
 );
-
 export { userRouter };

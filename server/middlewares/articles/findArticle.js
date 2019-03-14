@@ -9,7 +9,8 @@ export const findArticle = async (req, res, next) => {
   try {
     const article = await Articles.findOne({
       where: {
-        slug: req.params.slug
+        slug: req.params.slug,
+        isPublished: true
       }
     });
 
@@ -38,7 +39,6 @@ export const findAuthorsArticle = async (req, res, next) => {
         }
       }
     });
-
     if (isEmpty(articleDetails)) {
       return httpResponse(res, {
         statusCode: 404,

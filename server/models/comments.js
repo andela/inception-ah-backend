@@ -23,6 +23,16 @@ const getCommentModel = (sequelize, DataTypes) => {
     content: {
       type: DataTypes.TEXT,
       allowNull: false
+    },
+    numberOfLikes: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      defaultValue: 0
+    },
+    numberOfDislikes: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      defaultValue: 0
     }
   };
 
@@ -30,16 +40,18 @@ const getCommentModel = (sequelize, DataTypes) => {
 
   Comment.associate = db => {
     Comment.belongsTo(db.Users, {
-      foreignKey: "userId"
+      foreignKey: "userId",
+      as: "reviewer"
     });
 
     Comment.belongsTo(db.Articles, {
       foreignKey: "articleId",
-      onDelete: "CASCADE"
+      onDelete: "CASCADE",
+      as: "articleComments"
     });
     Comment.hasMany(db.Reactions, {
       scopes: {
-        commentLikes: {
+        commentReactions: {
           include: [
             {
               model: db.Reactions,
@@ -48,7 +60,8 @@ const getCommentModel = (sequelize, DataTypes) => {
           ]
         }
       },
-      foreignKey: "sourceType2Id",
+      as: "commentReactions",
+      foreignKey: "commentId",
       target: "id",
       onDelete: "CASCADE"
     });

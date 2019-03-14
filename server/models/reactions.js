@@ -14,7 +14,11 @@ const getReactionsModel = (sequelize, Sequelize) => {
       type: Sequelize.INTEGER,
       allowNull: false
     },
-    reactions: {
+    userId: {
+      type: Sequelize.UUID,
+      allowNull: false
+    },
+    reaction: {
       type: Sequelize.BOOLEAN,
       allowNull: false
     }
@@ -22,6 +26,7 @@ const getReactionsModel = (sequelize, Sequelize) => {
   const Reaction = sequelize.define("Reactions", reactionSchema, flags);
   Reaction.associate = db => {
     Reaction.belongsTo(db.Articles, {
+      as: "articleReactions",
       foreignKey: "articleId",
       target: "id",
       onDelete: "CASCADE"
@@ -33,7 +38,8 @@ const getReactionsModel = (sequelize, Sequelize) => {
     });
     Reaction.belongsTo(db.Users, {
       foreignKey: "userId",
-      onDelete: "CASCADE"
+      onDelete: "CASCADE",
+      as: "userComments"
     });
   };
   return Reaction;

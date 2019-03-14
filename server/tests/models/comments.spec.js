@@ -38,7 +38,7 @@ describe("Comments table model", () => {
   it("should create a 6-column row in the models", async () => {
     const { userId, articleId, content } = await commentDependencies();
     const comments = await Comments.create({ userId, articleId, content });
-    assert.lengthOf(Object.keys(comments.dataValues), 6);
+    assert.lengthOf(Object.keys(comments.dataValues), 8);
   });
 
   it("should create an instance of Comments", async () => {

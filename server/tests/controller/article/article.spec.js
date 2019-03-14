@@ -93,7 +93,8 @@ describe("CRUD Article Feature </api/v1/article>", done => {
     const articleData = await articleDependencies();
     const token = generateJWT({ userId: user.userId }, jwtConfigs);
     articleData.authorId = user.userId;
-    await Articles.create(articleData);
+    const article = await Articles.create(articleData);
+
     const res = await chai
       .request(app)
       .get("/api/v1/articles/feed")
@@ -131,6 +132,7 @@ describe("CRUD Article Feature </api/v1/article>", done => {
     const user = await userDependencies(registerUser);
     const articleData = await articleDependencies();
     articleData.authorId = user.userId;
+    articleData.isPublished = false;
     await Articles.create(articleData);
     const res = await chai.request(app).get("/api/v1/articles");
     expect(res.statusCode).to.equal(404);
