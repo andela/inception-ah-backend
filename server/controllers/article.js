@@ -2,44 +2,12 @@ import { Op } from "sequelize";
 import isEmpty from "lodash.isempty";
 
 import models from "@models";
+import { getBaseUrl } from "@helpers/users";
 import { httpResponse, serverError } from "@helpers/http";
-import { pagination } from "@helpers/pagination";
 import { generateUniqueSlug, calculateReadTime } from "@helpers/articles";
+import { sendPublishedArticleNotification } from "./notification";
 
-const { Articles, Users, Tags } = models;
-
-/**
- * @description A function to fetch articles and apply pagination.
- *
- * @param {object} options
- * options:
- *  { whereCondition: condition to filter the query,
- *    query: the query parameters for pagination
- *  }
- * @returns {array}  Array of the articles
- */
-const fetchArticles = async options => {
-  const { pageLimit, offset } = pagination(options.query);
-  const articles = await Articles.findAll({
-    order: [["createdAt", "DESC"]],
-    where: options.whereConditions,
-    /* TODO: Add join for Comment, Category, ArticleTags */
-    include: [
-      {
-        model: Users,
-        as: "author",
-        attributes: ["firstName", "lastName", "imageURL"]
-      },
-      {
-        model: Tags,
-        attributes: ["id", "tag"]
-      }
-    ],
-    limit: pageLimit,
-    offset
-  });
-  return articles;
-};
+const { Articles, Tags } = models;
 
 /**
  * @description Create a new Article
@@ -59,7 +27,7 @@ export const createArticle = async (req, res) => {
       content,
       description
     });
-    await newArticle.saveTags(tags, Tags);
+    await newArticle.saveTags(tags);
     return httpResponse(res, {
       statusCode: 201,
       message: "Article created successfully",
@@ -75,16 +43,25 @@ export const createArticle = async (req, res) => {
  *
  * @param {object} req HTTP request object
  * @param {object} res HTTP response object
+ * @param {function} next
  * @returns {object}  Response message object
  */
-export const publishArticle = async (req, res) => {
-  const article = req.article;
+export const publishArticle = async (req, res, next) => {
+  const { article } = req;
   try {
     const publishedArticle = await article.update(
       { isPublished: true },
       { fields: ["isPublished"] }
     );
     /* TODO: Fetch followers and send email notification */
+    const url = `${getBaseUrl(req)}/articles/${article.slug}`;
+    await sendPublishedArticleNotification(
+      article.authorId,
+      article.slug,
+      article.id,
+      url,
+      next
+    );
     return httpResponse(res, {
       message: "Article published successfully",
       publishedArticle
@@ -103,7 +80,7 @@ export const publishArticle = async (req, res) => {
  */
 export const getAllArticles = async (req, res) => {
   try {
-    const articles = await fetchArticles({
+    const articles = await Articles.fetchArticles({
       whereConditions: {
         isPublished: true
       },
@@ -144,13 +121,21 @@ export const getArticleBySlug = async (req, res) => {
       /* TODO: Add join for Comment, Category, ArticleTags */
       include: [
         {
-          model: Users,
+          model: models.Users,
           as: "author",
           attributes: ["firstName", "lastName", "imageURL"]
         },
         {
-          model: Tags,
+          model: models.Tags,
           attributes: ["id", "tag"]
+        },
+        {
+          model: models.Reactions,
+          as: "articleReactions"
+        },
+        {
+          model: models.Comments,
+          as: "articleComments"
         }
       ]
     });
@@ -179,7 +164,7 @@ export const getArticleBySlug = async (req, res) => {
 export const getArticlesByCategory = async (req, res) => {
   const { categoryId } = req.params;
   try {
-    const articles = await fetchArticles({
+    const articles = await Articles.fetchArticles({
       whereConditions: {
         categoryId
       },
@@ -210,7 +195,7 @@ export const getArticlesByCategory = async (req, res) => {
 export const getAuthorsArticles = async (req, res) => {
   const { userId } = req.user;
   try {
-    const authorsArticles = await fetchArticles({
+    const authorsArticles = await Articles.fetchArticles({
       whereConditions: {
         authorId: userId
       },
@@ -248,7 +233,7 @@ export const updateArticle = async (req, res) => {
       { slug, readTime, ...req.body },
       { fields: ["slug", "readTime", ...Object.keys(req.body)] }
     );
-    await article.saveTags(req.body.tags, Tags);
+    await article.saveTags(req.body.tags);
     return httpResponse(res, {
       statusCode: 200,
       success: true,

@@ -62,9 +62,7 @@ export default (sequelize, Sequelize) => {
       defaultValue: false
     },
     lastLogin: {
-      type: Sequelize.DATE,
-      defaultValue: Date.now,
-      allowNull: false
+      type: Sequelize.DATE
     },
     resetToken: {
       type: Sequelize.TEXT
@@ -102,16 +100,29 @@ export default (sequelize, Sequelize) => {
     });
     User.hasMany(db.Articles, {
       foreignKey: "authorId",
+      as: "articles",
       target: "id",
       onDelete: "CASCADE"
     });
     User.hasMany(db.Comments, {
       foreignKey: "userId",
       target: "id",
-      onDelete: "CASCADE"
+      onDelete: "CASCADE",
+      as: "reviewer"
     });
     User.hasMany(db.Reactions, {
       foreignKey: "userId",
+      target: "id",
+      onDelete: "CASCADE",
+      as: "userReactions"
+    });
+    User.hasMany(db.Followers, {
+      foreignKey: "followerId",
+      target: "id",
+      onDelete: "CASCADE"
+    });
+    User.hasMany(db.Followers, {
+      foreignKey: "authorId",
       target: "id",
       onDelete: "CASCADE"
     });
@@ -176,6 +187,15 @@ export default (sequelize, Sequelize) => {
     });
     this.save();
     return this;
+  };
+
+  User.prototype.getFullName = async function() {
+    let { firstName, lastName } = this;
+    return [firstName, lastName]
+      .map(name => {
+        return `${name.charAt(0).toUpperCase()}${name.substr(1)}`;
+      })
+      .join(" ");
   };
 
   return User;

@@ -1,32 +1,43 @@
 import { Router } from "express";
 import {
-  createTag,
   getAllTags,
   searchTags,
   getTag,
   updateTag,
   deleteTag
 } from "@controllers/tag";
+import { validateInput, validateUuid } from "@middlewares";
 
 const tagRouter = Router();
 
 /**
  * @description - Route to get all Tags or all Tags instances that matches the query
  */
-tagRouter.get("/tags/:tagId", getTag);
+tagRouter.get("/", getAllTags, searchTags);
 
 /**
- * @description - Route to get all Tags or all Tags instances that matches the query
+ * Group all similar routes
  */
-tagRouter.get("/tags", getAllTags, searchTags);
+tagRouter
+  .route("/:tagId")
 
-/**
- * @description - Route to update a Tag instance
- */
-tagRouter.put("/tags/:tagId", updateTag);
+  /**
+   * Perform uuid validation check
+   */
+  .all(validateUuid)
 
-/**
- * @description - Route to delete a Tag instance
- */
-tagRouter.delete("/tags/:tagId", deleteTag);
+  /**
+   * @description - Route to get all Tags or all Tags instances that matches the query
+   */
+  .get(getTag)
+
+  /**
+   * @description - Route to update a Tag instance
+   */
+  .put(validateInput, updateTag)
+
+  /**
+   * @description - Route to delete a Tag instance
+   */
+  .delete(deleteTag);
 export { tagRouter };

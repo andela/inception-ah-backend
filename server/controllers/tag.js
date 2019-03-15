@@ -23,7 +23,9 @@ export const getTag = async (req, res) => {
 
     return httpResponse(res, {
       statusCode: isEmpty(tag) ? 404 : 302,
-      message: isEmpty(tag) ? "Tag not found" : "Tag successfully retrieved",
+      message: isEmpty(tag)
+        ? "Tag does not exist"
+        : "Tag successfully retrieved",
       tag
     });
   } catch (error) {

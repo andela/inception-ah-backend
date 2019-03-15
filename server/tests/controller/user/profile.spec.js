@@ -37,7 +37,7 @@ const wrongId = "bc302642-83e8-4c1b-80b4-c9ed35b6f908";
 const invalidToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ";
 
 describe("Test for User Profile", () => {
-  describe("GET <API /api/v1/users/:id>", () => {
+  describe("GET <API /api/v1/users/:userId>", () => {
     it("should return user profile if a valid user id is supplied", async () => {
       const { id1 } = await userProfileDependencies();
       const res = await chai.request(app).get(`/api/v1/users/${id1}`);
@@ -56,7 +56,7 @@ describe("Test for User Profile", () => {
       const res = await chai.request(app).get("/api/v1/users/2222");
       expect(res.statusCode).to.equal(400);
       expect(res.body.success).to.be.false;
-      expect(res.body.message).to.equal("Invalid User Id");
+      expect(res.body.errorMessages).to.equal("userId is not a valid uuid");
     });
   });
 
@@ -65,7 +65,7 @@ describe("Test for User Profile", () => {
       const { id1 } = await userProfileDependencies();
       const res = await chai
         .request(app)
-        .put(`/api/v1/users/${id1}/updateProfile`)
+        .put(`/api/v1/users/${id1}`)
         .send(userData[3]);
       expect(res.statusCode).to.equal(401);
       expect(res.body.success).to.be.false;
@@ -76,7 +76,7 @@ describe("Test for User Profile", () => {
       const { id1, token1 } = await userProfileDependencies();
       const res = await chai
         .request(app)
-        .put(`/api/v1/users/${wrongId}/updateProfile`)
+        .put(`/api/v1/users/${wrongId}`)
         .set("Authorization", token1);
       expect(res.statusCode).to.equal(404);
       expect(res.body.success).to.be.false;
@@ -87,18 +87,19 @@ describe("Test for User Profile", () => {
       const { id1, token1 } = await userProfileDependencies();
       const res = await chai
         .request(app)
-        .put("/api/v1/users/ldkdkkdkdk/updateProfile")
+        .put("/api/v1/users/ldkdkkdkdk")
         .set("Authorization", token1);
+
       expect(res.statusCode).to.equal(400);
       expect(res.body.success).to.be.false;
-      expect(res.body.message).to.eql("Invalid User Id");
+      expect(res.body.errorMessages).to.eql("userId is not a valid uuid");
     });
 
     it("should update user profile if a valid user id is supplied", async () => {
       const { id1, token1 } = await userProfileDependencies();
       const res = await chai
         .request(app)
-        .put(`/api/v1/users/${id1}/updateProfile`)
+        .put(`/api/v1/users/${id1}`)
         .set("Authorization", token1)
         .send(userData[3]);
       expect(res.statusCode).to.equal(200);
@@ -110,7 +111,7 @@ describe("Test for User Profile", () => {
       const { id1, token2 } = await userProfileDependencies();
       const res = await chai
         .request(app)
-        .put(`/api/v1/users/${id1}/updateProfile`)
+        .put(`/api/v1/users/${id1}`)
         .set("Authorization", token2)
         .send(userData[3]);
       expect(res.statusCode).to.equal(401);
@@ -124,7 +125,7 @@ describe("Test for User Profile", () => {
       const { id2, token2 } = await userProfileDependencies();
       const res = await chai
         .request(app)
-        .put(`/api/v1/users/${id2}/updateProfile`)
+        .put(`/api/v1/users/${id2}`)
         .set("Authorization", token2)
         .send({
           firstName: "John",
@@ -143,7 +144,7 @@ describe("Test for User Profile", () => {
       const { id2 } = await userProfileDependencies();
       const res = await chai
         .request(app)
-        .put(`/api/v1/users/${id2}/updateProfile`)
+        .put(`/api/v1/users/${id2}`)
         .set("Authorization", invalidToken)
         .send(userData[3]);
       expect(res.statusCode).to.equal(500);

@@ -1,6 +1,7 @@
 export const articleData = {
   title: "The man called Erl",
   description: "This is the man of men",
+  isPublished: true,
   content:
     "Lorem Ipsum is simply dummy text of the printing" +
     "and typesetting industry. Lorem Ipsum has been the industry's" +

@@ -53,8 +53,20 @@ describe("GET <API /api/v1/tags", () => {
 
 describe("GET <API /api/v1/tags:tagId", () => {
   it("should return a 404 error if tagId does not exist", async () => {
-    const res = await chai.request(app).get("/api/v1/tags/qwewretrty");
+    const { tagInstance, tagId } = await tagDependencies();
+    await tagInstance.destroy();
+    const res = await chai
+      .request(app)
+      .put(`/api/v1/tags/${tagId}`)
+      .send({ tag: tagInstance.get("tag") });
     expect(res.statusCode).to.equal(404);
+    expect(res.body.message).to.equal("Tag does not exist");
+  });
+
+  it("should return a 400 for invalid uuid", async () => {
+    const res = await chai.request(app).put("/api/v1/tags/qwewretrty");
+    expect(res.statusCode).to.equal(400);
+    expect(res.body.errorMessages).to.equal("tagId is not a valid uuid");
   });
 
   it("should get a specific tag", async () => {
@@ -70,9 +82,21 @@ describe("GET <API /api/v1/tags:tagId", () => {
 });
 
 describe("UPDATE <API /api/v1/tags:tagId", () => {
-  it("should return a 404 error if tagId does not exist", async () => {
+  it("should return a 400 for invalid uuid", async () => {
     const res = await chai.request(app).put("/api/v1/tags/qwewretrty");
+    expect(res.statusCode).to.equal(400);
+    expect(res.body.errorMessages).to.equal("tagId is not a valid uuid");
+  });
+
+  it("should return a 404 error if tagId does not exist", async () => {
+    const { tagInstance, tagId } = await tagDependencies();
+    await tagInstance.destroy();
+    const res = await chai
+      .request(app)
+      .put(`/api/v1/tags/${tagId}`)
+      .send({ tag: tagInstance.get("tag") });
     expect(res.statusCode).to.equal(404);
+    expect(res.body.message).to.equal("Tag does not exist");
   });
 
   it("should update a specific tag", async () => {
@@ -103,9 +127,20 @@ describe("UPDATE <API /api/v1/tags:tagId", () => {
 describe("DELETE <API /api/v1/tags:tagId", () => {
   it("should return a 404 error", async () => {
     const res = await chai.request(app).delete(`/api/v1/tags/tryutyrtrer`);
-    expect(res.statusCode).to.equal(404);
+    expect(res.statusCode).to.equal(400);
     expect(res.body.success).to.equal(false);
-    expect(res.body.message).to.equal("Tag not found");
+    expect(res.body.errorMessages).to.equal("tagId is not a valid uuid");
+  });
+
+  it("should return a 404 error if tagId does not exist", async () => {
+    const { tagInstance, tagId } = await tagDependencies();
+    await tagInstance.destroy();
+    const res = await chai
+      .request(app)
+      .put(`/api/v1/tags/${tagId}`)
+      .send({ tag: tagInstance.get("tag") });
+    expect(res.statusCode).to.equal(404);
+    expect(res.body.message).to.equal("Tag does not exist");
   });
 
   it("should not delete a tag instance if it has been used on an article", async () => {

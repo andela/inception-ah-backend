@@ -74,8 +74,6 @@ const imageURL = Joi.string()
   .strict()
   .label("Image URL");
 
-export const uuidSchema = Joi.string().uuid();
-
 export const signUpSchema = Joi.object().keys({
   firstName,
   lastName,

@@ -7,12 +7,27 @@ import {
   userData,
   commentData,
   tagData,
-  category
+  category,
+  registerUser,
+  category as categoryData
 } from "@fixtures";
 import app from "@app";
+import { ARTICLE_REACTION, COMMENT_REACTION } from "@helpers/constants";
+import { generateJWT, getJWTConfigs } from "@helpers/jwt";
+
+const jwtConfigs = getJWTConfigs({ option: "authentication" });
 
 chai.use(chaiHttp);
-const { Users, Articles, Categories, Reports, Ratings, Tags } = models;
+const {
+  Users,
+  Articles,
+  Categories,
+  Reports,
+  Ratings,
+  Tags,
+  Reactions,
+  Comments
+} = models;
 
 export const userDependencies = async data => {
   const user = await Users.create(data);
@@ -161,7 +176,7 @@ export const commentDependencies = async (
     userId,
     articleId,
     articleSlug,
-    commentData: { content }
+    commentData: { content, articleId }
   });
 };
 
@@ -207,5 +222,125 @@ export const tagDependencies = async tag => {
     articleId,
     tagInstance,
     articleInstance
+  });
+};
+
+export const favoriteDependencies = async () => {
+  const createdUser = await Users.create(userData[0]);
+  const userId = createdUser.get("id");
+  const articleCategory = await Categories.create(categoryData);
+  const categoryId = articleCategory.get("id");
+  const articleTemplate = Object.assign(articleData, {
+    authorId: userId,
+    categoryId
+  });
+  const articleInstance = await Articles.create(articleTemplate);
+  const articleId = articleInstance.get("id");
+  const articleSlug = articleInstance.get("slug");
+
+  const commentInstance = await Comments.create({
+    userId,
+    articleId,
+    content: "This is a comment"
+  });
+
+  return Promise.resolve({
+    userId,
+    articleId,
+    users: createdUser,
+    articles: articleInstance,
+    articleSlug,
+    content: commentInstance.get("content"),
+    commentId: commentInstance.get("id"),
+    title: articleInstance.get("title")
+  });
+};
+
+export const articleReactionsDependencies = async () => {
+  const user1 = await Users.create(registerUser);
+  const user2 = await Users.create(userData[0]);
+  const user3 = await Users.create(userData[2]);
+
+  const usersTokens = [];
+  [user1, user2, user3].map(userInstance => {
+    return usersTokens.push(
+      generateJWT({ userId: userInstance.get("id") }, jwtConfigs)
+    );
+  });
+
+  const categoryInstance = await Categories.create(categoryData);
+  const categoryId = categoryInstance.get("id");
+
+  const articleInstance = Object.assign(articleData, {
+    categoryId,
+    authorId: user1.get("id")
+  });
+
+  const articleCreated = await Articles.create(articleInstance);
+  const articleSlug = articleCreated.get("slug");
+  const title = articleCreated.get("title");
+
+  const commentInstance = await Comments.create({
+    userId: user2.get("id"),
+    articleId: articleCreated.get("id"),
+    content: "This is a comment"
+  });
+
+  const commentId = commentInstance.get("id");
+
+  const user2ArticleReaction = await Reactions.create({
+    userId: user2.get("id"),
+    sourceType: ARTICLE_REACTION,
+    reaction: false,
+    articleId: articleCreated.get("id")
+  });
+
+  const user2CommentReaction = await Reactions.create({
+    userId: user2.get("id"),
+    sourceType: COMMENT_REACTION,
+    reaction: false,
+    commentId
+  });
+  const user3CommentReaction = await Reactions.create({
+    userId: user3.get("id"),
+    sourceType: COMMENT_REACTION,
+    reaction: true,
+    commentId
+  });
+  const user3ArticleReaction = await Reactions.create({
+    userId: user3.get("id"),
+    sourceType: ARTICLE_REACTION,
+    reaction: true,
+    articleId: articleCreated.get("id")
+  });
+
+  return Promise.resolve({
+    articleSlug,
+    usersTokens,
+    title,
+    commentId,
+    user2ArticleReaction,
+    user3ArticleReaction,
+    user2CommentReaction,
+    user3CommentReaction
+  });
+};
+
+/**
+ * @description Creates three user instances in the database
+ * @returns {array} an array of objects
+ */
+export const followerDependencies = async () => {
+  const user1 = await Users.create({
+    ...userData[0],
+    email: "user1@mail.test"
+  });
+  const user2 = await Users.create({
+    ...userData[1],
+    email: "user2@mail.test"
+  });
+  return Promise.resolve({
+    author: user1.dataValues,
+    follower: user2.dataValues
   });
 };

@@ -1,6 +1,8 @@
 import { generateUniqueSlug, calculateReadTime } from "@helpers/articles";
 import { ARTICLE_REACTION } from "@helpers/constants";
 import { mapAsync } from "../helpers/utils";
+import { pagination } from "@helpers/pagination";
+import models from "@models";
 
 const getArticleModel = (sequelize, DataTypes) => {
   const articleSchema = {
@@ -92,6 +94,7 @@ const getArticleModel = (sequelize, DataTypes) => {
 
     Article.hasMany(db.Comments, {
       foreignKey: "articleId",
+      as: "articleComments",
       target: "id",
       onDelete: "CASCADE"
     });
@@ -109,6 +112,7 @@ const getArticleModel = (sequelize, DataTypes) => {
       },
       foreignKey: "articleId",
       target: "id",
+      as: "articleReactions",
       onDelete: "CASCADE"
     });
 
@@ -133,13 +137,16 @@ const getArticleModel = (sequelize, DataTypes) => {
    * @returns {Promise} a promise that resolves to an array of object
    * @method saveTags
    */
-  Article.prototype.saveTags = async function(tags, tagModel) {
+  Article.prototype.saveTags = async function(tags) {
     if (!tags) return;
     try {
       let tagInstance;
+      /**
+       * We will loop through the tag list to check
+       */
       const tagIdArray = await mapAsync(tags, async tag => {
         tag = tag.trim();
-        tagInstance = await tagModel.findOne({
+        tagInstance = await models.Tags.findOne({
           /**
            * We are forcing our DBMS to make comparison in lowercase
            */
@@ -149,10 +156,9 @@ const getArticleModel = (sequelize, DataTypes) => {
           )
         });
         /**
-         * To avoid Cyclic Reference issue, we have chosen to pass in the Tag model
-         * as a parameter (tagModel) to this function
+         * If tag does not exist yet, then create it
          */
-        tagInstance = tagInstance || (await tagModel.create({ tag }));
+        tagInstance = tagInstance || (await models.Tags.create({ tag }));
         return tagInstance.get("id");
       });
       const result = await this.addTags(tagIdArray);
@@ -160,6 +166,36 @@ const getArticleModel = (sequelize, DataTypes) => {
     } catch (error) {
       throw error;
     }
+  };
+
+  Article.fetchArticles = function(options) {
+    const { pageLimit, offset } = pagination(options.query);
+    return this.findAll({
+      order: [["createdAt", "DESC"]],
+      where: options.whereConditions,
+      /* TODO: Add join for ArticleTags */
+      include: [
+        {
+          model: models.Users,
+          as: "author",
+          attributes: ["firstName", "lastName", "imageURL"]
+        },
+        {
+          model: models.Reactions,
+          as: "articleReactions"
+        },
+        {
+          model: models.Comments,
+          as: "articleComments"
+        },
+        {
+          model: models.Tags,
+          attributes: ["id", "tag"]
+        }
+      ],
+      limit: pageLimit,
+      offset
+    });
   };
 
   return Article;

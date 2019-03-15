@@ -8,8 +8,8 @@
  */
 export const mapAsync = async (array, callback) => {
   const result = [];
-  const length = array.length;
-  for (let i = 0; i < length; i++) {
+  const LENGTH = array.length;
+  for (let i = 0; i < LENGTH; i++) {
     result[i] = await callback.call(this, await array[i]);
   }
   return result;

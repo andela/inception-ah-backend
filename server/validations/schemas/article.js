@@ -1,5 +1,6 @@
 import Joi from "joi";
 import { errorFormatter } from "@validations/validator";
+import { tagsSchema } from "./tag";
 
 export const articleSchema = Joi.object().keys({
   title: Joi.string()
@@ -18,13 +19,6 @@ export const articleSchema = Joi.object().keys({
   categoryId: Joi.string()
     .required()
     .label("Category")
-    .error(() => {
-      const message = "Please select a category";
-      return message;
-    }),
-  tags: Joi.array()
-    .items(Joi.string())
-    .unique()
-    .allow(["", null])
-    .error(errors => errorFormatter(errors, null, "Duplicate tags not allowed"))
+    .error(errors => errorFormatter(errors, null, "Please select a category")),
+  tags: tagsSchema
 });

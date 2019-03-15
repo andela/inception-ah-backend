@@ -9,16 +9,18 @@ export const findArticle = async (req, res, next) => {
   try {
     const article = await Articles.findOne({
       where: {
-        slug: req.params.slug
+        [req.params.slug ? "slug" : "id"]:
+          req.params.slug || req.body.articleId,
+        isPublished: true
       }
     });
-
     if (isEmpty(article)) {
       return httpResponse(res, {
         statusCode: 404,
         message: "Article is not found"
       });
     }
+
     req.article = article;
     return next();
   } catch (error) {
@@ -38,7 +40,6 @@ export const findAuthorsArticle = async (req, res, next) => {
         }
       }
     });
-
     if (isEmpty(articleDetails)) {
       return httpResponse(res, {
         statusCode: 404,

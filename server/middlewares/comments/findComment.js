@@ -16,25 +16,23 @@ const { Comments } = models;
  */
 
 export const findSingleComment = async (req, res, next) => {
-  const { article } = req;
-  let commentId = req.params.id;
-  const validateId = Joi.validate(commentId, uuidSchema);
+  const { commentId } = req.params;
   try {
-    if (validateId.error) {
-      return httpResponse(res, {
-        statusCode: 400,
-        success: false,
-        message: "Invalid comment Id"
-      });
-    }
-    const comment = await Comments.findOne({
-      where: {
-        id: commentId,
-        articleId: article.dataValues.id
-      }
+    const comment = await Comments.findByPk(commentId, {
+      include: [
+        {
+          model: models.Users,
+          as: "reviewer",
+          attributes: ["firstName", "lastName", "imageURL"]
+        },
+        {
+          model: models.Reactions,
+          as: "commentReactions"
+        }
+      ]
     });
 
-    if (!comment) {
+    if (isEmpty(comment)) {
       return httpResponse(res, {
         statusCode: 404,
         message: "Comment is not found"
@@ -60,7 +58,18 @@ export const findAllComments = async (req, res, next) => {
   const { article } = req;
   try {
     const comments = await Comments.findAll({
-      where: { articleId: article.dataValues.id }
+      where: { articleId: article.dataValues.id },
+      include: [
+        {
+          model: models.Users,
+          as: "reviewer",
+          attributes: ["firstName", "lastName", "imageURL"]
+        },
+        {
+          model: models.Reactions,
+          as: "commentReactions"
+        }
+      ]
     });
     if (isEmpty(comments)) {
       return httpResponse(res, {

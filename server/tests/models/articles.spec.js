@@ -37,7 +37,7 @@ describe("Articles", () => {
   it("should create an instance of Articles", async () => {
     const dependencies = await articleDependencies();
     assert.instanceOf(dependencies.article, Articles);
-    assert.lengthOf(Object.keys(dependencies.article.dataValues), 14);
+    assert.lengthOf(Object.keys(dependencies.article.dataValues), 15);
   });
 
   it("should delete an articleData table", async () => {
@@ -47,6 +47,15 @@ describe("Articles", () => {
     expect(
       Articles.findOne({ where: { id: dependencies.articleId } })
     ).to.rejectedWith(Error);
+  });
+
+  it("should throw an error for invalid argument for tags", async () => {
+    try {
+      const { article } = await articleDependencies();
+      await article.saveTags([[]]);
+    } catch (error) {
+      assert.instanceOf(error, Error);
+    }
   });
 });
 

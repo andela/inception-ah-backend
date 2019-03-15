@@ -20,7 +20,7 @@ export {
   commentData,
   registerUser,
   category,
-  validUser, 
+  validUser,
   invalidUser,
   tagData
 };
