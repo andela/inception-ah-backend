@@ -11,8 +11,10 @@ const jwtConfigs = getJWTConfigs({ option: "authentication" });
 chai.use(chaiHttp);
 const { Articles, Users, Categories, Followers } = models;
 
+let articleSpecCopy;
 beforeEach(async () => {
   await models.sequelize.sync({ force: true });
+  articleSpecCopy = { ...articleSpec };
 });
 
 const userDependencies = async userDetails => {
@@ -27,8 +29,8 @@ const userDependencies = async userDetails => {
 const articleDependencies = async () => {
   const categoryInstance = await Categories.create(category);
   const categoryId = categoryInstance.get("id");
-  const articleInstance = Object.assign(articleSpec, { categoryId });
-  return Promise.resolve(articleInstance);
+  articleSpecCopy.categoryId = categoryId;
+  return Promise.resolve(articleSpecCopy);
 };
 
 describe("CRUD Article Feature </api/v1/article>", done => {

@@ -301,3 +301,12 @@ export const articleReactionsDependencies = async () => {
     user3CommentReaction
   });
 };
+
+const { firstName, lastName, email, password } = userData[0];
+export const signUpDependencies = async () => {
+  const res = await chai
+    .request(app)
+    .post("/api/v1/auth/signup")
+    .send({ firstName, lastName, email, password });
+  return Promise.resolve({ email, password });
+};

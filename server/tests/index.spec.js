@@ -26,3 +26,4 @@ import "./models/ratings.spec";
 import "./controller/follow/follow.spec";
 import "./controller/reaction/article.spec";
 import "./controller/reaction/comment.spec";
+import "./controller/article/rateArticle.spec";
