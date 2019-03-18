@@ -9,7 +9,7 @@ const notificationRouter = Router();
  * @returns - It returns reponse message
  */
 notificationRouter.post(
-  "/notification/optInOut",
+  "/optInOut",
   verifyToken,
   findUserById,
   notificationOptInOut

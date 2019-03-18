@@ -52,6 +52,7 @@ export const likeOrDislikeAnArticle = async (req, res) => {
     return serverError(res, error);
   }
 };
+
 export const likeOrDislikeACommment = async (req, res) => {
   const {
     comment,
@@ -100,6 +101,7 @@ export const likeOrDislikeACommment = async (req, res) => {
     return serverError(res, error);
   }
 };
+
 export const fetchAllArticleReactions = async (req, res) => {
   const {
     article: { id, title }

@@ -30,7 +30,7 @@ beforeEach(async () => {
 });
 
 describe("Rate Article", () => {
-  it("should rate and article with slug in URL", async () => {
+  it("should rate an article with slug in URL", async () => {
     const { email, password } = await signUpDependencies();
     const { token } = await logInUserDependencies(email, password);
     const { article } = await createArticle(token);
@@ -56,22 +56,8 @@ describe("Rate Article", () => {
       .post(`/api/v1/articles/${article.slug}/rate`)
       .send({ score: 1 })
       .set({ Authorization: token });
-    expect(ratingRequest.statusCode).equal(400);
+    expect(ratingRequest.statusCode).equal(404);
     expect(ratingRequest.body.success).to.be.false;
-  });
-
-  it("should rate and article with slug in POST body", async () => {
-    const { email, password } = await signUpDependencies();
-    const { token } = await logInUserDependencies(email, password);
-    const { article } = await createArticle(token);
-    const ratingRequest = await chai
-      .request(app)
-      .post(`/api/v1/articles/rate/`)
-      .send({ score: 3, slug: article.slug })
-      .set({ Authorization: token });
-    expect(ratingRequest.statusCode).equal(201);
-    expect(ratingRequest.body.success).to.be.true;
-    expect(ratingRequest.body.data.score).equal(3);
   });
 
   it(`should only modify the score of an existing rating`, async () => {

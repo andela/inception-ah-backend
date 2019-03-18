@@ -1,16 +1,15 @@
 import { Router } from "express";
 import {
   createComment,
-  getAllComments,
   updateComment,
   deleteComment
 } from "@controllers/comment";
 import {
-  findArticle,
+  findPublishedArticle,
   verifyToken,
-  findAllComments,
   findSingleComment,
-  validateInput
+  validateInput,
+  validateUuid
 } from "@middlewares";
 import {
   likeOrDislikeACommment,
@@ -20,64 +19,58 @@ import {
 const commentsRouter = Router();
 
 /**
- * @description - Route is used to create a comment
- * @returns - It returns a comment object
+ * Group all similar routes
  */
-commentsRouter.post(
-  "/articles/:slug/comments",
-  verifyToken,
-  findArticle,
-  validateInput,
-  createComment
-);
+commentsRouter
+  .route("/")
+
+  /**
+   * @description - Route is used to create a comment
+   * @returns - It returns a comment object
+   */
+  .post(verifyToken, findPublishedArticle, validateInput, createComment);
 
 /**
- * @description - Route to get all comments on an article
- * @returns - It returns an array of all the comments on an article
+ * Group all similar routes
  */
-commentsRouter.get(
-  "/articles/:slug/comments",
-  findArticle,
-  findAllComments,
-  getAllComments
-);
+commentsRouter
+  .route("/:commentId")
+
+  /**
+   * Perform middleware checks common to the grouped routes
+   */
+  .all(verifyToken, validateUuid, findSingleComment)
+
+  /**
+   * @description - Route to update a comment
+   * @returns - It returns an object of the updated comment
+   */
+  .put(updateComment)
+
+  /**
+   * @description - Route to delete a comment
+   * @returns - It returns an object of the deleted comment
+   */
+  .delete(deleteComment);
 
 /**
- * @description - Route to update a comment
- * @returns - It returns an object of the updated comment
+ * Group all similar routes
  */
-commentsRouter.put(
-  "/articles/:slug/comments/:id",
-  verifyToken,
-  findArticle,
-  findSingleComment,
-  updateComment
-);
+commentsRouter
+  .route("/:commentId/reaction")
 
-/**
- * @description - Route to delete a comment
- * @returns - It returns an object of the deleted comment
- */
-commentsRouter.delete(
-  "/articles/:slug/comments/:id",
-  verifyToken,
-  findArticle,
-  findSingleComment,
-  deleteComment
-);
-commentsRouter.post(
-  "/articles/:slug/comments/:id/reaction",
-  verifyToken,
-  findArticle,
-  findSingleComment,
-  likeOrDislikeACommment
-);
+  /**
+   * Perform middleware checks common to the grouped routes
+   */
+  .all(verifyToken, findSingleComment)
 
-commentsRouter.get(
-  "/articles/:slug/comments/:id/reaction",
-  verifyToken,
-  findArticle,
-  findSingleComment,
-  fetchAllCommentReactions
-);
+  /**
+   * @description - Route is use to create a comment's rction
+   */
+  .post(likeOrDislikeACommment)
+
+  /**
+   * @description - Route is use to get all comment's reactions
+   */
+  .get(fetchAllCommentReactions);
 export { commentsRouter };

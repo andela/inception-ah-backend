@@ -39,6 +39,6 @@ export const errorFormatter = (errors, label, message) => {
     case "string.regex.base":
       return message || `${label || err.path} is inavlid`;
     default:
-      return err;
+      return message || err;
   }
 };

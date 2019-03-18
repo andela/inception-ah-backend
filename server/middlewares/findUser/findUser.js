@@ -6,18 +6,8 @@ import { uuidSchema } from "@schemas";
 const { Users } = models;
 
 export const findUserById = async (req, res, next) => {
-  const userId = req.params.id || req.user.userId;
-  const validateId = Joi.validate(userId, uuidSchema);
-
+  const userId = req.params.userId || req.user.userId;
   try {
-    if (validateId.error) {
-      return httpResponse(res, {
-        statusCode: 400,
-        success: false,
-        message: "Invalid User Id"
-      });
-    }
-
     const user = await Users.findByPk(userId, {
       include: [
         {

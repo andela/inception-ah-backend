@@ -14,7 +14,6 @@ import { generateJWT, getJWTConfigs } from "@helpers/jwt";
 const jwtConfigs = getJWTConfigs({ option: "authentication" });
 
 chai.use(chaiHttp);
-const baseUrl = "/api/v1/articles";
 const { Comments } = models;
 
 beforeEach(async () => {
@@ -41,28 +40,19 @@ const commentReactionDependencies = async () => {
 
 describe("Test to add Reactions to Comment", () => {
   it("should disallow a user that is not signed to like an comment", async () => {
-    const { articleSlug, commentId } = await commentReactionDependencies();
-    const response = await chai
+    const { commentId } = await commentReactionDependencies();
+    const res = await chai
       .request(app)
-      .post(`${baseUrl}/${articleSlug}/comments/${commentId}/reaction`)
+      .post(`/api/v1/comments/${commentId}/reaction`)
       .set("authorization", "");
-    expect(response.statusCode).to.equal(401);
-  });
-
-  it("should return a statusCode of 404 for an article that is not found", async () => {
-    const { commentId, token } = await commentReactionDependencies();
-    const response = await chai
-      .request(app)
-      .post(`${baseUrl}/unknown/comments/${commentId}/reaction`)
-      .set("authorization", token);
-    expect(response.statusCode).to.equal(404);
+    expect(res.statusCode).to.equal(401);
   });
 
   it("should return a statusCode of 404 for a comment that is not found", async () => {
-    const { token, articleSlug } = await commentReactionDependencies();
+    const { token } = await commentReactionDependencies();
     const response = await chai
       .request(app)
-      .post(`${baseUrl}/${articleSlug}/comment/${invalidCommentId}/reaction`)
+      .post(`/api/v1/comment/${invalidCommentId}/reaction`)
       .set("authorization", token);
     expect(response.statusCode).to.equal(404);
   });
@@ -70,26 +60,21 @@ describe("Test to add Reactions to Comment", () => {
   it(`should like a comment 
     and unlike the comment that was previously liked by the same user
     `, async () => {
-    const {
-      articleSlug,
-      token,
-      commentId,
-      content
-    } = await commentReactionDependencies();
+    const { token, commentId, content } = await commentReactionDependencies();
 
-    const response = await chai
+    const res = await chai
       .request(app)
-      .post(`${baseUrl}/${articleSlug}/comments/${commentId}/reaction`)
+      .post(`/api/v1/comments/${commentId}/reaction`)
       .send({ reaction: true })
       .set({ authorization: token });
-    expect(response.statusCode).to.equal(201);
-    expect(response.body.message).to.eql(
+    expect(res.statusCode).to.equal(201);
+    expect(res.body.message).to.eql(
       `You have successfully added a like reaction to ${content}`
     );
 
     const unlikeResponse = await chai
       .request(app)
-      .post(`${baseUrl}/${articleSlug}/comments/${commentId}/reaction`)
+      .post(`/api/v1/comments/${commentId}/reaction`)
       .set("authorization", token);
     expect(unlikeResponse.statusCode).to.equal(200);
     expect(unlikeResponse.body.message).to.eql(
@@ -97,29 +82,23 @@ describe("Test to add Reactions to Comment", () => {
     );
   });
   it(`should dislike a comment 
-    and remove the dislike on the comment that was 
-    previously liked by the same user
-    `, async () => {
-    const {
-      articleSlug,
-      token,
-      commentId,
-      content
-    } = await commentReactionDependencies();
+    and remove the like on the comment that was 
+    previously liked by the same user`, async () => {
+    const { token, commentId, content } = await commentReactionDependencies();
 
-    const response = await chai
+    const res = await chai
       .request(app)
-      .post(`${baseUrl}/${articleSlug}/comments/${commentId}/reaction`)
+      .post(`/api/v1/comments/${commentId}/reaction`)
       .send({ reaction: false })
       .set({ authorization: token });
-    expect(response.statusCode).to.equal(201);
-    expect(response.body.message).to.eql(
+    expect(res.statusCode).to.equal(201);
+    expect(res.body.message).to.eql(
       `You have successfully added a dislike reaction to ${content}`
     );
 
     const unlikeResponse = await chai
       .request(app)
-      .post(`${baseUrl}/${articleSlug}/comments/${commentId}/reaction`)
+      .post(`/api/v1/comments/${commentId}/reaction`)
       .set("authorization", token);
     expect(unlikeResponse.statusCode).to.equal(200);
     expect(unlikeResponse.body.message).to.eql(
@@ -129,13 +108,12 @@ describe("Test to add Reactions to Comment", () => {
 
   it("should fetch all comment reactions given a correct commentId", async () => {
     const {
-      articleSlug,
       usersTokens,
       commentId
     } = await usersCommentsReactionsDependencies();
     const response = await chai
       .request(app)
-      .get(`${baseUrl}/${articleSlug}/comments/${commentId}/reaction`)
+      .get(`/api/v1/comments/${commentId}/reaction`)
       .set({ authorization: usersTokens[0] });
     expect(response.statusCode).to.equal(200);
     expect(response.body.data.length).to.equal(2);
@@ -143,7 +121,6 @@ describe("Test to add Reactions to Comment", () => {
 
   it("should return 404 for a comment that does not have any reactions", async () => {
     const {
-      articleSlug,
       content,
       userId,
       commentId
@@ -151,7 +128,7 @@ describe("Test to add Reactions to Comment", () => {
     const token = generateJWT({ userId }, jwtConfigs);
     const response = await chai
       .request(app)
-      .get(`${baseUrl}/${articleSlug}/comments/${commentId}/reaction`)
+      .get(`/api/v1/comments/${commentId}/reaction`)
       .set({ authorization: token });
     expect(response.statusCode).to.equal(404);
     expect(response.body.message).to.eql(

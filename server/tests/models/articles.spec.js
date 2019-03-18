@@ -48,6 +48,15 @@ describe("Articles", () => {
       Articles.findOne({ where: { id: dependencies.articleId } })
     ).to.rejectedWith(Error);
   });
+
+  it("should throw an error for invalid argument for tags", async () => {
+    try {
+      const { article } = await articleDependencies();
+      await article.saveTags([[]]);
+    } catch (error) {
+      assert.instanceOf(error, Error);
+    }
+  });
 });
 
 after(async () => {

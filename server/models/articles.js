@@ -1,5 +1,6 @@
 import { generateUniqueSlug, calculateReadTime } from "@helpers/articles";
 import { ARTICLE_REACTION } from "@helpers/constants";
+import { mapAsync } from "../helpers/utils";
 import { pagination } from "@helpers/pagination";
 import models from "@models";
 
@@ -127,6 +128,46 @@ const getArticleModel = (sequelize, DataTypes) => {
       onUpdate: "CASCADE"
     });
   };
+
+  /**
+   * @description Find or create a new instance of Tags
+   *
+   * @param {Array} tags array of tags
+   * @param {object} tagModel the tag model
+   * @returns {Promise} a promise that resolves to an array of object
+   * @method saveTags
+   */
+  Article.prototype.saveTags = async function(tags) {
+    if (!tags) return;
+    try {
+      let tagInstance;
+      /**
+       * We will loop through the tag list to check
+       */
+      const tagIdArray = await mapAsync(tags, async tag => {
+        tag = tag.trim();
+        tagInstance = await models.Tags.findOne({
+          /**
+           * We are forcing our DBMS to make comparison in lowercase
+           */
+          where: sequelize.where(
+            sequelize.fn("lower", sequelize.col("tag")),
+            sequelize.fn("lower", tag)
+          )
+        });
+        /**
+         * If tag does not exist yet, then create it
+         */
+        tagInstance = tagInstance || (await models.Tags.create({ tag }));
+        return tagInstance.get("id");
+      });
+      const result = await this.addTags(tagIdArray);
+      return result[0];
+    } catch (error) {
+      throw error;
+    }
+  };
+
   Article.fetchArticles = function(options) {
     const { pageLimit, offset } = pagination(options.query);
     return this.findAll({
@@ -146,6 +187,10 @@ const getArticleModel = (sequelize, DataTypes) => {
         {
           model: models.Comments,
           as: "articleComments"
+        },
+        {
+          model: models.Tags,
+          attributes: ["id", "tag"]
         }
       ],
       limit: pageLimit,

@@ -6,11 +6,33 @@ import {
   signInSchema,
   articleSchema,
   updateProfileSchema,
-  commentSchema
+  commentSchema,
+  tagSchema,
+  uuidSchema
 } from "@schemas";
 import { httpResponse, serverError } from "@helpers/http";
 
 const { Users } = models;
+/**
+ * @description Get the schema definitions
+ *
+ * @param {object} req the request object
+ * @returns {Joi.object} a Joi object
+ */
+const getSchema = req => {
+  const schemas = {
+    "/signup": signUpSchema,
+    "/signin": signInSchema,
+    "/articles": articleSchema,
+    "/users": updateProfileSchema,
+    "/comments": commentSchema,
+    "/tags": tagSchema
+  };
+  const path = req.baseUrl.endsWith("auth")
+    ? req.path.split("/").pop()
+    : req.baseUrl.split("/").pop();
+  return schemas[`/${path}`];
+};
 
 /**
  * Validate input
@@ -21,20 +43,7 @@ const { Users } = models;
  * @returns {funcion} HTTP response
  */
 export const validateInput = async (req, res, next) => {
-  // Map Schema definitions to route path
-  //This willenable us access the specific schema we need for the current validation
-  const schemas = {
-    "/signup": signUpSchema,
-    "/signin": signInSchema,
-    "/articles": articleSchema,
-    "/updateProfile": updateProfileSchema,
-    "/comments": commentSchema
-  };
-
-  const validation = await validator(
-    req.body,
-    schemas[`/${req.path.split("/").pop()}`]
-  );
+  const validation = await validator(req.body, getSchema(req));
   if (validation.hasError) {
     return httpResponse(res, {
       statusCode: 400,
@@ -107,4 +116,39 @@ export const validatePaginationParameters = (req, res, next) => {
     });
   }
   return next();
+};
+
+/**
+ * @description Validate a uuid
+ *
+ * @param {object} req HTTP request object
+ * @param {object} res HTTP reponse object
+ * @param {function} next callback
+ * @returns {object} HTTP response
+ */
+export const validateUuid = async (req, res, next) => {
+  const { params } = req;
+  const arrayOfParamsKeys = Object.keys(params);
+  let validation;
+  const error = {};
+  for (let i = 0; i < arrayOfParamsKeys.length; i++) {
+    /**
+     * Validate each uuid instance
+     */
+    validation = await validator(
+      { uuid: params[arrayOfParamsKeys[i]] },
+      uuidSchema
+    );
+    if (validation.hasError) {
+      error.hasError = true;
+      error.path = arrayOfParamsKeys[i]; // We need the params' key
+      break;
+    }
+  }
+  return error.hasError
+    ? httpResponse(res, {
+        statusCode: 400,
+        errorMessages: `${error.path} is not a valid uuid`
+      })
+    : next();
 };

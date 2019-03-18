@@ -1,35 +1,15 @@
 import chai from "chai";
 import chaiAsPromise from "chai-as-promised";
 import models from "@models";
-import { tagData, articleData, userData, category } from "@fixtures";
+import { tagDependencies } from "@dependencies";
 
 chai.use(chaiAsPromise);
 const { assert, expect } = chai;
-const { Tags, Categories, Users, Articles } = models;
+const { Tags } = models;
 
 beforeEach(async () => {
   await models.sequelize.sync({ force: true });
 });
-
-const tagDependencies = async () => {
-  const tagInstance = await Tags.create(tagData[0]);
-  const tagId = tagInstance.get("id");
-  const userInstance = await Users.create(userData[0]);
-  const categoryInstance = await Categories.create(category);
-  const articleTemplate = Object.assign(articleData, {
-    authorId: userInstance.get("id"),
-    categoryId: categoryInstance.get("id")
-  });
-  const articleInstance = await Articles.create(articleTemplate);
-  const articleId = articleInstance.get("id");
-
-  return Promise.resolve({
-    tagId,
-    articleId,
-    tagInstance,
-    articleInstance
-  });
-};
 
 describe("Tags model", () => {
   it("should create an instance of Tag", async () => {

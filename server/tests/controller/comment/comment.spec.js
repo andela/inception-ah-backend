@@ -23,12 +23,12 @@ const invalidSlug = "the-man-of-man-that-man-1550835108565";
 const invalidToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ";
 
 describe("CRUD Test for Article Comments", async () => {
-  describe("POST </api/v1/articles/:slug/comments>", () => {
+  describe("POST </api/v1/comments>", () => {
     it("should create a comment if valid details are passed in", async () => {
       const { user1 } = await createCommentDependencies();
       const res = await chai
         .request(app)
-        .post(`/api/v1/articles/${user1.articleSlug}/comments`)
+        .post(`/api/v1/comments`)
         .set("Authorization", user1.token)
         .send(user1.commentData);
       expect(res.statusCode).to.equal(201);
@@ -37,23 +37,11 @@ describe("CRUD Test for Article Comments", async () => {
       expect(res.body.comment);
     });
 
-    it("should return an error if invalid article slug is supplied", async () => {
-      const { user1 } = await createCommentDependencies();
-      const res = await chai
-        .request(app)
-        .post(`/api/v1/articles/${invalidSlug}/comments`)
-        .set("Authorization", user1.token)
-        .send(user1.commentData);
-      expect(res.statusCode).to.equal(404);
-      expect(res.body.success).to.be.false;
-      expect(res.body.message).to.equal("Article is not found");
-    });
-
     it("should return an error if token is not supplied", async () => {
       const { user1 } = await createCommentDependencies();
       const res = await chai
         .request(app)
-        .post(`/api/v1/articles/${user1.articleSlug}/comments`)
+        .post(`/api/v1/comments`)
         .send(user1.commentData);
       expect(res.statusCode).to.equal(401);
       expect(res.body.success).to.be.false;
@@ -64,9 +52,9 @@ describe("CRUD Test for Article Comments", async () => {
       const { user1 } = await createCommentDependencies();
       const res = await chai
         .request(app)
-        .post(`/api/v1/articles/${user1.articleSlug}/comments`)
+        .post(`/api/v1/comments`)
         .set("Authorization", user1.token)
-        .send({ content: "    " });
+        .send({ content: "    ", articleId: user1.articleId });
       expect(res.statusCode).to.equal(400);
       expect(res.body.success).to.be.false;
       expect(res.body.errorMessages.content).to.equal(
@@ -78,7 +66,7 @@ describe("CRUD Test for Article Comments", async () => {
       const { user1 } = await createCommentDependencies();
       const res = await chai
         .request(app)
-        .post(`/api/v1/articles/${user1.articleSlug}/comments`)
+        .post(`/api/v1/comments`)
         .set("Authorization", invalidToken)
         .send(user1.commentData);
       expect(res.statusCode).to.equal(500);
@@ -130,7 +118,7 @@ describe("CRUD Test for Article Comments", async () => {
     });
   });
 
-  describe("DELETE </api/v1/articles/:slug/comments/:id>", () => {
+  describe("DELETE </api/v1/comments/:commentId>", () => {
     it("should delete a comment", async () => {
       const { user1 } = await createCommentDependencies();
       const newComment = await Comments.create({
@@ -140,7 +128,7 @@ describe("CRUD Test for Article Comments", async () => {
       const commentId = newComment.dataValues.id;
       const res = await chai
         .request(app)
-        .delete(`/api/v1/articles/${user1.articleSlug}/comments/${commentId}`)
+        .delete(`/api/v1/comments/${commentId}`)
         .set("Authorization", user1.token);
       expect(res.statusCode).to.equal(200);
       expect(res.body.success).to.be.true;
@@ -156,35 +144,17 @@ describe("CRUD Test for Article Comments", async () => {
       const commentId = newComment.dataValues.id;
       const res = await chai
         .request(app)
-        .delete(`/api/v1/articles/${user1.articleSlug}/comments/${commentId}`);
+        .delete(`/api/v1/comments/${commentId}`);
       expect(res.statusCode).to.equal(401);
       expect(res.body.success).to.be.false;
       expect(res.body.message).to.equal("No valid token provided");
-    });
-
-    it("should return an error if invalid article slug is supplied", async () => {
-      const { user1 } = await createCommentDependencies();
-      const newComment = await Comments.create({
-        ...user1,
-        content: user1.commentData.content
-      });
-      const commentId = newComment.dataValues.id;
-      const res = await chai
-        .request(app)
-        .delete(`/api/v1/articles/${invalidSlug}/comments/${commentId}`)
-        .set("Authorization", user1.token);
-      expect(res.statusCode).to.equal(404);
-      expect(res.body.success).to.be.false;
-      expect(res.body.message).to.equal("Article is not found");
     });
 
     it("should return an error if the comment does not exist", async () => {
       const { user2 } = await createCommentDependencies();
       const res = await chai
         .request(app)
-        .delete(
-          `/api/v1/articles/${user2.articleSlug}/comments/${invalidCommentId}`
-        )
+        .delete(`/api/v1/comments/${invalidCommentId}`)
         .set("Authorization", user2.token);
       expect(res.statusCode).to.equal(404);
       expect(res.body.success).to.be.false;
@@ -195,11 +165,11 @@ describe("CRUD Test for Article Comments", async () => {
       const { user2 } = await createCommentDependencies();
       const res = await chai
         .request(app)
-        .delete(`/api/v1/articles/${user2.articleSlug}/comments/lllkhfreruj`)
+        .delete(`/api/v1/comments/lllkhfreruj`)
         .set("Authorization", user2.token);
       expect(res.statusCode).to.equal(400);
       expect(res.body.success).to.be.false;
-      expect(res.body.message).to.equal("Invalid comment Id");
+      expect(res.body.errorMessages).to.equal("commentId is not a valid uuid");
     });
 
     it("should return an error if user tries to delete another user's comment", async () => {
@@ -211,7 +181,7 @@ describe("CRUD Test for Article Comments", async () => {
       const commentId = newComment.dataValues.id;
       const res = await chai
         .request(app)
-        .delete(`/api/v1/articles/${user1.articleSlug}/comments/${commentId}`)
+        .delete(`/api/v1/comments/${commentId}`)
         .set("Authorization", user2.token);
       expect(res.statusCode).to.equal(401);
       expect(res.body.success).to.be.false;
@@ -231,7 +201,7 @@ describe("CRUD Test for Article Comments", async () => {
       const commentId = newComment.dataValues.id;
       const res = await chai
         .request(app)
-        .put(`/api/v1/articles/${user1.articleSlug}/comments/${commentId}`)
+        .put(`/api/v1/comments/${commentId}`)
         .set("Authorization", user1.token)
         .send({ content: "Nice writeup" });
       expect(res.statusCode).to.equal(200);
@@ -249,37 +219,18 @@ describe("CRUD Test for Article Comments", async () => {
       const commentId = newComment.dataValues.id;
       const res = await chai
         .request(app)
-        .put(`/api/v1/articles/${user1.articleSlug}/comments/${commentId}`)
+        .put(`/api/v1/comments/${commentId}`)
         .send({ content: "Nice writeup" });
       expect(res.statusCode).to.equal(401);
       expect(res.body.success).to.be.false;
       expect(res.body.message).to.equal("No valid token provided");
     });
 
-    it("should return an error if invalid article slug is supplied", async () => {
-      const { user1 } = await createCommentDependencies();
-      const newComment = await Comments.create({
-        ...user1,
-        content: user1.commentData.content
-      });
-      const commentId = newComment.dataValues.id;
-      const res = await chai
-        .request(app)
-        .put(`/api/v1/articles/${invalidSlug}/comments/${commentId}`)
-        .set("Authorization", user1.token)
-        .send({ content: "Nice writeup" });
-      expect(res.statusCode).to.equal(404);
-      expect(res.body.success).to.be.false;
-      expect(res.body.message).to.equal("Article is not found");
-    });
-
     it("should return an error if the comment does not exist", async () => {
       const { user2 } = await createCommentDependencies();
       const res = await chai
         .request(app)
-        .put(
-          `/api/v1/articles/${user2.articleSlug}/comments/${invalidCommentId}`
-        )
+        .put(`/api/v1/comments/${invalidCommentId}`)
         .set("Authorization", user2.token)
         .send({ content: "Nice writeup" });
       expect(res.statusCode).to.equal(404);
@@ -291,12 +242,12 @@ describe("CRUD Test for Article Comments", async () => {
       const { user2 } = await createCommentDependencies();
       const res = await chai
         .request(app)
-        .put(`/api/v1/articles/${user2.articleSlug}/comments/hkkllhgk`)
+        .put(`/api/v1/comments/hkkllhgk`)
         .set("Authorization", user2.token)
         .send({ content: "Nice writeup" });
       expect(res.statusCode).to.equal(400);
       expect(res.body.success).to.be.false;
-      expect(res.body.message).to.equal("Invalid comment Id");
+      expect(res.body.errorMessages).to.equal("commentId is not a valid uuid");
     });
 
     it("should return an error if user tries to update another user's comment", async () => {
@@ -308,7 +259,7 @@ describe("CRUD Test for Article Comments", async () => {
       const commentId = newComment.dataValues.id;
       const res = await chai
         .request(app)
-        .put(`/api/v1/articles/${user1.articleSlug}/comments/${commentId}`)
+        .put(`/api/v1/comments/${commentId}`)
         .set("Authorization", user2.token)
         .send({ content: "Nice writeup" });
       expect(res.statusCode).to.equal(401);
