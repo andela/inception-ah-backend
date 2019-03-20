@@ -5,8 +5,10 @@ import {
   findArticle,
   findAuthorsArticle,
   validateInput,
-  validatePaginationParameters
+  validatePaginationParameters,
+  findPublishedArticle
 } from "@middlewares";
+
 import {
   createArticle,
   publishArticle,
@@ -15,7 +17,8 @@ import {
   getAuthorsArticles,
   getArticlesByCategory,
   updateArticle,
-  deleteArticle
+  deleteArticle,
+  rateArticle
 } from "@controllers/article";
 
 import {
@@ -32,7 +35,7 @@ const articleRouter = Router();
 articleRouter.post(
   "/articles/:slug/favorite",
   verifyToken,
-  findArticle,
+  findPublishedArticle,
   favoriteOrUnFavoriteArticle
 );
 
@@ -117,7 +120,17 @@ articleRouter.post(
 articleRouter.get(
   "/articles/:slug/reaction",
   verifyToken,
-  findArticle,
+  findPublishedArticle,
   fetchAllArticleReactions
 );
+
+articleRouter.post(
+  "/articles/:slug/rate",
+  findArticle,
+  verifyToken,
+  rateArticle
+);
+
+articleRouter.post("/articles/rate", findArticle, verifyToken, rateArticle);
+
 export { articleRouter };

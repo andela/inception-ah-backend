@@ -7,7 +7,7 @@ import { httpResponse, serverError } from "@helpers/http";
 import { generateUniqueSlug, calculateReadTime } from "@helpers/articles";
 import { sendPublishedArticleNotification } from "./notification";
 
-const { Articles } = models;
+const { Articles, Users, Ratings } = models;
 
 /**
  * @description Create a new Article
@@ -257,5 +257,51 @@ export const deleteArticle = async (req, res) => {
     });
   } catch (error) {
     return serverError(res, error);
+  }
+};
+
+export const rateArticle = async (req, res) => {
+  const { slug, user, article } = req;
+  const articleId = article.get("id");
+  const raterId = user.userId;
+  const { score } = req.body;
+  const validScore = score < 6 && score > 0;
+
+  try {
+    const rating = await Ratings.findOne({
+      where: { raterId: user.userId, articleId }
+    });
+
+    if (validScore && article.isPublished) {
+      if (rating) {
+        await Ratings.update({ score }, { where: { articleId } });
+        httpResponse(res, {
+          message: `Rating Updated for ${slug}`,
+          statusCode: 202,
+          data: { score }
+        });
+      } else {
+        await Ratings.create({ articleId, raterId, score });
+        httpResponse(res, {
+          message: `Rating Added for ${slug}`,
+          statusCode: 201,
+          data: { score }
+        });
+      }
+    } else {
+      httpResponse(res, {
+        success: false,
+        message: "Rating is not in range of 1 - 5 or Article is not published",
+        statusCode: 400,
+        data: null
+      });
+    }
+  } catch (e) {
+    httpResponse(res, {
+      success: false,
+      message: "An internal Server Error occured, Rating failed",
+      statusCode: 500,
+      data: null
+    });
   }
 };

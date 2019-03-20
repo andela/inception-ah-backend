@@ -11,7 +11,11 @@ import {
   validatePaginationParameters
 } from "./validations/validations";
 
-import { findArticle, findAuthorsArticle } from "./articles/findArticle";
+import {
+  findArticle,
+  findAuthorsArticle,
+  findPublishedArticle
+} from "./articles/findArticle";
 import { findSingleComment, findAllComments } from "./comments/findComment";
 import { verifyToken } from "./authentications/verifyToken";
 import { findUserById } from "./findUser/findUser";
@@ -30,5 +34,6 @@ export {
   googleAuthRedirect,
   facebookAuthRedirect,
   findAuthorsArticle,
-  validatePaginationParameters
+  validatePaginationParameters,
+  findPublishedArticle
 };
