@@ -1,5 +1,6 @@
 import { generateJWT, getJWTConfigs } from "@helpers/jwt";
 
+const environment = process.env.NODE_ENV;
 /**
  * @description Removes all white space character, if any
  *
@@ -26,9 +27,20 @@ export const sanitize = (string, removeAll) => {
  * @methodget BaseUrl
  */
 export const getBaseUrl = httpRequestOrResponseObj => {
-  return `${httpRequestOrResponseObj.protocol}://${httpRequestOrResponseObj.get(
-    "host"
-  )}/api/v1`;
+  switch (environment) {
+    case "development":
+      return "http://127.0.0.1:8000";
+
+    case "test":
+      return `${
+        httpRequestOrResponseObj.protocol
+      }://${httpRequestOrResponseObj.get("host")}/api/v1`;
+
+    case "production":
+      return "https://inception-ah-frontend.herokuapp.com";
+    default:
+      break;
+  }
 };
 
 /**

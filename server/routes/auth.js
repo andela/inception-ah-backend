@@ -7,7 +7,7 @@ import { validateInput, checkUniqueEmail } from "@middlewares";
 const authRouter = Router();
 authRouter.post("/signin", validateInput, userLogin);
 authRouter.post("/signup", validateInput, checkUniqueEmail, userSignUp);
-authRouter.get("/verification/:token", verifyUserAccount);
+authRouter.get("/verification", verifyUserAccount);
 authRouter.use("/", socialAuthRouter);
 
 export { authRouter };

@@ -90,7 +90,7 @@ export const passwordResetRequest = async (req, res) => {
 
 export const resetPassword = async (req, res) => {
   const { password } = req.body;
-  const { token } = req.params;
+  const { token } = req.query;
 
   try {
     const foundUser = await Users.findOne({
@@ -136,7 +136,7 @@ export const userSignUp = async (req, res) => {
     const { password, ...user } = newUser.dataValues;
     const token = generateJWT({ userId: user.id }, verificationJWTConfigs);
     newUser.sendVerificationEmail(
-      `${getBaseUrl(req)}/auth/verification/${token}`
+      `${getBaseUrl(req)}/auth/verification/?token=${token}`
     );
     const message = `Sign up was successfull. Please check your email to activate your account!
       If you don't find it in your inbox, please check your spam messages.`;
@@ -161,7 +161,7 @@ export const userSignUp = async (req, res) => {
  */
 export const verifyUserAccount = async (req, res) => {
   try {
-    const decoded = decodeJWT(req.params.token, verificationJWTConfigs);
+    const decoded = decodeJWT(req.query.token, verificationJWTConfigs);
     let foundUser = await Users.findByPk(decoded.userId);
     if (!isEmpty(foundUser)) {
       // If account has previously been verified

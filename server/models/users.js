@@ -140,7 +140,7 @@ export default (sequelize, Sequelize) => {
   User.prototype.sendPasswordResetEmail = async function(url) {
     const { firstName, lastName, email } = this;
     const resetToken = await this.generateResetToken();
-    const resetUrl = `${url}/${resetToken}`;
+    const resetUrl = `${url}/?token=${resetToken}`;
     sendEmail(
       firstName,
       lastName,
