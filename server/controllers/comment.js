@@ -21,11 +21,29 @@ export const createComment = async (req, res) => {
       userId,
       content
     });
+    await req.article.increment("commentCounts");
     await sendCommentNotification(authorId, id, title);
+
+    const newlyCreatedComment = await Comments.findOne({
+      where: {
+        id: newComment.get("id")
+      },
+      include: [
+        {
+          model: models.Users,
+          as: "reviews"
+        },
+        {
+          model: models.Reactions,
+          as: "commentReactions"
+        }
+      ]
+    });
+
     return httpResponse(res, {
       statusCode: 201,
       message: "Comment created successfully",
-      comment: newComment
+      comment: newlyCreatedComment
     });
   } catch (error) {
     return serverError(res, error);

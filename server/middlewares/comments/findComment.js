@@ -35,8 +35,7 @@ export const findSingleComment = async (req, res, next) => {
       include: [
         {
           model: models.Users,
-          as: "reviewer",
-          attributes: ["firstName", "lastName", "imageURL"]
+          as: "reviews"
         },
         {
           model: models.Reactions,
@@ -75,14 +74,14 @@ export const findAllComments = async (req, res, next) => {
       include: [
         {
           model: models.Users,
-          as: "reviewer",
-          attributes: ["firstName", "lastName", "imageURL"]
+          as: "reviews"
         },
         {
           model: models.Reactions,
           as: "commentReactions"
         }
-      ]
+      ],
+      order: [["createdAt", "ASC"]]
     });
     if (isEmpty(comments)) {
       return httpResponse(res, {

@@ -41,7 +41,7 @@ const getCommentModel = (sequelize, DataTypes) => {
   Comment.associate = db => {
     Comment.belongsTo(db.Users, {
       foreignKey: "userId",
-      as: "reviewer"
+      as: "reviews"
     });
 
     Comment.belongsTo(db.Articles, {

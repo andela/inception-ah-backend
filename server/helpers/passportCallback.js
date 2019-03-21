@@ -26,9 +26,15 @@ export const getUserProfileFromApis = (token, tokenSecret, profile, done) => {
         });
         return done(null, userResponse(newUser));
       }
+      if (!foundUser.get("isVerified")) {
+        await foundUser.activateAccount();
+      }
+
       return done(null, userResponse(foundUser));
     } catch (error) {
-      return done(error, null);
+      return done(null, {
+        error: "There was problem trying to verify your account"
+      });
     }
   });
 };

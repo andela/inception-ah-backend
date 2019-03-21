@@ -23,28 +23,42 @@ export const userLogin = async (req, res) => {
   const { email, password } = req.body;
   try {
     const user = await Users.findOne({ where: { email } });
+
     if (user) {
-      const foundUser = user.get("password");
-      const matchedPassword = await comparePassword(password, foundUser);
-      if (matchedPassword) {
-        const authJWTConfings = getJWTConfigs({ option: "authentication" });
-        const payload = {
-          userId: user.get("id")
-        };
-        const token = await generateJWT(payload, authJWTConfings);
+      if (user.get("isVerified")) {
+        const foundUser = user.get("password");
+        const matchedPassword = await comparePassword(password, foundUser);
+        if (matchedPassword) {
+          const authJWTConfings = getJWTConfigs({ option: "authentication" });
+          const payload = {
+            userId: user.get("id")
+          };
+          const token = await generateJWT(payload, authJWTConfings);
+          return httpResponse(res, {
+            statusCode: 200,
+            success: true,
+            message: "login successful!",
+            userId: user.get("id"),
+            data: { token }
+          });
+        }
         return httpResponse(res, {
-          statusCode: 200,
-          success: true,
-          message: "login successful",
-          userId: user.get("id"),
-          data: { token }
+          statusCode: 401,
+          success: false,
+          message: "Invalid login credentials!",
+          data: null
         });
       }
+      return httpResponse(res, {
+        statusCode: 401,
+        success: false,
+        message: "Your account is not Verified! Please check your email!"
+      });
     }
     return httpResponse(res, {
       statusCode: 401,
       success: false,
-      message: "Invalid login credentials",
+      message: "Invalid login credentials!",
       data: null
     });
   } catch (err) {
@@ -67,13 +81,13 @@ export const passwordResetRequest = async (req, res) => {
       }
     });
     if (verifiedUser) {
-      const url = `${getBaseUrl(req)}/users/resetPassword`;
+      const url = `${getBaseUrl(req)}/resetPassword`;
       await verifiedUser.sendPasswordResetEmail(url);
       return httpResponse(res, {
         success: true,
         statusCode: 200,
-        message: `Email Sent Successfully to your email, `.concat(
-          "check your Spam in case you did not find it in your inbox"
+        message: `Email Reset Link was sent to your email, `.concat(
+          "check your spam in case you did not find it in your inbox"
         ),
         data: await verifiedUser.generateResetToken()
       });
@@ -90,16 +104,11 @@ export const passwordResetRequest = async (req, res) => {
 
 export const resetPassword = async (req, res) => {
   const { password } = req.body;
-  const { token } = req.query;
-
   try {
-    const foundUser = await Users.findOne({
-      where: {
-        resetToken: token
-      }
-    });
-    if (foundUser) {
-      await foundUser.resetPassword(password, token);
+    const decoded = decodeJWT(req.query.token, verificationJWTConfigs);
+    let foundUser = await Users.findByPk(decoded.userId);
+    if (!isEmpty(foundUser)) {
+      await foundUser.resetPassword(password);
       return httpResponse(res, {
         success: true,
         statusCode: 200,
@@ -108,14 +117,13 @@ export const resetPassword = async (req, res) => {
       });
     }
     return httpResponse(res, {
-      statusCode: 400,
-      message: "Password Reset Failed, try again"
+      statusCode: 404,
+      message: "Sorry, user does not exist"
     });
   } catch (error) {
-    return serverError(res, error);
+    serverError(res, error);
   }
 };
-
 /**
  * @description Sign up a new user
  *
@@ -136,7 +144,7 @@ export const userSignUp = async (req, res) => {
     const { password, ...user } = newUser.dataValues;
     const token = generateJWT({ userId: user.id }, verificationJWTConfigs);
     newUser.sendVerificationEmail(
-      `${getBaseUrl(req)}/auth/verification/?token=${token}`
+      `${getBaseUrl(req)}/verification?token=${token}`
     );
     const message = `Sign up was successfull. Please check your email to activate your account!
       If you don't find it in your inbox, please check your spam messages.`;
@@ -163,19 +171,21 @@ export const verifyUserAccount = async (req, res) => {
   try {
     const decoded = decodeJWT(req.query.token, verificationJWTConfigs);
     let foundUser = await Users.findByPk(decoded.userId);
-    if (!isEmpty(foundUser)) {
+    if (foundUser) {
       // If account has previously been verified
       // return the appropriate message
       if (foundUser.get("isVerified")) {
         return httpResponse(res, {
           statusCode: 200,
-          message: "Account has been verified"
+          message: "Account has been verified",
+          data: userResponse(foundUser)
         });
       }
       return httpResponse(res, {
         message: "Account verification was successfull",
+        userId: foundUser.get("id"),
         // activate user account and return response to client
-        user: userResponse(await foundUser.activateAccount())
+        data: userResponse(await foundUser.activateAccount())
       });
     }
     return httpResponse(res, {
@@ -230,6 +240,43 @@ export const updateUserProfile = async (req, res) => {
       statusCode: 401,
       success: false,
       message: "Unauthorized. Can not update another user's profile"
+    });
+  } catch (error) {
+    return serverError(res, error);
+  }
+};
+
+export const getAllUsersProfile = async (req, res) => {
+  try {
+    const allUsers = await Users.findAll({
+      attributes: ["id", "imageURL", "firstName", "lastName"],
+      include: [
+        {
+          model: models.Articles,
+          as: "author"
+        }
+      ]
+    });
+    let userProfile = [];
+    allUsers.map(user => {
+      const { id, firstName, lastName, imageURL, author } = user;
+      return userProfile.push({
+        id,
+        firstName,
+        lastName,
+        imageURL,
+        publicationsCount: author.length
+      });
+    });
+
+    userProfile.sort(
+      (prev, next) => next.publicationsCount - prev.publicationsCount
+    );
+
+    return httpResponse(res, {
+      data: userProfile,
+      message: "Users successfully retrieved",
+      success: true
     });
   } catch (error) {
     return serverError(res, error);

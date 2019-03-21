@@ -7,7 +7,7 @@ import { httpResponse, serverError } from "@helpers/http";
 import { generateUniqueSlug, calculateReadTime } from "@helpers/articles";
 import { sendPublishedArticleNotification } from "./notification";
 
-const { Articles } = models;
+const { Articles, Categories } = models;
 
 /**
  * @description Create a new Article
@@ -17,15 +17,19 @@ const { Articles } = models;
  * @returns {object}  Response message object
  */
 export const createArticle = async (req, res) => {
-  const { title, content, description, categoryId } = req.body;
+  const { title, content, description, imageURL } = req.body;
   const { userId } = req.user;
+
+  const category = await Categories.create({ category: title });
+
   try {
     const newArticle = await Articles.create({
       title,
       authorId: userId,
-      categoryId,
+      categoryId: category.get("id"),
       content,
-      description
+      description,
+      imageURL
     });
     return httpResponse(res, {
       statusCode: 201,
@@ -118,21 +122,7 @@ export const getArticleBySlug = async (req, res) => {
         }
       },
       /* TODO: Add join for Comment, Category, ArticleTags */
-      include: [
-        {
-          model: models.Users,
-          as: "author",
-          attributes: ["firstName", "lastName", "imageURL"]
-        },
-        {
-          model: models.Reactions,
-          as: "articleReactions"
-        },
-        {
-          model: models.Comments,
-          as: "articleComments"
-        }
-      ]
+      include: [{ all: true, nested: true }]
     });
     if (isEmpty(article)) {
       return httpResponse(res, {
@@ -188,7 +178,7 @@ export const getArticlesByCategory = async (req, res) => {
  * @returns {object}  Response message object
  */
 export const getAuthorsArticles = async (req, res) => {
-  const { userId } = req.user;
+  const userId = req.params.id;
   try {
     const authorsArticles = await Articles.fetchArticles({
       whereConditions: {

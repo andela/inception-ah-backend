@@ -9,8 +9,8 @@ export const findArticle = async (req, res, next) => {
   try {
     const article = await Articles.findOne({
       where: {
-        slug: req.params.slug,
-        isPublished: true
+        slug: req.params.slug
+        // isPublished: true
       }
     });
 

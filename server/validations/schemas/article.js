@@ -11,9 +11,10 @@ export const articleSchema = Joi.object().keys({
     .required()
     .label("Description"),
   content: Joi.string()
-    .min(200)
+    .min(100)
     .required()
     .label("Content"),
+  imageURL: Joi.string().allow(["", null]),
   categoryId: Joi.string()
     .required()
     .label("Category")

@@ -3,7 +3,8 @@ import {
   passwordResetRequest,
   resetPassword,
   getUserProfile,
-  updateUserProfile
+  updateUserProfile,
+  getAllUsersProfile
 } from "@controllers/user";
 import { verifyToken, findUserById, validateInput } from "@middlewares";
 
@@ -19,4 +20,6 @@ userRouter.put(
   validateInput,
   updateUserProfile
 );
+
+userRouter.get("/", getAllUsersProfile);
 export { userRouter };
