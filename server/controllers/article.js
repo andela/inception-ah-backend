@@ -134,8 +134,7 @@ export const getArticleBySlug = async (req, res) => {
       include: [
         {
           model: models.Users,
-          as: "author",
-          attributes: ["firstName", "lastName", "imageURL"]
+          as: "author"
         },
         {
           model: models.Reactions,

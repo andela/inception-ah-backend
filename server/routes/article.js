@@ -117,6 +117,7 @@ articleRouter.post(
   "/articles/:slug/reaction",
   verifyToken,
   findArticle,
+  validateInput,
   likeOrDislikeAnArticle
 );
 

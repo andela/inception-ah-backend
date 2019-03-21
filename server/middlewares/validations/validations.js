@@ -6,7 +6,8 @@ import {
   signInSchema,
   articleSchema,
   updateProfileSchema,
-  commentSchema
+  commentSchema,
+  reactionSchema
 } from "@schemas";
 import { httpResponse, serverError } from "@helpers/http";
 
@@ -28,9 +29,9 @@ export const validateInput = async (req, res, next) => {
     "/signin": signInSchema,
     "/articles": articleSchema,
     "/updateProfile": updateProfileSchema,
-    "/comments": commentSchema
+    "/comments": commentSchema,
+    "/reaction": reactionSchema
   };
-
   const validation = await validator(
     req.body,
     schemas[`/${req.path.split("/").pop()}`]

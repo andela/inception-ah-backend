@@ -141,7 +141,7 @@ const getArticleModel = (sequelize, DataTypes) => {
     const { pageLimit, offset } = pagination(options.query);
     return this.findAll({
       order: [["createdAt", "DESC"]],
-      // where: options.whereConditions,
+      where: options.whereConditions,
       /* TODO: Add join for ArticleTags */
       include: [
         {
