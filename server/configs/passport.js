@@ -11,7 +11,9 @@ const {
   GOOGLE_CLIENT_ID,
   GOOGLE_CLIENT_SECRET,
   GOOGLE_REDIRECT_PROD,
-  PORT
+  PORT,
+  FRONTEND_LINK,
+  FRONTEND_LINK_DEV
 } = process.env;
 
 export const socialAuthConfig = {
@@ -25,7 +27,7 @@ export const socialAuthConfig = {
     : {
         clientID: FACEBOOK_CLIENT_ID,
         clientSecret: FACEBOOK_CLIENT_SECRET,
-        callbackURL: `http://localhost:8000/auth/facebook/redirect`,
+        callbackURL: `http://localhost:${PORT}/api/v1/auth/facebook/redirect`,
         profileFields: ["id", "displayName", "photos", "email"]
       },
   google: {
@@ -33,6 +35,9 @@ export const socialAuthConfig = {
     clientSecret: GOOGLE_CLIENT_SECRET,
     callbackURL: isProd
       ? GOOGLE_REDIRECT_PROD
-      : "http://localhost:8000/auth/google/redirect"
+      : `http://localhost:${PORT}/api/v1/auth/google/redirect`
   }
 };
+
+export const frontEndLink = FRONTEND_LINK;
+export const frontEndLinkDev = FRONTEND_LINK_DEV;

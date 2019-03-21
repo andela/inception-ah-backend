@@ -47,8 +47,7 @@ articleRouter.post("/articles", verifyToken, validateInput, createArticle);
  * @returns - It returns an array of articles by an author
  */
 articleRouter.get(
-  "/articles/feed",
-  verifyToken,
+  "/articles/:id/feed",
   validatePaginationParameters,
   getAuthorsArticles
 );

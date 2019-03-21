@@ -3,7 +3,7 @@ import models from "@models";
 import { serverError, httpResponse } from "@helpers/http";
 import { uuidSchema } from "@schemas";
 
-const { Users } = models;
+const { Users, Reactions, Comments, Articles, Followers } = models;
 
 export const findUserById = async (req, res, next) => {
   const userId = req.params.id || req.user.userId;
@@ -21,16 +21,24 @@ export const findUserById = async (req, res, next) => {
     const user = await Users.findByPk(userId, {
       include: [
         {
-          model: models.Articles,
-          as: "articles"
+          model: Articles,
+          as: "author"
         },
         {
-          model: models.Comments,
-          as: "reviewer"
-        },
-        {
-          model: models.Reactions,
+          model: Reactions,
           as: "userReactions"
+        },
+        {
+          model: Comments,
+          as: "reviews"
+        },
+        {
+          model: Followers,
+          as: "following"
+        },
+        {
+          model: Followers,
+          as: "followers"
         }
       ]
     });

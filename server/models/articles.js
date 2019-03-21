@@ -34,6 +34,16 @@ const getArticleModel = (sequelize, DataTypes) => {
       defaultValue: 0,
       allowNull: false
     },
+
+    imageURL: {
+      type: DataTypes.STRING
+    },
+
+    commentCounts: {
+      type: DataTypes.INTEGER,
+      defaultValue: 0,
+      allowNull: false
+    },
     categoryId: {
       type: DataTypes.UUID,
       allowNull: false
@@ -131,7 +141,7 @@ const getArticleModel = (sequelize, DataTypes) => {
     const { pageLimit, offset } = pagination(options.query);
     return this.findAll({
       order: [["createdAt", "DESC"]],
-      where: options.whereConditions,
+      // where: options.whereConditions,
       /* TODO: Add join for ArticleTags */
       include: [
         {
@@ -141,11 +151,13 @@ const getArticleModel = (sequelize, DataTypes) => {
         },
         {
           model: models.Reactions,
-          as: "articleReactions"
+          as: "articleReactions",
+          required: false
         },
         {
           model: models.Comments,
-          as: "articleComments"
+          as: "articleComments",
+          required: false
         }
       ],
       limit: pageLimit,

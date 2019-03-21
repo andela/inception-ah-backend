@@ -39,7 +39,7 @@ const getReactionsModel = (sequelize, Sequelize) => {
     Reaction.belongsTo(db.Users, {
       foreignKey: "userId",
       onDelete: "CASCADE",
-      as: "userComments"
+      as: "userReactions"
     });
   };
   return Reaction;

@@ -2,7 +2,8 @@ import { Router } from "express";
 import {
   followOrUnfollowUser,
   getFollowedUsers,
-  getFollowers
+  getFollowers,
+  getFollower
 } from "@controllers/follow";
 import { verifyToken, findUserById } from "@middlewares";
 
@@ -30,5 +31,7 @@ followerRouter.get("/follow", verifyToken, getFollowedUsers);
  * @returns an array of objects
  */
 followerRouter.get("/follower", verifyToken, getFollowers);
+
+followerRouter.get("/follower/:id", verifyToken, getFollower);
 
 export { followerRouter };
