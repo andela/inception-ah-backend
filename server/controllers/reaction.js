@@ -20,7 +20,7 @@ export const likeOrDislikeAnArticle = async (req, res) => {
       }
     });
     if (!articleReaction) {
-      await Reactions.create({
+      const newReaction = await Reactions.create({
         articleId: article.id,
         sourceType: ARTICLE_REACTION,
         reaction,
@@ -31,7 +31,8 @@ export const likeOrDislikeAnArticle = async (req, res) => {
         statusCode: 201,
         message: `You have successfully added a ${
           typeOfReaction(reaction).type
-        } reaction to ${title}`
+        } reaction to ${title}`,
+        reaction: newReaction
       });
     }
     await Reactions.destroy({
@@ -68,7 +69,7 @@ export const likeOrDislikeACommment = async (req, res) => {
     });
 
     if (!commentReaction) {
-      await Reactions.create({
+      const newReaction = await Reactions.create({
         commentId: comment.id,
         sourceType: COMMENT_REACTION,
         reaction,
@@ -79,7 +80,8 @@ export const likeOrDislikeACommment = async (req, res) => {
         statusCode: 201,
         message: `You have successfully added a ${
           typeOfReaction(reaction).type
-        } reaction to ${content}`
+        } reaction to ${content}`,
+        reaction: newReaction
       });
     }
     await Reactions.destroy({
@@ -107,7 +109,14 @@ export const fetchAllArticleReactions = async (req, res) => {
   const articleReactions = await Reactions.findAll({
     where: {
       articleId: id
-    }
+    },
+    include: [
+      {
+        model: models.Users,
+        as: "userReactions",
+        attributes: ["firstName", "lastName", "imageURL"]
+      }
+    ]
   });
 
   if (!articleReactions.length) {
@@ -119,7 +128,7 @@ export const fetchAllArticleReactions = async (req, res) => {
   return httpResponse(res, {
     statusCode: 200,
     message: "Reactions successfully retrieved",
-    data: articleReactions
+    reactions: articleReactions
   });
 };
 export const fetchAllCommentReactions = async (req, res) => {
@@ -129,7 +138,14 @@ export const fetchAllCommentReactions = async (req, res) => {
   const commentReactions = await Reactions.findAll({
     where: {
       commentId: id
-    }
+    },
+    include: [
+      {
+        model: models.Users,
+        as: "userReactions",
+        attributes: ["firstName", "lastName", "imageURL"]
+      }
+    ]
   });
   if (!commentReactions.length) {
     return httpResponse(res, {
@@ -140,6 +156,6 @@ export const fetchAllCommentReactions = async (req, res) => {
   return httpResponse(res, {
     statusCode: 200,
     message: "Reactions successfully retrieved",
-    data: commentReactions
+    reactions: commentReactions
   });
 };

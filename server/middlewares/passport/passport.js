@@ -17,7 +17,7 @@ export const googleAuthRedirect = () => {
 };
 
 export const facebookAuth = () => {
-  return passport.authenticate("facebook");
+  return passport.authenticate("facebook", { scope: ["email"] });
 };
 
 export const facebookAuthRedirect = () => {

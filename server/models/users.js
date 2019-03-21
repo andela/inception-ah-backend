@@ -4,6 +4,9 @@ import { hashPassword } from "@helpers/password";
 import { decryptToken, getTimeDifference, encryptToken } from "@helpers/crypto";
 import { sendEmail } from "@emails/email";
 import { resetConstants, verifyConstants } from "@emails/constants";
+import { generateJWT, decodeJWT, getJWTConfigs } from "@helpers/jwt";
+
+const verificationJWTConfigs = getJWTConfigs({ option: "verification" });
 
 export default (sequelize, Sequelize) => {
   const userSchema = {
@@ -102,7 +105,7 @@ export default (sequelize, Sequelize) => {
     });
     User.hasMany(db.Articles, {
       foreignKey: "authorId",
-      as: "articles",
+      as: "author",
       target: "id",
       onDelete: "CASCADE"
     });
@@ -110,7 +113,7 @@ export default (sequelize, Sequelize) => {
       foreignKey: "userId",
       target: "id",
       onDelete: "CASCADE",
-      as: "reviewer"
+      as: "reviews"
     });
     User.hasMany(db.Reactions, {
       foreignKey: "userId",
@@ -121,26 +124,26 @@ export default (sequelize, Sequelize) => {
     User.hasMany(db.Followers, {
       foreignKey: "followerId",
       target: "id",
+      as: "followers",
       onDelete: "CASCADE"
     });
     User.hasMany(db.Followers, {
       foreignKey: "authorId",
       target: "id",
-      onDelete: "CASCADE"
+      onDelete: "CASCADE",
+      as: "following"
     });
   };
 
   User.prototype.generateResetToken = async function() {
-    this.resetToken = encryptToken();
-    this.save();
-    await this.reload();
-    return this.resetToken;
+    const token = generateJWT({ userId: this.id }, verificationJWTConfigs);
+    return token;
   };
 
   User.prototype.sendPasswordResetEmail = async function(url) {
     const { firstName, lastName, email } = this;
     const resetToken = await this.generateResetToken();
-    const resetUrl = `${url}/?token=${resetToken}`;
+    const resetUrl = `${url}?token=${resetToken}`;
     sendEmail(
       firstName,
       lastName,
@@ -151,14 +154,10 @@ export default (sequelize, Sequelize) => {
     );
   };
 
-  User.prototype.resetPassword = async function(password, token) {
-    if (getTimeDifference(decryptToken(token)) > Number(expiryTime)) {
-      throw new Error("The Link has expired");
-    }
-    this.password = hashPassword(password);
-    this.resetToken = "";
-    this.save();
-    await this.reload();
+  User.prototype.resetPassword = async function(password) {
+    this.password = bcrypt.hashSync(password, bcrypt.genSaltSync(10));
+    await this.save();
+    return this.reload();
   };
 
   User.prototype.sendVerificationEmail = async function(url) {

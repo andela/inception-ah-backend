@@ -21,6 +21,7 @@ export const createComment = async (req, res) => {
       userId,
       content
     });
+    await req.article.increment("commentCounts");
     await sendCommentNotification(authorId, id, title);
     return httpResponse(res, {
       statusCode: 201,

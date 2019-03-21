@@ -70,6 +70,7 @@ commentsRouter.post(
   verifyToken,
   findArticle,
   findSingleComment,
+  validateInput,
   likeOrDislikeACommment
 );
 

@@ -6,6 +6,7 @@ import {
   updateProfileSchema
 } from "./user";
 import { commentSchema } from "./comment";
+import { reactionSchema } from "./reaction";
 
 export {
   signInSchema,
@@ -13,5 +14,6 @@ export {
   uuidSchema,
   articleSchema,
   updateProfileSchema,
-  commentSchema
+  commentSchema,
+  reactionSchema
 };

@@ -130,3 +130,36 @@ export const getFollowers = async (req, res) => {
     return serverError(res, error);
   }
 };
+
+export const getFollower = async (req, res) => {
+  const { userId } = req.user;
+  const followerId = req.params.id;
+  try {
+    const follower = await Followers.findOne({
+      where: { authorId: userId, followerId },
+      attributes: ["authorId", "followerId"],
+      include: [
+        {
+          model: Users,
+          as: "follower",
+          attributes: ["firstName", "lastName", "imageURL", "biography"]
+        }
+      ]
+    });
+    if (!follower) {
+      return httpResponse(res, {
+        statusCode: 404,
+        success: false,
+        message: "The user is not following you"
+      });
+    }
+    return httpResponse(res, {
+      statusCode: 200,
+      success: true,
+      message: "Follower retrieved",
+      data: follower.rows
+    });
+  } catch (error) {
+    return serverError(res, error);
+  }
+};
