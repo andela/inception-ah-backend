@@ -3,8 +3,10 @@ import { authRouter } from "@routes/auth";
 import { userRouter } from "@routes/user";
 import { articleRouter } from "@routes/article";
 import { commentsRouter } from "@routes/comment";
+import { tagRouter } from "@routes/tag";
 import { followerRouter } from "@routes/follow";
 import { notificationRouter } from "@routes/notification";
+import { categoryRouter } from "@routes/category";
 
 const mainAppRouter = Router();
 mainAppRouter.get("/", (req, res, next) => {
@@ -15,9 +17,11 @@ mainAppRouter.get("/", (req, res, next) => {
 });
 mainAppRouter.use("/auth", authRouter);
 mainAppRouter.use("/users", userRouter);
-mainAppRouter.use("/", articleRouter);
-mainAppRouter.use("/", commentsRouter);
+mainAppRouter.use("/articles", articleRouter);
+mainAppRouter.use("/comments", commentsRouter);
+mainAppRouter.use("/tags", tagRouter);
 mainAppRouter.use("/profiles", followerRouter);
-mainAppRouter.use("/", notificationRouter);
+mainAppRouter.use("/notification", notificationRouter);
+mainAppRouter.use("/categories", categoryRouter);
 
 export { mainAppRouter };

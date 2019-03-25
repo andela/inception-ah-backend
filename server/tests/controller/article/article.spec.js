@@ -1,14 +1,26 @@
 import chai, { expect } from "chai";
 import chaiHttp from "chai-http";
-
+import sinon from "sinon";
+import sinonChai from "sinon-chai";
 import app from "@app";
 import models from "@models";
 import { generateJWT, getJWTConfigs } from "@helpers/jwt";
 import { registerUser, articleSpec, category } from "@fixtures";
+import {
+  createArticle,
+  publishArticle,
+  getAllArticles,
+  getArticleBySlug,
+  getArticlesByCategory,
+  getAuthorsArticles,
+  updateArticle,
+  deleteArticle
+} from "@controllers/article";
 
 const jwtConfigs = getJWTConfigs({ option: "authentication" });
 
 chai.use(chaiHttp);
+chai.use(sinonChai);
 const { Articles, Users, Categories, Followers } = models;
 
 let articleSpecCopy;
@@ -16,6 +28,8 @@ beforeEach(async () => {
   await models.sequelize.sync({ force: true });
   articleSpecCopy = { ...articleSpec };
 });
+
+afterEach(() => sinon.restore());
 
 const userDependencies = async userDetails => {
   const user = await Users.create(userDetails);
@@ -26,18 +40,21 @@ const userDependencies = async userDetails => {
   });
 };
 
-const articleDependencies = async () => {
+const articleDependencies = async tags => {
   const categoryInstance = await Categories.create(category);
   const categoryId = categoryInstance.get("id");
-  articleSpecCopy.categoryId = categoryId;
-  return Promise.resolve(articleSpecCopy);
+  const articleData = Object.assign(articleSpec, {
+    categoryId,
+    tags
+  });
+  return Promise.resolve({ articleData, categoryId });
 };
 
 describe("CRUD Article Feature </api/v1/article>", done => {
   const slug = "the-man-of-man-that-man-1550835108565";
   it("should not create an article", async () => {
     const user = await userDependencies(registerUser);
-    const articleData = await articleDependencies();
+    const { articleData } = await articleDependencies();
     const token = generateJWT({ userId: user.userId }, jwtConfigs);
     const res = await chai
       .request(app)
@@ -51,9 +68,29 @@ describe("CRUD Article Feature </api/v1/article>", done => {
     );
   });
 
+  it("should not create an article with duplicate tag", async () => {
+    const user = await userDependencies(registerUser);
+    const { articleData } = await articleDependencies([
+      "JavaScript",
+      "javascript"
+    ]);
+    const token = generateJWT({ userId: user.userId }, jwtConfigs);
+    const res = await chai
+      .request(app)
+      .post("/api/v1/articles")
+      .send(articleData)
+      .set({ Authorization: token });
+    expect(res.statusCode).to.equal(400);
+    expect(res.body.success).to.be.false;
+    expect(res.body.errorMessages.tags).to.equal("Duplicate tags not allowed");
+  });
+
   it("should create an article", async () => {
     const user = await userDependencies(registerUser);
-    const articleData = await articleDependencies();
+    const { articleData } = await articleDependencies([
+      "Android",
+      "Javascript"
+    ]);
     const token = generateJWT({ userId: user.userId }, jwtConfigs);
     const res = await chai
       .request(app)
@@ -66,7 +103,7 @@ describe("CRUD Article Feature </api/v1/article>", done => {
 
   it("should not create an article when category Id is not provided", async () => {
     const user = await userDependencies(registerUser);
-    const articleData = await articleDependencies();
+    const { articleData } = await articleDependencies();
     const token = generateJWT({ userId: user.userId }, jwtConfigs);
     const res = await chai
       .request(app)
@@ -80,8 +117,18 @@ describe("CRUD Article Feature </api/v1/article>", done => {
     );
   });
 
+  it("should return 404 if there are no articles associated to a category id", async () => {
+    const { categoryId } = await articleDependencies();
+    const res = await chai
+      .request(app)
+      .get(`/api/v1/categories/${categoryId}/articles`);
+    expect(res.statusCode).to.equal(404);
+    expect(res.body.success).to.be.false;
+    expect(res.body.message).to.equal("Articles not found");
+  });
+
   it("should return an error status Code of 500 for wrong token", async () => {
-    const articleData = await articleDependencies();
+    const { articleData } = await articleDependencies();
     const res = await chai
       .request(app)
       .post("/api/v1/articles")
@@ -92,7 +139,7 @@ describe("CRUD Article Feature </api/v1/article>", done => {
 
   it("should return all articles by an author", async () => {
     const user = await userDependencies(registerUser);
-    const articleData = await articleDependencies();
+    const { articleData } = await articleDependencies();
     const token = generateJWT({ userId: user.userId }, jwtConfigs);
     articleData.authorId = user.userId;
     const article = await Articles.create(articleData);
@@ -106,7 +153,7 @@ describe("CRUD Article Feature </api/v1/article>", done => {
 
   it("should return 404 error if authors articles are not found", async () => {
     const user = await userDependencies(registerUser);
-    const articleData = await articleDependencies();
+    const { articleData } = await articleDependencies();
     const token = generateJWT({ userId: user.userId }, jwtConfigs);
     articleData.authorId = user.userId;
     const res = await chai
@@ -118,7 +165,7 @@ describe("CRUD Article Feature </api/v1/article>", done => {
 
   it("should return all published articles", async () => {
     const user = await userDependencies(registerUser);
-    const articleData = await articleDependencies();
+    const { articleData } = await articleDependencies();
     articleData.authorId = user.userId;
     let articles = await Articles.create(articleData);
     await articles.update({
@@ -132,7 +179,7 @@ describe("CRUD Article Feature </api/v1/article>", done => {
 
   it("should return 404 error if no published articles are found", async () => {
     const user = await userDependencies(registerUser);
-    const articleData = await articleDependencies();
+    const { articleData } = await articleDependencies();
     articleData.authorId = user.userId;
     articleData.isPublished = false;
     await Articles.create(articleData);
@@ -142,7 +189,7 @@ describe("CRUD Article Feature </api/v1/article>", done => {
 
   it("should return one article if the slug is valid", async () => {
     const user = await userDependencies(registerUser);
-    const articleData = await articleDependencies();
+    const { articleData } = await articleDependencies();
     articleData.authorId = user.userId;
     const article = await Articles.create(articleData);
     const res = await chai.request(app).get(`/api/v1/articles/${article.slug}`);
@@ -151,7 +198,7 @@ describe("CRUD Article Feature </api/v1/article>", done => {
 
   it("should return 404 if the article slug is invalid", async () => {
     const user = await userDependencies(registerUser);
-    const articleData = await articleDependencies();
+    const { articleData } = await articleDependencies();
     articleData.authorId = user.userId;
     await Articles.create(articleData);
     const res = await chai.request(app).get(`/api/v1/articles/${slug}`);
@@ -160,7 +207,7 @@ describe("CRUD Article Feature </api/v1/article>", done => {
 
   it("should update an article", async () => {
     const user = await userDependencies(registerUser);
-    const articleData = await articleDependencies();
+    const { articleData } = await articleDependencies();
     const token = generateJWT({ userId: user.userId }, jwtConfigs);
     articleData.authorId = user.userId;
     const article = await Articles.create(articleData);
@@ -174,7 +221,7 @@ describe("CRUD Article Feature </api/v1/article>", done => {
 
   it("should return 404 error if article to update is not found", async () => {
     const user = await userDependencies(registerUser);
-    const articleData = await articleDependencies();
+    const { articleData } = await articleDependencies();
     const token = generateJWT({ userId: user.userId }, jwtConfigs);
     articleData.authorId = user.userId;
     await Articles.create(articleData);
@@ -189,7 +236,7 @@ describe("CRUD Article Feature </api/v1/article>", done => {
 
   it("should return an error status code of 500, if token  is malformed", async () => {
     const user = await userDependencies(registerUser);
-    const articleData = await articleDependencies();
+    const { articleData } = await articleDependencies();
     articleData.authorId = user.userId;
     await Articles.create(articleData);
     const res = await chai
@@ -202,7 +249,7 @@ describe("CRUD Article Feature </api/v1/article>", done => {
 
   it("should return articles based on their category", async () => {
     const user = await userDependencies(registerUser);
-    const articleData = await articleDependencies();
+    const { articleData } = await articleDependencies();
     articleData.authorId = user.userId;
     let articles = await Articles.create(articleData);
     const res = await chai
@@ -220,7 +267,7 @@ describe("CRUD Article Feature </api/v1/article>", done => {
       authorId: user.userId,
       followerId: user1.userId
     });
-    const articleData = await articleDependencies();
+    const { articleData } = await articleDependencies();
     const token = generateJWT({ userId: user.userId }, jwtConfigs);
     articleData.authorId = user.userId;
     const article = await Articles.create(articleData);
@@ -234,7 +281,7 @@ describe("CRUD Article Feature </api/v1/article>", done => {
 
   it("should return 404 error if article to publish is not found", async () => {
     const user = await userDependencies(registerUser);
-    const articleData = await articleDependencies();
+    const { articleData } = await articleDependencies();
     const token = generateJWT({ userId: user.userId }, jwtConfigs);
     articleData.authorId = user.userId;
     await Articles.create(articleData);
@@ -248,7 +295,7 @@ describe("CRUD Article Feature </api/v1/article>", done => {
 
   it("should delete an article", async () => {
     const user = await userDependencies(registerUser);
-    const articleData = await articleDependencies();
+    const { articleData } = await articleDependencies();
     const token = generateJWT({ userId: user.userId }, jwtConfigs);
     articleData.authorId = user.userId;
     const article = await Articles.create(articleData);
@@ -261,7 +308,7 @@ describe("CRUD Article Feature </api/v1/article>", done => {
 
   it("should return 404 error if article to delete is not found", async () => {
     const user = await userDependencies(registerUser);
-    const articleData = await articleDependencies();
+    const { articleData } = await articleDependencies();
     const token = generateJWT({ userId: user.userId }, jwtConfigs);
     articleData.authorId = user.userId;
     await Articles.create(articleData);
@@ -271,5 +318,107 @@ describe("CRUD Article Feature </api/v1/article>", done => {
       .set({ Authorization: token });
     expect(res.statusCode).to.equal(404);
     expect(res.body.success).to.be.false;
+  });
+
+  it("should return server error for createArticles", async () => {
+    const req = { body: {}, user: {} };
+    const res = {
+      status() {},
+      json() {}
+    };
+    sinon.stub(res, "status").returnsThis();
+    sinon.stub(Articles, "create").throws();
+    await createArticle(req, res);
+    expect(res.status).to.have.been.calledWith(500);
+  });
+
+  it("should return server error for publishArticle", async () => {
+    const req = { article: {} };
+    const res = {
+      status() {},
+      json() {}
+    };
+    sinon.stub(res, "status").returnsThis();
+    sinon.stub(Articles, "update").throws();
+    await publishArticle(req, res);
+    expect(res.status).to.have.been.calledWith(500);
+  });
+
+  it("should return server error for getAllArticles", async () => {
+    const req = { article: {} };
+    const res = {
+      status() {},
+      json() {}
+    };
+    sinon.stub(res, "status").returnsThis();
+    sinon.stub(Articles, "findAll").throws();
+    await getAllArticles(req, res);
+    expect(res.status).to.have.been.calledWith(500);
+  });
+
+  it("should return server error for getArticleBySlug", async () => {
+    const req = { params: {} };
+    const res = {
+      status() {},
+      json() {}
+    };
+    sinon.stub(res, "status").returnsThis();
+    sinon.stub(Articles, "findOne").throws();
+    await getArticleBySlug(req, res);
+    expect(res.status).to.have.been.calledWith(500);
+  });
+
+  it("should return server error for getArticlesByCategory", async () => {
+    const req = { params: {} };
+    const res = {
+      status() {},
+      json() {}
+    };
+    sinon.stub(res, "status").returnsThis();
+    sinon.stub(Articles, "fetchArticles").throws();
+    await getArticlesByCategory(req, res);
+    expect(res.status).to.have.been.calledWith(500);
+  });
+
+  it("should return server error for getAuthorsArticles", async () => {
+    const req = { user: {} };
+    const res = {
+      status() {},
+      json() {}
+    };
+    sinon.stub(res, "status").returnsThis();
+    sinon.stub(Articles, "fetchArticles").throws();
+    await getAuthorsArticles(req, res);
+    expect(res.status).to.have.been.calledWith(500);
+  });
+
+  it("should return server error for getAuthorsArticles", async () => {
+    const req = {
+      article: {},
+      body: {
+        title: "This is an Article",
+        content: "Article content"
+      }
+    };
+    const res = {
+      status() {},
+      json() {}
+    };
+    sinon.stub(res, "status").returnsThis();
+    sinon.stub(Articles, "update").throws();
+    await updateArticle(req, res);
+    expect(res.status).to.have.been.calledWith(500);
+  });
+
+  it("should return server error for getAuthorsArticles", async () => {
+    const req = { article: {} };
+    const res = {
+      status() {},
+      json() {}
+    };
+    sinon.stub(res, "status").returnsThis();
+    sinon.stub(Articles, "destroy").throws();
+    await deleteArticle(req, res);
+    expect(res.status).to.have.been.calledWith(500);
   });
 });

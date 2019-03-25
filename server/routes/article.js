@@ -2,11 +2,12 @@ import { Router } from "express";
 import { favoriteOrUnFavoriteArticle } from "@controllers/favorite";
 import {
   verifyToken,
-  findArticle,
   findAuthorsArticle,
   validateInput,
-  validatePaginationParameters,
-  findPublishedArticle
+  findAllComments,
+  findPublishedArticle,
+  findArticle,
+  validatePaginationParameters
 } from "@middlewares";
 
 import {
@@ -15,12 +16,11 @@ import {
   getAllArticles,
   getArticleBySlug,
   getAuthorsArticles,
-  getArticlesByCategory,
   updateArticle,
   deleteArticle,
   rateArticle
 } from "@controllers/article";
-
+import { getAllComments } from "@controllers/comment";
 import {
   likeOrDislikeAnArticle,
   fetchAllArticleReactions
@@ -33,7 +33,7 @@ const articleRouter = Router();
  * @returns - It returns reponse message
  */
 articleRouter.post(
-  "/articles/:slug/favorite",
+  "/:slug/favorite",
   verifyToken,
   findPublishedArticle,
   favoriteOrUnFavoriteArticle
@@ -43,14 +43,14 @@ articleRouter.post(
  * @description - Route is use to create an article
  * @returns - It returns an article object
  */
-articleRouter.post("/articles", verifyToken, validateInput, createArticle);
+articleRouter.post("/", verifyToken, validateInput, createArticle);
 
 /**
  * @description - Route to get all articles by an author
  * @returns - It returns an array of articles by an author
  */
 articleRouter.get(
-  "/articles/feed",
+  "/feed",
   verifyToken,
   validatePaginationParameters,
   getAuthorsArticles
@@ -60,77 +60,94 @@ articleRouter.get(
  * @description - Route gets all published articles
  * @returns - It returns an array of all published articles
  */
-articleRouter.get("/articles", validatePaginationParameters, getAllArticles);
+articleRouter.get("/", validatePaginationParameters, getAllArticles);
 
 /**
- * @description - Route to get an article by slug
- * @returns - It returns an object of the article
+ * Group all similar route
  */
-articleRouter.get("/articles/:slug", getArticleBySlug);
+articleRouter
+  .route("/:slug")
+  /**
+   * @description - Route to get an article by slug
+   * @returns - It returns an object of the article
+   */
+  .get(getArticleBySlug)
 
-/**
- * @description - Route to update an article
- * @returns - It returns an object of the updated article
- */
-articleRouter.put(
-  "/articles/:slug",
-  verifyToken,
-  findAuthorsArticle,
-  updateArticle
-);
+  /**
+   * Perform middleware checks common to the grouped routes
+   */
+  .all(verifyToken, findAuthorsArticle)
 
-/**
- * @description - Route gets all published articles by category
- * @returns - It returns an array of all published articles
- */
-articleRouter.get(
-  "/categories/:categoryId/articles",
-  validatePaginationParameters,
-  getArticlesByCategory
-);
+  /**
+   * @description - Route to update an article
+   * @returns - It returns an object of the updated article
+   */
+  .put(updateArticle)
+
+  /**
+   * @description - Route to delete an article
+   * @returns - It returns a response
+   */
+  .delete(deleteArticle);
 
 /**
  * @description - Route to publish an unpublished article
  * @returns - It returns an object of the published article
  */
 articleRouter.put(
-  "/articles/:slug/publish",
+  "/:slug/publish",
   verifyToken,
   findAuthorsArticle,
   publishArticle
 );
 
 /**
- * @description - Route to delete an article
- * @returns - It returns a response
+ * @description - Route to get all comments on an article
+ * @returns - It returns an array of all the comments on an article
  */
-articleRouter.delete(
-  "/articles/:slug",
-  verifyToken,
-  findAuthorsArticle,
-  deleteArticle
-);
-articleRouter.post(
-  "/articles/:slug/reaction",
-  verifyToken,
-  findArticle,
-  likeOrDislikeAnArticle
-);
-
 articleRouter.get(
-  "/articles/:slug/reaction",
+  "/:slug/reaction",
   verifyToken,
   findPublishedArticle,
   fetchAllArticleReactions
 );
 
+/**
+ * @description - Route to post rating on an article
+ * @returns - It returns a response
+ */
+
 articleRouter.post(
-  "/articles/:slug/rate",
-  findArticle,
+  "/:slug/rate",
   verifyToken,
+  findPublishedArticle,
   rateArticle
 );
 
-articleRouter.post("/articles/rate", findArticle, verifyToken, rateArticle);
+articleRouter.get(
+  "/:slug/comments",
+  findPublishedArticle,
+  findAllComments,
+  getAllComments
+);
 
+/**
+ * Group similar routes
+ */
+articleRouter.route("/:slug/reaction")
+
+  /**
+   * Perform all middleware checks common to the grouped routes
+   */
+  .all(verifyToken, findPublishedArticle)
+
+  /**
+   * @description - Route is use to create article's reactions
+   */
+  .post(likeOrDislikeAnArticle)
+
+  /**
+   * @description - Route is use to get all article's reactions
+   */
+  .get(fetchAllArticleReactions);
 export { articleRouter };

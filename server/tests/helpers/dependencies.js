@@ -5,9 +5,10 @@ import {
   validUserData,
   articleData,
   userData,
-  registerUser,
   commentData,
-  articleSpec,
+  tagData,
+  category,
+  registerUser,
   category as categoryData
 } from "@fixtures";
 import app from "@app";
@@ -23,6 +24,7 @@ const {
   Categories,
   Reports,
   Ratings,
+  Tags,
   Reactions,
   Comments
 } = models;
@@ -64,11 +66,6 @@ export const updateProfileDependencies = async (email, password, userScope) => {
   });
 };
 
-const destroyDependencies = function() {
-  this.forEach(async dependency => {
-    dependency.destroy();
-  });
-};
 /**
  * @description Create persistent Article data on the database.
  * @throws {Sequelice Constraint Error } similar
@@ -76,29 +73,20 @@ const destroyDependencies = function() {
  * @returns {Articles} instance of Article Model
  */
 export const getArticleInstance = async (articleOverride = {}) => {
-  let category, author, article, authorId;
-  try {
-    category = await Categories.create({ category: "computers" });
+  let categoryInstance, author, article, authorId;
+  categoryInstance = await Categories.create({ category: "computers" });
 
-    //create an authorId if it is not provided in function argument
-    if (!("authorId" in articleOverride)) {
-      author = await getUserInstance();
-      authorId = { authorId: author.get("id") };
-    }
-
-    const articleCopy = Object.assign({}, articleData);
-    const articleFixture = Object.assign(
-      articleCopy,
-      authorId,
-      articleOverride
-    );
-    articleFixture.categoryId = category.get("id");
-    article = await Articles.create(articleFixture);
-  } catch (err) {
-    throw new Error(`Failed to create Article Dependecies\n${err}`);
+  //create an authorId if it is not provided in function argument
+  if (!("authorId" in articleOverride)) {
+    author = await getUserInstance();
+    authorId = { authorId: author.get("id") };
   }
-  const destroy = destroyDependencies.bind([category, author, article]);
-  return Promise.resolve({ article, author, category, destroy });
+
+  const articleCopy = Object.assign({}, articleData);
+  const articleFixture = Object.assign(articleCopy, authorId, articleOverride);
+  articleFixture.categoryId = categoryInstance.get("id");
+  article = await Articles.create(articleFixture);
+  return Promise.resolve({ article, author, category });
 };
 
 /**
@@ -112,8 +100,7 @@ export const getUserInstance = async userOverride => {
     userOverride
   );
   const user = await Users.create(userFixture);
-  const destroy = destroyDependencies.bind([user]);
-  return Promise.resolve(user, destroy);
+  return Promise.resolve(user);
 };
 
 /**
@@ -133,8 +120,7 @@ export const getReportDependencies = async reportOverride => {
     ...reportOverride
   };
   const report = await Reports.create(reportData);
-  const destroy = destroyDependencies.bind([report, reporter, article]);
-  return Promise.resolve({ report, reporter, article, destroy });
+  return Promise.resolve({ report, reporter, article });
 };
 
 export const commentDependencies = async (
@@ -173,7 +159,7 @@ export const commentDependencies = async (
     userId,
     articleId,
     articleSlug,
-    commentData: { content }
+    commentData: { content, articleId }
   });
 };
 
@@ -199,6 +185,27 @@ export const getRatingsDependencies = async (overrideFixture = {}) => {
     throw new Error(`Failed to create Ratings Dependecies\n${err}`);
   }
   return Promise.resolve({ rating, rater, author, articleInstance });
+};
+
+export const tagDependencies = async tag => {
+  const data = tag ? { tag } : tagData[0];
+  const tagInstance = await Tags.create(data);
+  const tagId = tagInstance.get("id");
+  const userInstance = await Users.create(userData[0]);
+  const categoryInstance = await Categories.create(category);
+  const articleTemplate = Object.assign(articleData, {
+    authorId: userInstance.get("id"),
+    categoryId: categoryInstance.get("id")
+  });
+  const articleInstance = await Articles.create(articleTemplate);
+  const articleId = articleInstance.get("id");
+
+  return Promise.resolve({
+    tagId,
+    articleId,
+    tagInstance,
+    articleInstance
+  });
 };
 
 export const favoriteDependencies = async () => {
@@ -299,6 +306,25 @@ export const articleReactionsDependencies = async () => {
     user3ArticleReaction,
     user2CommentReaction,
     user3CommentReaction
+  });
+};
+
+/**
+ * @description Creates three user instances in the database
+ * @returns {array} an array of objects
+ */
+export const followerDependencies = async () => {
+  const user1 = await Users.create({
+    ...userData[0],
+    email: "user1@mail.test"
+  });
+  const user2 = await Users.create({
+    ...userData[1],
+    email: "user2@mail.test"
+  });
+  return Promise.resolve({
+    author: user1.dataValues,
+    follower: user2.dataValues
   });
 };
 

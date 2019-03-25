@@ -5,15 +5,21 @@ import {
   getUserProfile,
   updateUserProfile
 } from "@controllers/user";
-import { verifyToken, findUserById, validateInput } from "@middlewares";
+import {
+  verifyToken,
+  findUserById,
+  validateInput,
+  validateUuid
+} from "@middlewares";
 
 const userRouter = Router();
 
 userRouter.post("/resetPassword", passwordResetRequest);
-userRouter.put("/resetPassword/:token", resetPassword);
-userRouter.get("/:id", findUserById, getUserProfile);
+userRouter.put("/resetPassword", resetPassword);
+userRouter.get("/:userId", validateUuid, findUserById, getUserProfile);
 userRouter.put(
-  "/:id/updateProfile",
+  "/:userId",
+  validateUuid,
   findUserById,
   verifyToken,
   validateInput,

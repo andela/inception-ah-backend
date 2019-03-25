@@ -7,7 +7,7 @@ import { httpResponse, serverError } from "@helpers/http";
 import { generateUniqueSlug, calculateReadTime } from "@helpers/articles";
 import { sendPublishedArticleNotification } from "./notification";
 
-const { Articles, Users, Ratings } = models;
+const { Articles, Ratings } = models;
 
 /**
  * @description Create a new Article
@@ -17,7 +17,7 @@ const { Articles, Users, Ratings } = models;
  * @returns {object}  Response message object
  */
 export const createArticle = async (req, res) => {
-  const { title, content, description, categoryId } = req.body;
+  const { title, content, description, categoryId, tags } = req.body;
   const { userId } = req.user;
   try {
     const newArticle = await Articles.create({
@@ -27,6 +27,7 @@ export const createArticle = async (req, res) => {
       content,
       description
     });
+    await newArticle.saveTags(tags);
     return httpResponse(res, {
       statusCode: 201,
       message: "Article created successfully",
@@ -123,6 +124,10 @@ export const getArticleBySlug = async (req, res) => {
           model: models.Users,
           as: "author",
           attributes: ["firstName", "lastName", "imageURL"]
+        },
+        {
+          model: models.Tags,
+          attributes: ["id", "tag"]
         },
         {
           model: models.Reactions,
@@ -228,6 +233,7 @@ export const updateArticle = async (req, res) => {
       { slug, readTime, ...req.body },
       { fields: ["slug", "readTime", ...Object.keys(req.body)] }
     );
+    await article.saveTags(req.body.tags);
     return httpResponse(res, {
       statusCode: 200,
       success: true,

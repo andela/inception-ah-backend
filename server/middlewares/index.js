@@ -6,6 +6,7 @@ import {
   setPassportMiddleware
 } from "@passport";
 import {
+  validateUuid,
   validateInput,
   checkUniqueEmail,
   validatePaginationParameters
@@ -30,6 +31,7 @@ export {
   setPassportMiddleware,
   validateInput,
   googleAuth,
+  validateUuid,
   facebookAuth,
   googleAuthRedirect,
   facebookAuthRedirect,

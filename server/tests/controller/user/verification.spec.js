@@ -1,30 +1,35 @@
 import chai from "chai";
 import uniqid from "uuid/v4";
 import chaiHttp from "chai-http";
+import sinon from "sinon";
+import sinonChai from "sinon-chai";
 import { generateJWT, decodeJWT, getJWTConfigs } from "@helpers/jwt";
 import app from "@app";
 import models from "@models";
 import { userData } from "@fixtures";
 import { userDependencies } from "@dependencies";
+import { verifyUserAccount } from "@controllers/user";
 
 let token;
 chai.use(chaiHttp);
+chai.use(sinonChai);
 const { expect, assert } = chai;
 
 beforeEach(async () => {
   await models.sequelize.sync({ force: true });
 });
 
-chai.use(chaiHttp);
+afterEach(() => sinon.restore());
+
 const verificationConfig = getJWTConfigs({ option: "verification" });
 
-describe("GET <API /api/v1/auth/verification/:token>", () => {
+describe("GET <API /api/v1/auth/verification?token=token>", () => {
   it("should verify a user registration", async () => {
     const user = await userDependencies(userData[0]);
     token = generateJWT({ userId: user.id }, verificationConfig);
     const res1 = await chai
       .request(app)
-      .get(`/api/v1/auth/verification/${token}`);
+      .get(`/api/v1/auth/verification?token=${token}`);
     expect(res1.statusCode).to.equal(200);
     expect(res1.body.user).to.be.an("object");
     expect(res1.body.message).to.equal("Account verification was successfull");
@@ -32,7 +37,7 @@ describe("GET <API /api/v1/auth/verification/:token>", () => {
 
     const res2 = await chai
       .request(app)
-      .get(`/api/v1/auth/verification/${token}`);
+      .get(`/api/v1/auth/verification?token=${token}`);
     expect(res2.statusCode).to.equal(200);
     expect(res2.body.message).to.equal("Account has been verified");
   });
@@ -40,15 +45,31 @@ describe("GET <API /api/v1/auth/verification/:token>", () => {
   it("should return user not found", async () => {
     const res = await chai
       .request(app)
-      .get(`/api/v1/auth/verification/${token}`);
+      .get(`/api/v1/auth/verification?token=${token}`);
     expect(res.statusCode).to.equal(404);
     expect(res.body.message).to.equal("Sorry, user does not exist");
   });
 
   it("should return a server error", async () => {
-    const res = await chai.request(app).get(`/api/v1/auth/verification/234656`);
+    const res = await chai
+      .request(app)
+      .get(`/api/v1/auth/verification?token=234656`);
     expect(res.statusCode).to.equal(500);
     expect(res.body.success).to.be.false;
+  });
+
+  it("should return server error for verifyUserAccount", async () => {
+    const user = await userDependencies(userData[0]);
+    token = generateJWT({ userId: user.id }, verificationConfig);
+    const req = { query: { token } };
+    const res = {
+      status() {},
+      json() {}
+    };
+    sinon.stub(res, "status").returnsThis();
+    sinon.stub(models.Users, "findByPk").throws();
+    await verifyUserAccount(req, res);
+    expect(res.status).to.have.been.calledWith(500);
   });
 });
 

@@ -13,7 +13,7 @@ const followerRouter = Router();
  * @returns a response
  */
 followerRouter.post(
-  "/:id/follow",
+  "/:userId/follow",
   verifyToken,
   findUserById,
   followOrUnfollowUser

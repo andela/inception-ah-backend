@@ -16,22 +16,9 @@ const { Comments } = models;
  */
 
 export const findSingleComment = async (req, res, next) => {
-  const { article } = req;
-  let commentId = req.params.id;
-  const validateId = Joi.validate(commentId, uuidSchema);
+  const { commentId } = req.params;
   try {
-    if (validateId.error) {
-      return httpResponse(res, {
-        statusCode: 400,
-        success: false,
-        message: "Invalid comment Id"
-      });
-    }
-    const comment = await Comments.findOne({
-      where: {
-        id: commentId,
-        articleId: article.dataValues.id
-      },
+    const comment = await Comments.findByPk(commentId, {
       include: [
         {
           model: models.Users,
