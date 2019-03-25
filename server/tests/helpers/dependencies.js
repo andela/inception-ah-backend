@@ -9,7 +9,8 @@ import {
   tagData,
   category,
   registerUser,
-  category as categoryData
+  category as categoryData,
+  articleSpec
 } from "@fixtures";
 import app from "@app";
 import { ARTICLE_REACTION, COMMENT_REACTION } from "@helpers/constants";
@@ -328,11 +329,57 @@ export const followerDependencies = async () => {
   });
 };
 
-const { firstName, lastName, email, password } = userData[0];
 export const signUpDependencies = async () => {
+  const { firstName, lastName, email, password } = userData[0];
   const res = await chai
     .request(app)
     .post("/api/v1/auth/signup")
     .send({ firstName, lastName, email, password });
   return Promise.resolve({ email, password });
+};
+
+export const signUp = async () => {
+  const { email, password } = await signUpDependencies();
+  return { email, password };
+};
+
+export const login = async () => {
+  const { email, password } = await signUp();
+  const response = await chai
+    .request(app)
+    .post("/api/v1/auth/signin")
+    .send({ email, password });
+  const { token } = response.body.data;
+  return token;
+};
+
+export const createArticle = async token => {
+  if (!token) {
+    token = await login();
+  }
+  const categoryInstance = await Categories.create(categoryData);
+  const articleContent = Object.assign({}, articleSpec, {
+    categoryId: categoryInstance.get("id")
+  });
+
+  const response = await chai
+    .request(app)
+    .post("/api/v1/articles")
+    .send(articleContent)
+    .set({ Authorization: token });
+  const article = response.body.article;
+  return { token, article };
+};
+
+export const publishArticle = async (article, token) => {
+  if (!article) {
+    article = await createArticle(token);
+    token = article.token;
+    article = article.article;
+  }
+  const response = await chai
+    .request(app)
+    .put(`/api/v1/articles/${article.slug}/publish`)
+    .set({ Authorization: token });
+  return { article, token, response: { response: response.body } };
 };

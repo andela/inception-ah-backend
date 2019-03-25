@@ -22,3 +22,19 @@ export const calculateReadTime = content => {
   const readTime = Math.round(result.minutes).toFixed(0);
   return readTime <= 0 ? 1 : readTime;
 };
+
+/**
+ * @description Construct a query that is used to search Article that contains the
+ * query in title or description property
+ * @param {query} query - article content
+ * @param {op} Op - Sequelize Operator
+ * @returns {Object} A query condition useable in sequelize "where" object
+ */
+export const searchBuilder = (query, Op) => {
+  return {
+    [Op.or]: [
+      { title: { [Op.iRegexp]: `^.*${query}.*$` } },
+      { description: { [Op.iRegexp]: `^.*${query}.*$` } }
+    ]
+  };
+};
