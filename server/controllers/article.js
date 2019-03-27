@@ -4,10 +4,15 @@ import isEmpty from "lodash.isempty";
 import models from "@models";
 import { getBaseUrl } from "@helpers/users";
 import { httpResponse, serverError } from "@helpers/http";
-import { generateUniqueSlug, calculateReadTime } from "@helpers/articles";
+import {
+  generateUniqueSlug,
+  calculateReadTime,
+  searchBuilder
+} from "@helpers/articles";
+import { pagination } from "@helpers/pagination";
 import { sendPublishedArticleNotification } from "./notification";
 
-const { Articles, Ratings } = models;
+const { Articles, Ratings, Users } = models;
 
 /**
  * @description Create a new Article
@@ -310,4 +315,48 @@ export const rateArticle = async (req, res) => {
       data: null
     });
   }
+};
+
+/**
+ * Get Articles and Respective authors that contains specified
+ * query keyword in either the Articles title or description
+ * /articles/search&query={title|description}&pageLimit&offset
+ * @param {*} req HttpServerRequest Object
+ * @param {*} res HttpServerResponse Object
+ */
+export const searchArticle = async (req, res) => {
+  let { query, pageLimit, pageNumber } = req.query;
+
+  pageLimit = pageLimit < 0 ? 0 : pageLimit;
+  pageNumber = pageNumber < 0 ? 0 : pageNumber;
+  query = query || null;
+
+  // return early avoid search for empty query
+  if (!query) {
+    httpResponse(res, {
+      success: true,
+      message: "empty query supplied",
+      statusCode: 404,
+      data: []
+    });
+  }
+  const { limit, offset } = pagination({ pageLimit, pageNumber });
+  const results = await Articles.findAll({
+    where: searchBuilder(query, Op),
+    limit,
+    offset,
+    include: [{ model: Users, as: "author" }]
+  });
+  const articles = results.map(data => {
+    const { dataValues } = data;
+    const { author } = dataValues;
+    const { password, email, resetToken, ...authorsData } = author.dataValues;
+    return { article: dataValues, author: authorsData };
+  });
+  httpResponse(res, {
+    success: true,
+    message: "successfull",
+    statusCode: 200,
+    data: articles
+  });
 };

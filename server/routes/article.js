@@ -18,7 +18,8 @@ import {
   getAuthorsArticles,
   updateArticle,
   deleteArticle,
-  rateArticle
+  rateArticle,
+  searchArticle
 } from "@controllers/article";
 import { getAllComments } from "@controllers/comment";
 import {
@@ -60,7 +61,13 @@ articleRouter.get(
  * @description - Route gets all published articles
  * @returns - It returns an array of all published articles
  */
-articleRouter.get("/", validatePaginationParameters, getAllArticles);
+articleRouter.get("/", validatePaginationParameters, (req, res, next) => {
+  if ("search" in req.query) {
+    next();
+  } else {
+    getAllArticles(req, res, next);
+  }
+});
 
 /**
  * Group all similar route
@@ -131,10 +138,19 @@ articleRouter.get(
   getAllComments
 );
 
+articleRouter.get("/", verifyToken, (req, res, next) => {
+  if ("search" in req.query) {
+    searchArticle(req, res, next);
+  } else {
+    next();
+  }
+});
+
 /**
  * Group similar routes
  */
-articleRouter.route("/:slug/reaction")
+articleRouter
+  .route("/:slug/reaction")
 
   /**
    * Perform all middleware checks common to the grouped routes
@@ -150,4 +166,5 @@ articleRouter.route("/:slug/reaction")
    * @description - Route is use to get all article's reactions
    */
   .get(fetchAllArticleReactions);
+
 export { articleRouter };
