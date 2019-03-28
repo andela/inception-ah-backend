@@ -5,6 +5,7 @@ import { tagsSchema } from "./tag";
 export const articleSchema = Joi.object().keys({
   title: Joi.string()
     .min(10)
+    // .max(50)
     .trim()
     .required()
     .label("Title"),

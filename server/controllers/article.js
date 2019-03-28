@@ -12,7 +12,7 @@ import {
 import { pagination } from "@helpers/pagination";
 import { sendPublishedArticleNotification } from "./notification";
 
-const { Articles, Ratings, Users } = models;
+const { Articles, Ratings, Users, Categories } = models;
 
 /**
  * @description Create a new Article
@@ -22,15 +22,16 @@ const { Articles, Ratings, Users } = models;
  * @returns {object}  Response message object
  */
 export const createArticle = async (req, res) => {
-  const { title, content, description, categoryId, tags } = req.body;
+  const { title, content, description, /* categoryId, */ tags } = req.body;
+  const category = await Categories.create({ category: title });
   const { userId } = req.user;
   try {
     const newArticle = await Articles.create({
       title,
       authorId: userId,
-      categoryId,
+      categoryId: category.get("id"),
       content,
-      description
+      description: content.substring(0, 200)
     });
     await newArticle.saveTags(tags);
     return httpResponse(res, {
