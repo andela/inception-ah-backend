@@ -15,7 +15,8 @@ import {
   getAuthorsArticles,
   getArticlesByCategory,
   updateArticle,
-  deleteArticle
+  deleteArticle,
+  getDraftArticle
 } from "@controllers/article";
 
 import {
@@ -62,7 +63,13 @@ articleRouter.get("/articles", validatePaginationParameters, getAllArticles);
  * @description - Route to get an article by slug
  * @returns - It returns an object of the article
  */
-articleRouter.get("/articles/:slug", getArticleBySlug);
+articleRouter.get("/articles/:slug", (req, res, next) => {
+  if (req.params.slug !== "draft") {
+    getArticleBySlug(req, res, next);
+  } else {
+    next();
+  }
+});
 
 /**
  * @description - Route to update an article
@@ -119,4 +126,7 @@ articleRouter.get(
   findArticle,
   fetchAllArticleReactions
 );
+
+articleRouter.get("/articles/draft/", verifyToken, getDraftArticle);
+
 export { articleRouter };

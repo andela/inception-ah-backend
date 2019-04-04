@@ -38,7 +38,9 @@ app.get("/", (req, res, next) => {
 app.all("*", (req, res) => {
   return res.status(404).json({
     success: false,
-    message: "Not Found"
+    message: `requested path ${req.url} ${req.method}/${
+      req.query
+    }   does not exist`
   });
 });
 

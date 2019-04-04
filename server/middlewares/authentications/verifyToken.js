@@ -27,6 +27,7 @@ export const verifyToken = async (req, res, next) => {
     req.user = decodedToken;
     return next();
   } catch (error) {
+    error.message = "can not decode access token";
     return serverError(res, error);
   }
 };

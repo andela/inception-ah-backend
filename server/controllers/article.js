@@ -6,6 +6,7 @@ import { getBaseUrl } from "@helpers/users";
 import { httpResponse, serverError } from "@helpers/http";
 import { generateUniqueSlug, calculateReadTime } from "@helpers/articles";
 import { sendPublishedArticleNotification } from "./notification";
+import { findAuthorsArticle } from "@middlewares";
 
 const { Articles, Categories } = models;
 
@@ -14,30 +15,38 @@ const { Articles, Categories } = models;
  *
  * @param {object} req HTTP request object
  * @param {object} res HTTP response object
+ * @param {object} next express next function
  * @returns {object}  Response message object
+ *
  */
-export const createArticle = async (req, res) => {
-  const { title, content, description, imageURL } = req.body;
-  const { userId } = req.user;
-
+export const createArticle = async (req, res, next) => {
+  const { title, content, description, imageURL, slug } = req.body;
   const category = await Categories.create({ category: title });
-
-  try {
-    const newArticle = await Articles.create({
-      title,
-      authorId: userId,
-      categoryId: category.get("id"),
-      content,
-      description,
-      imageURL
-    });
-    return httpResponse(res, {
-      statusCode: 201,
-      message: "Article created successfully",
-      article: newArticle
-    });
-  } catch (error) {
-    return serverError(res, error);
+  req.body.categoryId = category.get("id");
+  const { userId } = req.user;
+  if (slug) {
+    req.params = { slug };
+    await findAuthorsArticle(req, res, next);
+    req.params = { slug };
+    await updateArticle(req, res, next);
+  } else {
+    try {
+      const newArticle = await Articles.create({
+        title,
+        authorId: userId,
+        categoryId: req.body.categoryId,
+        content,
+        description,
+        imageURL
+      });
+      return httpResponse(res, {
+        statusCode: 201,
+        message: "Article created successfully",
+        article: newArticle
+      });
+    } catch (error) {
+      return serverError(res, error);
+    }
   }
 };
 
@@ -225,11 +234,13 @@ export const getAuthorsArticles = async (req, res) => {
  */
 export const updateArticle = async (req, res) => {
   const article = req.article;
-  const slug = generateUniqueSlug(req.body.title);
+  req.body.categoryId = article.get("categoryId");
+  const slug = req.params.slug || generateUniqueSlug(req.body.title);
   const readTime = calculateReadTime(req.body.content);
   try {
+    req.body.slug = slug;
     const updatedArticle = await article.update(
-      { slug, readTime, ...req.body },
+      { readTime, ...req.body },
       { fields: ["slug", "readTime", ...Object.keys(req.body)] }
     );
     return httpResponse(res, {
@@ -261,5 +272,32 @@ export const deleteArticle = async (req, res) => {
     });
   } catch (error) {
     return serverError(res, error);
+  }
+};
+
+export const getDraftArticle = async (req, res) => {
+  try {
+    const { slug, user } = req;
+    console.log(slug, user);
+    const articleDetails = await Articles.findOne({
+      where: {
+        authorId: user.userId,
+        isPublished: null
+      }
+    });
+
+    if (!articleDetails) {
+      return httpResponse(res, {
+        statusCode: 404,
+        message: "No Article draft found"
+      });
+    }
+    return httpResponse(res, {
+      statusCode: 200,
+      message: "Draft found Found",
+      article: articleDetails
+    });
+  } catch (error) {
+    serverError(res, error);
   }
 };
