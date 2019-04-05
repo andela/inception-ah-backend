@@ -33,6 +33,7 @@ export const followOrUnfollowUser = async (req, res) => {
       return httpResponse(res, {
         statusCode: 201,
         success: true,
+        status: true,
         message: `You are now following ${author}`
       });
     }
@@ -42,6 +43,7 @@ export const followOrUnfollowUser = async (req, res) => {
     return httpResponse(res, {
       statusCode: 200,
       success: true,
+      status: false,
       message: `You are no longer following ${author}`
     });
   } catch (error) {
@@ -158,6 +160,35 @@ export const getFollower = async (req, res) => {
       success: true,
       message: "Follower retrieved",
       data: follower.rows
+    });
+  } catch (error) {
+    return serverError(res, error);
+  }
+};
+
+export const checkFollerStatus = async (req, res) => {
+  const { authorId } = req.params;
+  const { userId } = req.user;
+
+  try {
+    const followerStatus = await Followers.findOne({
+      where: {
+        authorId,
+        followerId: userId
+      }
+    });
+    if (!followerStatus) {
+      return httpResponse(res, {
+        success: true,
+        status: false,
+        message: "You are not following this author"
+      });
+    }
+
+    return httpResponse(res, {
+      success: true,
+      status: true,
+      message: "You are following this author"
     });
   } catch (error) {
     return serverError(res, error);

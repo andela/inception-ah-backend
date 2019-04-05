@@ -3,7 +3,8 @@ import {
   followOrUnfollowUser,
   getFollowedUsers,
   getFollowers,
-  getFollower
+  getFollower,
+  checkFollerStatus
 } from "@controllers/follow";
 import { verifyToken, findUserById } from "@middlewares";
 
@@ -33,5 +34,10 @@ followerRouter.get("/follow", verifyToken, getFollowedUsers);
 followerRouter.get("/follower", verifyToken, getFollowers);
 
 followerRouter.get("/follower/:id", verifyToken, getFollower);
+followerRouter.get(
+  "/follower/status/:authorId",
+  verifyToken,
+  checkFollerStatus
+);
 
 export { followerRouter };
